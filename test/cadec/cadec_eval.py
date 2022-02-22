@@ -5,9 +5,13 @@ import torch
 import numpy as np
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
+import sys
+sys.path.insert(1, "/home/tc24/BryanWork/CODER/pretrain")
+from model import UMLSPretrainedModel
+
 
 batch_size = 64
-device = "cuda:1"
+device = "cuda:0"
 
 
 def main():
@@ -21,24 +25,8 @@ def main():
         W = load_vectors_bin(filename)
     else:
         bert_like = True
-        try:
-            config = AutoConfig.from_pretrained(filename)
-            model = AutoModel.from_pretrained(
-                filename, config=config).to(device)
-        except BaseException:
-            model = torch.load(os.path.join(
-                filename, 'pytorch_model.bin')).to(device)
-
-        try:
-            model.output_hidden_states = False
-        except BaseException:
-            pass
-
-        try:
-            tokenizer = AutoTokenizer.from_pretrained(filename)
-        except BaseException:
-            tokenizer = AutoTokenizer.from_pretrained(
-                os.path.join(filename, "../"))
+        model = torch.load(filename).to(device)
+        tokenizer = model.tokenizer
 
     top_k = 3
     if bert_like:
@@ -66,9 +54,9 @@ def get_bert_embed(phrase_list, m, tok, normalize=True, summary_method="CLS"):
             input_gpu_0 = torch.LongTensor(input_ids[now_count:min(
                 now_count + batch_size, count)]).to(device)
             if summary_method == "CLS":
-                embed = m(input_gpu_0)[1]
+                embed = m.bert(input_gpu_0)[1]
             if summary_method == "MEAN":
-                embed = torch.mean(m(input_gpu_0)[0], dim=1)
+                embed = torch.mean(m.bert(input_gpu_0)[0], dim=1)
             if normalize:
                 embed_norm = torch.norm(
                     embed, p=2, dim=1, keepdim=True).clamp(min=1e-12)
