@@ -273,7 +273,7 @@ def main():
     )
     parser.add_argument("--warmup_steps", default=10000,
                         help="Linear warmup over warmup_steps or a float.")
-    parser.add_argument("--device", type=str, default='cuda:1', help="device")
+    parser.add_argument("--device", type=str, default='cuda:0', help="device")
     parser.add_argument("--seed", type=int, default=72,
                         help="random seed for initialization")
     parser.add_argument("--schedule", type=str, default="linear",
