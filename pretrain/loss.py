@@ -77,15 +77,13 @@ class MultiSimilarityLoss(nn.Module):
             if len(neg_pair_) >= 1:
                 pos_pair = pos_pair_[pos_pair_ - self.margin < max(neg_pair_)]
                 if len(pos_pair) >= 1:
-                    pos_loss = 1.0 / self.scale_pos * torch.log(
-                        1 + torch.sum(torch.exp(-self.scale_pos * (pos_pair - self.thresh))))
+                    pos_loss = torch.sum(torch.log(1 + torch.exp(-1*(pos_pair - self.thresh))))
                     loss.append(pos_loss)
 
             if len(pos_pair_) >= 1:
                 neg_pair = neg_pair_[neg_pair_ + self.margin > min(pos_pair_)]
                 if len(neg_pair) >= 1:
-                    neg_loss = 1.0 / self.scale_neg * torch.log(
-                        1 + torch.sum(torch.exp(self.scale_neg * (neg_pair - self.thresh))))
+                    neg_loss = torch.sum(torch.log(1 + torch.exp(neg_pair - self.thresh)))
                     loss.append(neg_loss)
 
         #print(labels, len(loss))
