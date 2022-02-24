@@ -25,8 +25,11 @@ def main():
         W = load_vectors_bin(filename)
     else:
         bert_like = True
+#        model = torch.load(filename).to(device)
+#        tokenizer = AutoTokenizer.from_pretrained("monologg/biobert_v1.1_pubmed")
         model = torch.load(filename).to(device)
         tokenizer = model.tokenizer
+        model = model.bert
 
     top_k = 3
     if bert_like:
@@ -54,9 +57,9 @@ def get_bert_embed(phrase_list, m, tok, normalize=True, summary_method="CLS"):
             input_gpu_0 = torch.LongTensor(input_ids[now_count:min(
                 now_count + batch_size, count)]).to(device)
             if summary_method == "CLS":
-                embed = m.bert(input_gpu_0)[1]
+                embed = m(input_gpu_0)[1]
             if summary_method == "MEAN":
-                embed = torch.mean(m.bert(input_gpu_0)[0], dim=1)
+                embed = torch.mean(m(input_gpu_0)[0], dim=1)
             if normalize:
                 embed_norm = torch.norm(
                     embed, p=2, dim=1, keepdim=True).clamp(min=1e-12)
