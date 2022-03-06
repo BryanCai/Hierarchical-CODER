@@ -14,11 +14,14 @@ def byLineReader(filename):
 
 
 class UMLS(object):
-    def __init__(self, umls_path, source_range=None, lang_range=['ENG'], only_load_dict=False):
+    def __init__(self, umls_path, cui2phecode_path=None, source_range=None, lang_range=['ENG'], only_load_dict=False):
+        # cui2phecode can be downloaded through https://cloud.tsinghua.edu.cn/f/098cf76bee4c4be58e33/?dl=1
         self.umls_path = umls_path
+        self.cui2phecode_path = cui2phecode_path
         self.source_range = source_range
         self.lang_range = lang_range
         self.detect_type()
+        self.cui2phecode = self._load_pickle(cui2phecode_path)
         self.load()
         if not only_load_dict:
             self.load_rel()
@@ -29,6 +32,18 @@ class UMLS(object):
             self.type = "RRF"
         else:
             self.type = "txt"
+
+    def _load_pickle(self, path):
+        if path == None:
+            return None
+        with open(path, 'rb') as f:
+            return pickle.load(f)
+
+    def transform(self, cui):
+        if cui in self.cui2phecode.keys():
+            return self.cui2phecode[cui]
+        else:
+            return None
 
     def load(self):
         reader = byLineReader(os.path.join(self.umls_path, "MRCONSO." + self.type))
@@ -53,6 +68,10 @@ class UMLS(object):
 
             if (self.source_range is None or source in self.source_range) and (self.lang_range is None or lang in self.lang_range):
                 if not lui in self.lui_set:
+                    if self.cui2phecode_path is not None:
+                        phecode = self.transform(cui)
+                        if phecode is None:
+                            continue
                     read_count += 1
                     self.str2cui[string] = cui
                     self.str2cui[string.lower()] = cui

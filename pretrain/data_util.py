@@ -82,7 +82,8 @@ class UMLSDataset(Dataset):
     # @profile
     def __getitem__(self, index):
         cui0, cui1, re, rel = self.umls.rel[index].split("\t")
-
+        phecode0 = self.umls.cui2phecode[cui0]
+        phecode1 = self.umls.cui2phecode[cui1]
         str0_list = list(self.umls.cui2str[cui0])
         str1_list = list(self.umls.cui2str[cui1])
         if len(str0_list) > self.max_lui_per_cui:
@@ -99,6 +100,7 @@ class UMLSDataset(Dataset):
         str2_list = []
         cui2_index_list = []
         sty2_index_list = []
+        cui2_phecode_list = []
 
         cui2 = my_sample(self.umls.cui, self.umls.cui_count,
                          index * self.max_lui_per_cui, use_len * 2)
@@ -113,6 +115,7 @@ class UMLSDataset(Dataset):
                 use_cui2 = cui2[sample_index]
             # if not "\t".join([cui0, use_cui2, re, rel]) in self.umls.rel: # TOO SLOW!
             if True:
+                cui2_phecode_list.append(self.umls.cui2phecode[use_cui2])
                 cui2_index_list.append(self.cui2id[use_cui2])
                 sty2_index_list.append(
                     self.sty2id[self.umls.cui2sty[use_cui2]])
@@ -139,7 +142,8 @@ class UMLSDataset(Dataset):
             [cui0_index] * use_len, [cui1_index] * use_len, cui2_index_list, \
             [sty0_index] * use_len, [sty1_index] * use_len, sty2_index_list, \
             [re_index] * use_len, \
-            [rel_index] * use_len
+            [rel_index] * use_len, \
+            [phecode0] * use_len, [phecode1] * use_len, cui2_phecode_list
 
     def __len__(self):
         return self.len
