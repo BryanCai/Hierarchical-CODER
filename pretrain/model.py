@@ -7,7 +7,7 @@ from transformers.modeling_utils import SequenceSummary
 from torch import nn
 import torch.nn.functional as F
 import torch
-from loss import AMSoftmax
+from loss import AMSoftmax, HierarchicalMultiSimilarityLoss
 from pytorch_metric_learning import losses, miners
 from trans import TransE
 
@@ -48,7 +48,7 @@ class UMLSPretrainedModel(nn.Module):
             self.cui_loss_fn = AMSoftmax(
                 self.feature_dim, self.cui_label_count)
         if self.cui_loss_type == "ms_loss":
-            self.cui_loss_fn = losses.MultiSimilarityLoss(alpha=2, beta=50)
+            self.cui_loss_fn = HierarchicalMultiSimilarityLoss(alpha=2, beta=50)
             self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
         self.trans_loss_type = trans_loss_type

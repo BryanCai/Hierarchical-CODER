@@ -2,6 +2,20 @@ import torch
 import torch.nn as nn
 
 
+def logsumexp(x, keep_mask=None, add_one=True, dim=1):
+    if keep_mask is not None:
+        x = x.masked_fill(~keep_mask, torch.finfo(x.dtype).min)
+    if add_one:
+        zeros = torch.zeros(x.size(dim - 1), dtype=x.dtype, device=x.device).unsqueeze(
+            dim
+        )
+        x = torch.cat([x, zeros], dim=dim)
+
+    output = torch.logsumexp(x, dim=dim, keepdim=True)
+    if keep_mask is not None:
+        output = output.masked_fill(~torch.any(keep_mask, dim=dim, keepdim=True), 0)
+    return output
+
 class AMSoftmax(nn.Module):
     def __init__(self,
                  in_feats,
@@ -41,57 +55,31 @@ class AMSoftmax(nn.Module):
         costh = torch.mm(x_norm, w_norm)
         return costh
 
-class MultiSimilarityLoss(nn.Module):
-    def __init__(self):
-        super(MultiSimilarityLoss, self).__init__()
-        self.thresh = 0.5
-        self.margin = 0.1
+class HierarchicalMultiSimilarityLoss(nn.Module):
+    def __init__(self, alpha=2, beta=50, base=0.5, **kwargs):
+        super(HierarchicalMultiSimilarityLoss, self).__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.base = base
 
-        self.scale_pos = 2.0
-        self.scale_neg = 50.0
+    def forward(self, embeddings, labels, indices_tuple):
+        emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+        mat = torch.matmul(emb_normalized, emb_normalized.t())
+        a1, p, a2, n = indices_tuple
+        pos_mask, neg_mask = torch.zeros_like(mat), torch.zeros_like(mat)
+        pos_mask[a1, p] = 1
+        neg_mask[a2, n] = 1
+        pos_exp = self.base - mat
+        neg_exp = mat - self.base
+        pos_loss = (1.0 / self.alpha) * logsumexp(
+            self.alpha * pos_exp, keep_mask=pos_mask.bool(), add_one=True
+        )
+        neg_loss = (1.0 / self.beta) * logsumexp(
+            self.beta * neg_exp, keep_mask=neg_mask.bool(), add_one=True
+        )
+        return torch.mean(pos_loss + neg_loss)
 
-    def forward(self, feats, labels):
-        #assert feats.size(0) == labels.size(0), \
-        #    f"feats.size(0): {feats.size(0)} is not equal to labels.size(0): {labels.size(0)}"
-        batch_size = feats.size(0)
 
-        # Feature normalize
-        x_norm = torch.norm(feats, p=2, dim=1, keepdim=True).clamp(min=1e-12)
-        x_norm = torch.div(feats, x_norm)
-
-        sim_mat = torch.matmul(x_norm, torch.t(x_norm))
-
-        epsilon = 1e-5
-        loss = []
-
-        #unique_label, inverse_indices = torch.unique_consecutive(labels, return_inverse=True)
-
-        for i in range(batch_size):
-            pos_pair_ = sim_mat[i][labels == labels[i]]
-            pos_pair_ = pos_pair_[pos_pair_ < 1 - epsilon]
-            neg_pair_ = sim_mat[i][labels != labels[i]]
-
-            #print(pos_pair_)
-            #print(neg_pair_)
-           
-            if len(neg_pair_) >= 1:
-                pos_pair = pos_pair_[pos_pair_ - self.margin < max(neg_pair_)]
-                if len(pos_pair) >= 1:
-                    pos_loss = torch.sum(torch.log(1 + torch.exp(-1*(pos_pair - self.thresh))))
-                    loss.append(pos_loss)
-
-            if len(pos_pair_) >= 1:
-                neg_pair = neg_pair_[neg_pair_ + self.margin > min(pos_pair_)]
-                if len(neg_pair) >= 1:
-                    neg_loss = torch.sum(torch.log(1 + torch.exp(neg_pair - self.thresh)))
-                    loss.append(neg_loss)
-
-        #print(labels, len(loss))
-        if len(loss) == 0:
-            return torch.zeros([], requires_grad=True).to(feats.device)
-
-        loss = sum(loss) / batch_size
-        return loss
 
 if __name__ == '__main__':
     criteria = AMSoftmax(20, 5)
