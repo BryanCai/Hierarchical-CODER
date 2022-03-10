@@ -2,6 +2,7 @@ import os
 from tqdm import tqdm
 import re
 from random import shuffle
+import pickle
 #import ipdb
 
 def byLineReader(filename):

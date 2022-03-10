@@ -167,7 +167,7 @@ def run(args):
         lang = None
         assert args.model_name_or_path.find("bio") == -1, "Should use multi-language model"
     umls_dataset = UMLSDataset(
-        umls_folder=args.umls_dir, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
+        umls_folder=args.umls_dir, cui2phecode_path=args.cui2phecode_path, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
     umls_dataloader = fixed_length_dataloader(
         umls_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
 
@@ -219,6 +219,12 @@ def main():
         default="../umls",
         type=str,
         help="UMLS dir",
+    )
+    parser.add_argument(
+        "--cui2phecode_path",
+        default=None,
+        type=str,
+        help="cui2phecode path",
     )
     parser.add_argument(
         "--model_name_or_path",

@@ -4,6 +4,7 @@ embeddings/
 models/
 normalization/
 umls/
+runs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
