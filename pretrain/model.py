@@ -7,7 +7,7 @@ from transformers.modeling_utils import SequenceSummary
 from torch import nn
 import torch.nn.functional as F
 import torch
-from loss import AMSoftmax, HierarchicalMultiSimilarityLoss
+from loss import AMSoftmax, HierarchicalMultiSimilarityLoss, HierarchicalLogLoss
 from pytorch_metric_learning import losses, miners
 from trans import TransE
 
@@ -50,6 +50,9 @@ class UMLSPretrainedModel(nn.Module):
         if self.cui_loss_type == "ms_loss":
             self.cui_loss_fn = HierarchicalMultiSimilarityLoss(alpha=2, beta=50)
             self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
+        if self.cui_loss_type == "log_loss":
+            self.cui_loss_fn = HierarchicalLogLoss()
+            self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
         self.trans_loss_type = trans_loss_type
         if self.trans_loss_type == "TransE":
@@ -74,6 +77,11 @@ class UMLSPretrainedModel(nn.Module):
         loss = self.cui_loss_fn(pooled_output, label, pairs)
         return loss
 
+    def log_loss(self, pooled_output, label):
+        pairs = self.miner(pooled_output, label)
+        loss = self.cui_loss_fn(pooled_output, label, pairs)
+        return loss
+
     def calculate_loss(self, pooled_output=None, logits=None, label=None):
         if self.cui_loss_type == "softmax":
             return self.softmax(logits, label)
@@ -81,6 +89,8 @@ class UMLSPretrainedModel(nn.Module):
             return self.am_softmax(pooled_output, label)
         if self.cui_loss_type == "ms_loss":
             return self.ms_loss(pooled_output, label)
+        if self.cui_loss_type == "log_loss":
+            return self.log_loss(pooled_output, label)
 
     def get_sentence_feature(self, input_ids):
         # bert, albert, roberta

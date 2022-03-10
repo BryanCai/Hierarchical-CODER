@@ -16,6 +16,15 @@ def logsumexp(x, keep_mask=None, add_one=True, dim=1):
         output = output.masked_fill(~torch.any(keep_mask, dim=dim, keepdim=True), 0)
     return output
 
+def sumlogexp(x, keep_mask=None, dim=1):
+    if keep_mask is not None:
+        x = x.masked_fill(~keep_mask, torch.finfo(x.dtype).min)
+
+    output = torch.sum(torch.log(torch.add(torch.exp(x), 1)), dim=dim, keepdim=True)
+    if keep_mask is not None:
+        output = output.masked_fill(~torch.any(keep_mask, dim=dim, keepdim=True), 0)
+    return output
+
 class AMSoftmax(nn.Module):
     def __init__(self,
                  in_feats,
@@ -77,9 +86,26 @@ class HierarchicalMultiSimilarityLoss(nn.Module):
         neg_loss = (1.0 / self.beta) * logsumexp(
             self.beta * neg_exp, keep_mask=neg_mask.bool(), add_one=True
         )
+
         return torch.mean(pos_loss + neg_loss)
 
+class HierarchicalLogLoss(nn.Module):
+    def __init__(self, base=0.5, **kwargs):
+        super(HierarchicalLogLoss, self).__init__()
+        self.base = base
 
+    def forward(self, embeddings, labels, indices_tuple):
+        emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+        mat = torch.matmul(emb_normalized, emb_normalized.t())
+        a1, p, a2, n = indices_tuple
+        pos_mask, neg_mask = torch.zeros_like(mat), torch.zeros_like(mat)
+        pos_mask[a1, p] = 1
+        neg_mask[a2, n] = 1
+        pos_exp = self.base - mat
+        neg_exp = mat - self.base
+        pos_loss = sumlogexp(pos_exp, keep_mask=pos_mask.bool())
+        neg_loss = sumlogexp(neg_exp, keep_mask=neg_mask.bool())
+        return torch.mean(pos_loss + neg_loss)
 
 if __name__ == '__main__':
     criteria = AMSoftmax(20, 5)
