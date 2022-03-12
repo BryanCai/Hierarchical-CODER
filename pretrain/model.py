@@ -75,10 +75,16 @@ class UMLSPretrainedModel(nn.Module):
         loss, _ = self.cui_loss_fn(pooled_output, label)
         return loss
 
+    def old_ms_loss(self, pooled_output, label):
+        pairs = self.miner(pooled_output, label)
+        loss = self.cui_loss_fn(pooled_output, label, pairs)
+        return loss
+
     def ms_loss(self, pooled_output, label):
         pairs = self.miner(pooled_output, label)
         loss = self.cui_loss_fn(pooled_output, label, pairs)
         return loss
+
 
     def log_loss(self, pooled_output, label):
         pairs = self.miner(pooled_output, label)
@@ -90,6 +96,8 @@ class UMLSPretrainedModel(nn.Module):
             return self.softmax(logits, label)
         if self.cui_loss_type == "am_softmax":
             return self.am_softmax(pooled_output, label)
+        if self.cui_loss_type == "old_ms_loss":
+            return self.old_ms_loss(pooled_output, label)
         if self.cui_loss_type == "ms_loss":
             return self.ms_loss(pooled_output, label)
         if self.cui_loss_type == "log_loss":
