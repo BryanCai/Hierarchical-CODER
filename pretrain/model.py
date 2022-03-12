@@ -47,6 +47,9 @@ class UMLSPretrainedModel(nn.Module):
         if self.cui_loss_type == "am_softmax":
             self.cui_loss_fn = AMSoftmax(
                 self.feature_dim, self.cui_label_count)
+        if self.cui_loss_type == "old_ms_loss":
+            self.cui_loss_fn = losses.MultiSimilarityLoss(alpha=2, beta=50)
+            self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
         if self.cui_loss_type == "ms_loss":
             self.cui_loss_fn = HierarchicalMultiSimilarityLoss(alpha=2, beta=50)
             self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
