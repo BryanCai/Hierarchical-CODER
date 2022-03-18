@@ -167,7 +167,7 @@ def run(args):
         lang = None
         assert args.model_name_or_path.find("bio") == -1, "Should use multi-language model"
     umls_dataset = UMLSDataset(
-        umls_folder=args.umls_dir, cui2phecode_path=args.cui2phecode_path, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
+        umls_folder=args.umls_dir, cuitree_path=args.cuitree_path, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
     umls_dataloader = fixed_length_dataloader(
         umls_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
 
@@ -175,6 +175,7 @@ def run(args):
         rel_label_count = len(umls_dataset.re2id)
     else:
         rel_label_count = len(umls_dataset.rel2id)
+
 
     model_load = False
     if os.path.exists(args.output_dir):
@@ -201,7 +202,9 @@ def run(args):
                                     sty_label_count=len(umls_dataset.sty2id),
                                     re_weight=args.re_weight,
                                     sty_weight=args.sty_weight,
-                                    cui_loss_type=args.cui_loss_type).to(args.device)
+                                    cui_loss_type=args.cui_loss_type,
+                                    id2cui=umls_dataset.id2cui,
+                                    cuitree=umls_dataset.umls.cuitree).to(args.device)
         args.shift = 0
         model_load = True
 
@@ -222,10 +225,10 @@ def main():
         help="UMLS dir",
     )
     parser.add_argument(
-        "--cui2phecode_path",
+        "--cuitree_path",
         default=None,
         type=str,
-        help="cui2phecode path",
+        help="cuitree path",
     )
     parser.add_argument(
         "--model_name_or_path",

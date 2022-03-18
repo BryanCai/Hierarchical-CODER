@@ -30,8 +30,8 @@ def my_sample(lst, lst_length, start, length):
 
 
 class UMLSDataset(Dataset):
-    def __init__(self, umls_folder, model_name_or_path, lang, cui2phecode_path=None, json_save_path=None, max_lui_per_cui=8, max_length=32):
-        self.umls = UMLS(umls_folder, cui2phecode_path=cui2phecode_path, lang_range=lang)
+    def __init__(self, umls_folder, model_name_or_path, lang, cuitree_path=None, json_save_path=None, max_lui_per_cui=8, max_length=32):
+        self.umls = UMLS(umls_folder, cuitree_path, lang_range=lang)
         self.len = len(self.umls.rel)
         self.max_lui_per_cui = max_lui_per_cui
         self.max_length = max_length
@@ -44,6 +44,7 @@ class UMLSDataset(Dataset):
 
         self.cui2id = {cui: index for index,
                        cui in enumerate(self.umls.cui2str.keys())}
+        self.id2cui = {v: k for k, v in self.cui2id.items()}
 
         self.re_set = set()
         self.rel_set = set()
@@ -82,9 +83,7 @@ class UMLSDataset(Dataset):
     # @profile
     def __getitem__(self, index):
         cui0, cui1, re, rel = self.umls.rel[index].split("\t")
-        if self.umls.cui2phecode is not None:
-            phecode0 = self.umls.cui2phecode[cui0]
-            phecode1 = self.umls.cui2phecode[cui1]
+
         str0_list = list(self.umls.cui2str[cui0])
         str1_list = list(self.umls.cui2str[cui1])
         if len(str0_list) > self.max_lui_per_cui:
@@ -101,7 +100,6 @@ class UMLSDataset(Dataset):
         str2_list = []
         cui2_index_list = []
         sty2_index_list = []
-        cui2_phecode_list = []
 
         cui2 = my_sample(self.umls.cui, self.umls.cui_count,
                          index * self.max_lui_per_cui, use_len * 2)
@@ -116,8 +114,6 @@ class UMLSDataset(Dataset):
                 use_cui2 = cui2[sample_index]
             # if not "\t".join([cui0, use_cui2, re, rel]) in self.umls.rel: # TOO SLOW!
             if True:
-                if self.umls.cui2phecode is not None:
-                    cui2_phecode_list.append(self.umls.cui2phecode[use_cui2])
                 cui2_index_list.append(self.cui2id[use_cui2])
                 sty2_index_list.append(
                     self.sty2id[self.umls.cui2sty[use_cui2]])
@@ -140,19 +136,11 @@ class UMLSDataset(Dataset):
 
         re_index = self.re2id[re]
         rel_index = self.rel2id[rel]
-        if self.umls.cui2phecode is not None:
-            return input_ids_0, input_ids_1, input_ids_2, \
-                [cui0_index] * use_len, [cui1_index] * use_len, cui2_index_list, \
-                [sty0_index] * use_len, [sty1_index] * use_len, sty2_index_list, \
-                [re_index] * use_len, \
-                [rel_index] * use_len, \
-                [phecode0] * use_len, [phecode1] * use_len, cui2_phecode_list
-        else:
-            return input_ids_0, input_ids_1, input_ids_2, \
-                [cui0_index] * use_len, [cui1_index] * use_len, cui2_index_list, \
-                [sty0_index] * use_len, [sty1_index] * use_len, sty2_index_list, \
-                [re_index] * use_len, \
-                [rel_index] * use_len
+        return input_ids_0, input_ids_1, input_ids_2, \
+            [cui0_index] * use_len, [cui1_index] * use_len, cui2_index_list, \
+            [sty0_index] * use_len, [sty1_index] * use_len, sty2_index_list, \
+            [re_index] * use_len, \
+            [rel_index] * use_len
 
     def __len__(self):
         return self.len

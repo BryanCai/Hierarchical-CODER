@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import networkx as nx
 
 
 def logsumexp(x, keep_mask=None, add_one=True, dim=1):
@@ -24,6 +25,16 @@ def sumlogexp(x, keep_mask=None, dim=1):
     if keep_mask is not None:
         output = output.masked_fill(~torch.any(keep_mask, dim=dim, keepdim=True), 0)
     return output
+
+def masked_mse(dist_mat, tree_embeds, keep_mask=None, dim=1):
+    if keep_mask is not None:
+        dist_mat = dist_mat.masked_fill(~keep_mask, 0)
+
+    output = torch.sum(torch.square(dist_mat - tree_embeds), dim=dim, keepdim=True)
+    if keep_mask is not None:
+        output = output.masked_fill(~torch.any(keep_mask, dim=dim, keepdim=True), 0)
+    return output
+
 
 class AMSoftmax(nn.Module):
     def __init__(self,
@@ -94,18 +105,19 @@ class HierarchicalLogLoss(nn.Module):
         super(HierarchicalLogLoss, self).__init__()
         self.base = base
 
-    def forward(self, embeddings, labels, indices_tuple):
-        emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
-        mat = torch.matmul(emb_normalized, emb_normalized.t())
+    def forward(self, dist_mat, tree_embeds, tree_mask, indices_tuple):
         a1, p, a2, n = indices_tuple
-        pos_mask, neg_mask = torch.zeros_like(mat), torch.zeros_like(mat)
+        pos_mask, neg_mask = torch.zeros_like(dist_mat), torch.zeros_like(dist_mat)
         pos_mask[a1, p] = 1
         neg_mask[a2, n] = 1
-        pos_exp = self.base - mat
-        neg_exp = mat - self.base
+        pos_exp = self.base - dist_mat
+        neg_exp = dist_mat - self.base
         pos_loss = sumlogexp(pos_exp, keep_mask=pos_mask.bool())
         neg_loss = sumlogexp(neg_exp, keep_mask=neg_mask.bool())
-        return torch.mean(pos_loss + neg_loss)
+
+        tree_loss = masked_mse(dist_mat, tree_embeds, keep_mask=tree_mask)
+
+        return torch.mean(pos_loss + neg_loss + tree_loss)
 
 if __name__ == '__main__':
     criteria = AMSoftmax(20, 5)

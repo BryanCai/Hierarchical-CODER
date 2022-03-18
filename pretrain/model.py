@@ -10,6 +10,7 @@ import torch
 from loss import AMSoftmax, HierarchicalMultiSimilarityLoss, HierarchicalLogLoss
 from pytorch_metric_learning import losses, miners
 from trans import TransE
+import networkx as nx
 
 
 class UMLSPretrainedModel(nn.Module):
@@ -17,7 +18,8 @@ class UMLSPretrainedModel(nn.Module):
                  cui_label_count, rel_label_count, sty_label_count,
                  re_weight=1.0, sty_weight=0.1,
                  cui_loss_type="ms_loss",
-                 trans_loss_type="TransE", trans_margin=1.0):
+                 trans_loss_type="TransE", trans_margin=1.0,
+                 id2cui=None, cuitree=None, max_cui_dist=3):
         super(UMLSPretrainedModel, self).__init__()
 
         self.device = device
@@ -40,6 +42,14 @@ class UMLSPretrainedModel(nn.Module):
 
         self.cui_loss_type = cui_loss_type
         self.cui_label_count = cui_label_count
+
+        self.id2cui = id2cui
+        self.cuitree = cuitree
+        self.max_cui_dist = max_cui_dist
+        self.tree_embedding = nn.Sequential(
+            nn.Embedding(self.max_cui_dist + 1, 1, padding_idx=self.max_cui_dist),
+            nn.Tanh()
+            )
 
         if self.cui_loss_type == "softmax":
             self.cui_loss_fn = nn.CrossEntropyLoss()
@@ -85,11 +95,30 @@ class UMLSPretrainedModel(nn.Module):
         loss = self.cui_loss_fn(pooled_output, label, pairs)
         return loss
 
+    def log_loss(self, embeddings, labels):
+        pairs = self.miner(embeddings, labels)        
+        emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+        dist_mat = torch.matmul(emb_normalized, emb_normalized.t())
+        cui_dists = torch.zeros_like(dist_mat, dtype=torch.int)
+        l = labels.cpu().numpy()
+        for i in range(embeddings.size()[0]):
+            for j in range(embeddings.size()[0]):
+                cui_dists[i][j] = self.get_tree_distance(l[i], l[j])
 
-    def log_loss(self, pooled_output, label):
-        pairs = self.miner(pooled_output, label)
-        loss = self.cui_loss_fn(pooled_output, label, pairs)
+        tree_mask = cui_dists < self.max_cui_dist
+        tree_embeds = self.tree_embedding(cui_dists).squeeze(2)
+
+        loss = self.cui_loss_fn(dist_mat, tree_embeds, tree_mask, pairs)
         return loss
+
+    def get_tree_distance(self, id1, id2):
+        cui1 = self.id2cui[id1]
+        cui2 = self.id2cui[id2]
+        try:
+            x = nx.shortest_path_length(self.cuitree, cui1, cui2)
+        except (nx.exception.NetworkXNoPath, nx.exception.NodeNotFound) as e:
+            x = self.max_cui_dist
+        return min(x, self.max_cui_dist)
 
     def calculate_loss(self, pooled_output=None, logits=None, label=None):
         if self.cui_loss_type == "softmax":
