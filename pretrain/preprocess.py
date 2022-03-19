@@ -31,7 +31,7 @@ def main():
     parser.add_argument(
         "--cutoff",
         default=3,
-        type=str,
+        type=int,
     )
     args = parser.parse_args()
     run(args)
