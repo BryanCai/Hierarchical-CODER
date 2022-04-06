@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer
 from load_umls import UMLS
+from load_trees import LOINC, PHECODE
 from torch.utils.data import Dataset, DataLoader
 from random import sample
 from sampler_util import FixedLengthBatchSampler, my_collate_fn
@@ -30,8 +31,8 @@ def my_sample(lst, lst_length, start, length):
 
 
 class UMLSDataset(Dataset):
-    def __init__(self, umls_folder, model_name_or_path, lang, cuitree_path=None, json_save_path=None, max_lui_per_cui=8, max_length=32):
-        self.umls = UMLS(umls_folder, cuitree_path, lang_range=lang)
+    def __init__(self, umls_folder, model_name_or_path, lang, json_save_path=None, max_lui_per_cui=8, max_length=32):
+        self.umls = UMLS(umls_folder, lang_range=lang)
         self.len = len(self.umls.rel)
         self.max_lui_per_cui = max_lui_per_cui
         self.max_length = max_length
@@ -146,23 +147,98 @@ class UMLSDataset(Dataset):
         return self.len
 
 
-def fixed_length_dataloader(umls_dataset, fixed_length=96, num_workers=0):
-    base_sampler = RandomSampler(umls_dataset)
+def fixed_length_dataloader(dataset, fixed_length=96, num_workers=0):
+    base_sampler = RandomSampler(dataset)
     batch_sampler = FixedLengthBatchSampler(
         sampler=base_sampler, fixed_length=fixed_length, drop_last=True)
-    dataloader = DataLoader(umls_dataset, batch_sampler=batch_sampler,
+    dataloader = DataLoader(dataset, batch_sampler=batch_sampler,
                             collate_fn=my_collate_fn, num_workers=num_workers, pin_memory=True)
     return dataloader
 
 
+class TreeDataset(Dataset):
+    def __init__(self, loinc_tree_path, loinc_map_path, phecode_path, model_name_or_path, max_neg_samples=8, max_length=32):
+        self.trees = {}
+        self.trees['loinc'] = LOINC(loinc_tree_path, loinc_map_path)
+        self.trees['phecode'] = PHECODE(phecode_path)
+        self.obj_list = []
+        self.len = 0
+        for tree in self.trees:
+            self.obj_list += [(i, tree) for i in self.trees[tree].text.keys()]
+            self.len += len(self.trees[tree])
+        self.max_neg_samples = max_neg_samples
+        self.max_length = max_length
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+
+    def __getitem__(self, index):
+        anchor_id, tree = self.obj_list[index]
+        if anchor_id not in self.trees[tree].text:
+            return [], [], []
+        neg_samples_close = []
+        neg_samples_far = []
+
+        neg_samples_close += [(i, 1) for i in self.trees[tree].children[anchor_id]]
+        neg_samples_far += [(i, 2) for i in self.trees[tree].grandchildren[anchor_id]]
+        if anchor_id in self.trees[tree].parent:
+            parent = self.trees[tree].parent[anchor_id]
+            neg_samples_close += [(parent, 1)]
+            neg_samples_far += [(i, 2) for i in self.trees[tree].children[parent] if i != anchor_id]
+            if parent in self.trees[tree].parent:
+                grandparent = self.trees[tree].parent[parent]
+                neg_samples_far += [(grandparent, 2)]
+
+        neg_samples_close = [i for i in neg_samples_close if i[0] in self.trees[tree].text]
+        neg_samples_far = [i for i in neg_samples_far if i[0] in self.trees[tree].text]
+
+        if len(neg_samples_close) > self.max_neg_samples:
+            neg_samples = sample(neg_samples_close, self.max_neg_samples)
+        else:
+            neg_samples = neg_samples_close
+
+        neg_samples += sample(neg_samples_far, min(len(neg_samples_far), self.max_neg_samples - len(neg_samples)))
+
+        if len(neg_samples) == 0:
+            return [], [], []
+
+        neg_samples_id, neg_samples_dist = list(zip(*neg_samples))
+
+        anchor_string = self.trees[tree].text[anchor_id]
+        neg_samples_string = [self.trees[tree].text[i] for i in neg_samples_id]
+
+
+        anchor_input_id = self.tokenize_one(anchor_string)
+        neg_samples_input_id = [self.tokenize_one(s) for s in neg_samples_string]
+
+        return [anchor_input_id]*len(neg_samples_input_id), neg_samples_input_id, neg_samples_dist
+
+    def __len__(self):
+        return self.len
+
+
+    def tokenize_one(self, string):
+        return self.tokenizer.encode_plus(string, max_length=self.max_length, truncation=True, padding='max_length')['input_ids']
+
+
 if __name__ == "__main__":
-    umls_dataset = UMLSDataset(umls_folder="../umls",
-                               model_name_or_path="../biobert_v1.1",
-                               lang=None)
-    ipdb.set_trace()
-    umls_dataloader = fixed_length_dataloader(umls_dataset, num_workers=4)
+    loinc_tree_path = "D:/Projects/CODER/deps/codes/loinc/AccessoryFiles/MultiAxialHierarchy/MultiAxialHierarchy.csv"
+    loinc_map_path = "D:/Projects/CODER/deps/codes/loinc/LoincTableCore/LoincTableCore.csv"
+    phecode_path = "D:/Projects/CODER/deps/codes/icd_phecode/phecode_icd9_rolled.csv"
+
+    tree_dataset = TreeDataset(loinc_tree_path=loinc_tree_path, 
+        loinc_map_path=loinc_map_path, 
+        phecode_path=phecode_path,
+        model_name_or_path="monologg/biobert_v1.1_pubmed")
+
+    # umls_dataset = UMLSDataset(umls_folder="../umls",
+    #                            model_name_or_path="../biobert_v1.1",
+    #                            lang=None)
+    # ipdb.set_trace()
+    tree_dataloader = fixed_length_dataloader(tree_dataset, num_workers=4)
     now_time = time()
-    for index, batch in enumerate(umls_dataloader):
+    index = 0
+    for batch in tree_dataloader:
+        print(index)
+        index += 1
         print(time() - now_time)
         now_time = time()
         if index < 10:
