@@ -1,4 +1,4 @@
-from data_util import UMLSDataset, fixed_length_dataloader
+from data_util import UMLSDataset, TreeDataset, fixed_length_dataloader
 from model import UMLSPretrainedModel
 from transformers import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup, get_constant_schedule_with_warmup
 from tqdm import tqdm, trange
@@ -17,7 +17,7 @@ import pathlib
 from tensorboardX import SummaryWriter
 
 
-def train(args, model, train_dataloader, umls_dataset):
+def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
     writer = SummaryWriter(comment='umls')
 
     t_total = args.max_steps
@@ -67,12 +67,25 @@ def train(args, model, train_dataloader, umls_dataset):
 
     while True:
         model.train()
-        epoch_iterator = tqdm(train_dataloader, desc="Iteration", ascii=True)
+
+        tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
+        for _, batch in enumerate(tree_iterator):
+            anchor_ids        = batch[0].to(args.device)
+            neg_samples_ids   = batch[1].to(args.device)
+            neg_samples_dists = batch[2].to(args.device)
+            loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+
+            if args.gradient_accumulation_steps > 1:
+                loss = loss / args.gradient_accumulation_steps
+            loss.backward()
+
+
+        umls_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
         batch_loss = 0.
         batch_sty_loss = 0.
         batch_cui_loss = 0.
         batch_re_loss = 0.
-        for _, batch in enumerate(epoch_iterator):
+        for _, batch in enumerate(umls_iterator):
             input_ids_0 = batch[0].to(args.device)
             input_ids_1 = batch[1].to(args.device)
             input_ids_2 = batch[2].to(args.device)
@@ -90,24 +103,21 @@ def train(args, model, train_dataloader, umls_dataset):
             # for item in batch:
             #     print(item.shape)
 
-            loss, (sty_loss, cui_loss, re_loss) = \
-                model(input_ids_0, input_ids_1, input_ids_2,
-                      cui_label_0, cui_label_1, cui_label_2,
-                      sty_label_0, sty_label_1, sty_label_2,
-                      re_label)
+            loss, (sty_loss, re_loss) = \
+                model.get_rel_loss(input_ids_0, input_ids_1, input_ids_2,
+                                   cui_label_0, cui_label_1, cui_label_2,
+                                   sty_label_0, sty_label_1, sty_label_2,
+                                   re_label)
             batch_loss = float(loss.item())
             batch_sty_loss = float(sty_loss.item())
-            batch_cui_loss = float(cui_loss.item())
             batch_re_loss = float(re_loss.item())
 
             # tensorboardX
             writer.add_scalar(
-                'rel_count', train_dataloader.batch_sampler.rel_sampler_count, global_step=global_step)
+                'rel_count', umls_dataloader.batch_sampler.rel_sampler_count, global_step=global_step)
             writer.add_scalar('batch_loss', batch_loss,
                               global_step=global_step)
             writer.add_scalar('batch_sty_loss', batch_sty_loss,
-                              global_step=global_step)
-            writer.add_scalar('batch_cui_loss', batch_cui_loss,
                               global_step=global_step)
             writer.add_scalar('batch_re_loss', batch_re_loss,
                               global_step=global_step)
@@ -116,8 +126,8 @@ def train(args, model, train_dataloader, umls_dataset):
                 loss = loss / args.gradient_accumulation_steps
             loss.backward()
 
-            epoch_iterator.set_description("Rel_count: %s, Loss: %0.4f, Sty: %0.4f, Cui: %0.4f, Re: %0.4f" %
-                                           (train_dataloader.batch_sampler.rel_sampler_count, batch_loss, batch_sty_loss, batch_cui_loss, batch_re_loss))
+            umls_iterator.set_description("Rel_count: %s, Loss: %0.4f, Sty: %0.4f, Re: %0.4f" %
+                                           (umls_dataloader.batch_sampler.rel_sampler_count, batch_loss, batch_sty_loss, batch_re_loss))
 
             if (global_step + 1) % args.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(
@@ -149,6 +159,7 @@ def train(args, model, train_dataloader, umls_dataset):
             if args.max_steps > 0 and global_step > args.max_steps:
                 return None
 
+
     return None
 
 
@@ -167,9 +178,17 @@ def run(args):
         lang = None
         assert args.model_name_or_path.find("bio") == -1, "Should use multi-language model"
     umls_dataset = UMLSDataset(
-        umls_folder=args.umls_dir, cuitree_path=args.cuitree_path, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
+        umls_folder=args.umls_dir, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
     umls_dataloader = fixed_length_dataloader(
         umls_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
+
+    tree_dataset = TreeDataset(loinc_tree_path=args.loinc_tree_path, 
+        loinc_map_path=args.loinc_map_path, 
+        phecode_path=args.phecode_path,
+        model_name_or_path=args.model_name_or_path)
+
+    tree_dataloader = fixed_length_dataloader(
+        tree_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
 
     if args.use_re:
         rel_label_count = len(umls_dataset.re2id)
@@ -197,20 +216,16 @@ def run(args):
         if not os.path.exists(args.output_dir):
             os.makedirs(args.output_dir)
         model = UMLSPretrainedModel(device=args.device, model_name_or_path=args.model_name_or_path,
-                                    cui_label_count=len(umls_dataset.cui2id),
                                     rel_label_count=rel_label_count,
                                     sty_label_count=len(umls_dataset.sty2id),
                                     re_weight=args.re_weight,
-                                    sty_weight=args.sty_weight,
-                                    cui_loss_type=args.cui_loss_type,
-                                    id2cui=umls_dataset.id2cui,
-                                    cuitree=umls_dataset.umls.cuitree).to(args.device)
+                                    sty_weight=args.sty_weight).to(args.device)
         args.shift = 0
         model_load = True
 
     if args.do_train:
         torch.save(args, os.path.join(args.output_dir, 'training_args.bin'))
-        train(args, model, umls_dataloader, umls_dataset)
+        train(args, model, umls_dataloader, tree_dataloader, umls_dataset)
         torch.save(model, os.path.join(args.output_dir, 'last_model.pth'))
 
     return None
@@ -225,16 +240,25 @@ def main():
         help="UMLS dir",
     )
     parser.add_argument(
-        "--cuitree_path",
-        default=None,
-        type=str,
-        help="cuitree path",
-    )
-    parser.add_argument(
         "--model_name_or_path",
         default="../biobert_v1.1",
         type=str,
         help="Path to pre-trained model or shortcut name selected in the list: ",
+    )
+    parser.add_argument(
+        "--loinc_tree_path",
+        type=str,
+        help="Path to loinc tree",
+    )
+    parser.add_argument(
+        "--loinc_map_path",
+        type=str,
+        help="Path to loinc map",
+    )
+    parser.add_argument(
+        "--phecode_path",
+        type=str,
+        help="Path to phecode tree",
     )
     parser.add_argument(
         "--output_dir",
@@ -300,8 +324,7 @@ def main():
                         help="Weight of sty.")
     parser.add_argument("--re_weight", type=float, default=1.0,
                         help="Weight of re.")
-    parser.add_argument("--cui_loss_type", type=str, default="ms_loss",
-                        help="cui loss type.")
+
     args = parser.parse_args()
 
     run(args)

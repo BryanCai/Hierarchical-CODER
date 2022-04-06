@@ -16,14 +16,11 @@ def byLineReader(filename):
 
 
 class UMLS(object):
-    def __init__(self, umls_path, cuitree_path=None, source_range=None, lang_range=['ENG'], only_load_dict=False):
+    def __init__(self, umls_path, source_range=None, lang_range=['ENG'], only_load_dict=False):
         self.umls_path = umls_path
         self.source_range = source_range
         self.lang_range = lang_range
         self.detect_type()
-        self.cuitree = self._load_pickle(cuitree_path)
-        if self.cuitree is not None:
-            self.cuitree = self.cuitree.to_undirected()
         self.load()
         if not only_load_dict:
             self.load_rel()
