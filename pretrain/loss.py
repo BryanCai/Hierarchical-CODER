@@ -127,8 +127,9 @@ class HierarchicalTreeLoss(nn.Module):
 
     def forward(self, anchor_embed, neg_samples_embed, neg_dists_embed):
         cdist = self.cos(anchor_embed, neg_samples_embed)
-        loss = torch.sum(torch.square(cdist - neg_dists_embed))
-        return loss
+        neg_loss = torch.sum(torch.log(torch.add(torch.exp(cdist - self.base), 1)))
+        tree_loss = torch.sum(torch.square(cdist - neg_dists_embed))
+        return neg_loss + tree_loss
 
 if __name__ == '__main__':
     criteria = AMSoftmax(20, 5)
