@@ -1,12 +1,14 @@
 import pandas as pd
 
 class HierarchicalData():
-    def __init__(self, icd9_phecode_path, icd10_phecode_path, loinc_path, rxnorm_path, cpt_ccs_path):
+    def __init__(self, icd9_phecode_path, icd10_phecode_path, loinc_path, rxnorm_path, cpt_ccs_path, cpt_path):
         self.icd9_phecode = pd.read_csv(icd9_phecode_path)
         self.icd10_phecode = pd.read_csv(icd10_phecode_path)
         self.loinc = pd.read_csv(loinc_path)
         self.rxnorm = pd.read_csv(rxnorm_path)
         self.cpt_ccs = pd.read_csv(cpt_ccs_path)
+        self.cpt = pd.read_csv(cpt_path, sep='\t')
+        self.cpt2string = {str(key): value for key, value in zip(self.cpt['CODE'], self.cpt['STR'])}
         self.load_icd_phecode()
         self.load_loinc()
         self.load_rxnorm()
@@ -85,19 +87,23 @@ class HierarchicalData():
         print('number of rxnorm parents:', len(self.rxnorm_parents))
 
     def load_cpt_ccs(self):
-        self.ccs2cpt_code = dict()
+        self.ccs2cpt_string = dict()
         for idx in range(len(self.cpt_ccs)):
             cpt_range = self.cpt_ccs['Code Range'][idx][1:-1].split('-')
             ccs = self.cpt_ccs['CCS'][idx]
-            if ccs not in self.ccs2cpt_code:
-                self.ccs2cpt_code[ccs] = set()
+            if ccs not in self.ccs2cpt_string:
+                self.ccs2cpt_string[ccs] = set()
             if cpt_range[0] == cpt_range[1]:
-                self.ccs2cpt_code[ccs].update([cpt_range[0]])
+                if cpt_range[0] in self.cpt2string:
+                    self.ccs2cpt_string[ccs].update([self.cpt2string[cpt_range[0]]])
             else:
                 cpt_range = list(range(int(cpt_range[0]), int(cpt_range[1])+1))
-                self.ccs2cpt_code[ccs].update([str(cpt) for cpt in cpt_range])
+                for cpt in cpt_range:
+                    if str(cpt) in self.cpt2string:
+                        self.ccs2cpt_string[ccs].update([self.cpt2string[str(cpt)]])
         
-        print('ccs number:', len(self.ccs2cpt_code))
+        print('ccs number:', len(self.ccs2cpt_string))
+        # print(self.ccs2cpt_string)
 
             
 
@@ -107,5 +113,6 @@ if __name__ == '__main__':
         icd10_phecode_path='icd_phecode/phecode_icd10.csv',
         loinc_path='loinc/AccessoryFiles/MultiAxialHierarchy/MultiAxialHierarchy.csv',
         rxnorm_path='rxnorm/rxnorm_hierarchy_w_cuis_2019umls.csv',
-        cpt_ccs_path='cpt_ccs/CCS_services_procedures_v2021-1.csv'
+        cpt_ccs_path='cpt_ccs/CCS_services_procedures_v2021-1.csv',
+        cpt_path='cpt_ccs/CUI_CPT.tsv'
     )
