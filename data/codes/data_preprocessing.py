@@ -2,8 +2,8 @@ import pandas as pd
 
 class HierarchicalData():
     def __init__(self, icd9_phecode_path, icd10_phecode_path, loinc_path, rxnorm_path, cpt_ccs_path, cpt_path):
-        self.icd9_phecode = pd.read_csv(icd9_phecode_path, dtype='str')
-        self.icd10_phecode = pd.read_csv(icd10_phecode_path, dtype='str')
+        self.icd9_phecode = pd.read_csv(icd9_phecode_path, dtype='str').dropna().reset_index(drop=True)
+        self.icd10_phecode = pd.read_csv(icd10_phecode_path, dtype='str').dropna().reset_index(drop=True)
         self.loinc = pd.read_csv(loinc_path)
         self.rxnorm = pd.read_csv(rxnorm_path)
         self.cpt_ccs = pd.read_csv(cpt_ccs_path)
@@ -117,21 +117,31 @@ class HierarchicalData():
 
     def print_to_file(self):
         # icd-phecode
-        icd_phecode_data = []
+        phecode_parent2child_data = []
+        for phe1 in self.phecode_list:
+            for phe2 in self.phecode_list:
+                try:
+                    if len(phe2) > len(phe1):
+                        if len(phe1)==3 and phe2[:3]==phe1[:3]:
+                            phecode_parent2child_data.append([phe1, phe2])
+                        if len(phe1)==5 and phe2[:5]==phe1[:5]:
+                            phecode_parent2child_data.append([phe1, phe2])
+                except:
+                    print(phe1, phe2)
+        df1 = pd.DataFrame(phecode_parent2child_data, columns=['Parent', 'Child'], dtype='str')
+        df1 = df1.dropna()
+        df1.to_csv('phecode_hierarchy.csv', index=False)
+
+
+        phecode2icdstring_data = []
         for phecode, icd_set in self.phecode2icd.items():
             for icd in icd_set:
-                icd_phecode_data.append([phecode, icd])
-        df1 = pd.DataFrame(icd_phecode_data, columns=['Phecode', 'ICD code'], dtype='str')
-        df1 = df1.dropna()
-        # print(df.head)
-        df1.to_csv('icd_phecode_hierarchy.csv', index=False)
-        
-        icd_string_data = []
-        for icd, string in self.icd2string.items():
-            icd_string_data.append([icd, string])
-        df2 = pd.DataFrame(icd_string_data, columns=['ICD code', 'String'], dtype='str')
+                phecode2icdstring_data.append([phecode, self.icd2string[icd]])
+        df2 = pd.DataFrame(phecode2icdstring_data, columns=['Phecode', 'ICD string'], dtype='str')
         df2 = df2.dropna()
-        df2.to_csv('icd_code2string.csv', index=False)
+        # print(df.head)
+        df2.to_csv('phecode2icd_string.csv', index=False)
+        
 
         # loinc
         loinc_data = []
