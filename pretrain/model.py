@@ -39,6 +39,9 @@ class UMLSPretrainedModel(nn.Module):
         self.sty_loss_fn = nn.CrossEntropyLoss()
         self.sty_weight = sty_weight
 
+        self.pos_loss = HierarchicalLogLoss()
+        self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
+
         self.max_tree_dist = max_tree_dist
         self.tree_dist_embedding = nn.Sequential(
             nn.Embedding(self.max_tree_dist + 1, 1, padding_idx=self.max_tree_dist),
@@ -62,16 +65,7 @@ class UMLSPretrainedModel(nn.Module):
         pairs = self.miner(embeddings, labels)        
         emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
         dist_mat = torch.matmul(emb_normalized, emb_normalized.t())
-        cui_dists = torch.zeros_like(dist_mat, dtype=torch.int)
-        l = labels.cpu().numpy()
-        for i in range(embeddings.size()[0]):
-            for j in range(embeddings.size()[0]):
-                cui_dists[i][j] = self.get_tree_distance(l[i], l[j])
-
-        tree_mask = cui_dists < self.max_tree_dist
-        tree_embeds = self.tree_embedding(cui_dists).squeeze(2)
-
-        loss = self.cui_loss_fn(dist_mat, tree_embeds, tree_mask, pairs)
+        loss = self.pos_loss(dist_mat, pairs)
         return loss
 
 
@@ -114,6 +108,9 @@ class UMLSPretrainedModel(nn.Module):
         logits_sty = self.linear_sty(pooled_output)
         sty_loss = self.sty_loss_fn(logits_sty, sty_label)
 
+
+        cui_loss = self.log_loss(pooled_output, cui_label)
+
         cui_0_output = pooled_output[0:use_len]
         cui_1_output = pooled_output[use_len:2 * use_len]
         cui_2_output = pooled_output[2 * use_len:]
@@ -121,7 +118,7 @@ class UMLSPretrainedModel(nn.Module):
         re_loss = self.re_loss_fn(
             cui_0_output, cui_1_output, cui_2_output, re_output)
 
-        loss = self.sty_weight * sty_loss + self.re_weight * re_loss
+        loss = self.sty_weight * sty_loss + cui_loss + self.re_weight * re_loss
 
         return loss, (sty_loss, re_loss)
 

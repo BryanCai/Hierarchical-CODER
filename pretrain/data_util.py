@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer
 from load_umls import UMLS
-from load_trees import LOINC, PHECODE
+from load_trees import TREE
 from torch.utils.data import Dataset, DataLoader
-from random import sample
+import random
 from sampler_util import FixedLengthBatchSampler, my_collate_fn
 from torch.utils.data.sampler import RandomSampler
 import ipdb
@@ -88,9 +88,9 @@ class UMLSDataset(Dataset):
         str0_list = list(self.umls.cui2str[cui0])
         str1_list = list(self.umls.cui2str[cui1])
         if len(str0_list) > self.max_lui_per_cui:
-            str0_list = sample(str0_list, self.max_lui_per_cui)
+            str0_list = random.sample(str0_list, self.max_lui_per_cui)
         if len(str1_list) > self.max_lui_per_cui:
-            str1_list = sample(str1_list, self.max_lui_per_cui)
+            str1_list = random.sample(str1_list, self.max_lui_per_cui)
         use_len = min(len(str0_list), len(str1_list))
         str0_list = str0_list[0:use_len]
         str1_list = str1_list[0:use_len]
@@ -118,7 +118,7 @@ class UMLSDataset(Dataset):
                 cui2_index_list.append(self.cui2id[use_cui2])
                 sty2_index_list.append(
                     self.sty2id[self.umls.cui2sty[use_cui2]])
-                str2_list.append(sample(self.umls.cui2str[use_cui2], 1)[0])
+                str2_list.append(random.sample(self.umls.cui2str[use_cui2], 1)[0])
                 sample_index += 1
 
         # print(str0_list)
@@ -157,10 +157,11 @@ def fixed_length_dataloader(dataset, fixed_length=96, num_workers=0):
 
 
 class TreeDataset(Dataset):
-    def __init__(self, loinc_tree_path, loinc_map_path, phecode_path, model_name_or_path, max_neg_samples=8, max_length=32):
+    def __init__(self, loinc_tree_path, loinc_map_path, rxnorm_tree_path, rxnorm_map_path, cpt_tree_path, cpt_map_path, model_name_or_path, max_neg_samples=8, max_length=32):
         self.trees = {}
-        self.trees['loinc'] = LOINC(loinc_tree_path, loinc_map_path)
-        self.trees['phecode'] = PHECODE(phecode_path)
+        self.trees['loinc'] = TREE(loinc_tree_path, loinc_map_path)
+        self.trees['rxnorm'] = TREE(rxnorm_tree_path, rxnorm_map_path)
+        self.trees['cpt'] = TREE(cpt_tree_path, cpt_map_path)
         self.obj_list = []
         self.len = 0
         for tree in self.trees:
@@ -191,19 +192,19 @@ class TreeDataset(Dataset):
         neg_samples_far = [i for i in neg_samples_far if i[0] in self.trees[tree].text]
 
         if len(neg_samples_close) > self.max_neg_samples:
-            neg_samples = sample(neg_samples_close, self.max_neg_samples)
+            neg_samples = random.sample(neg_samples_close, self.max_neg_samples)
         else:
             neg_samples = neg_samples_close
 
-        neg_samples += sample(neg_samples_far, min(len(neg_samples_far), self.max_neg_samples - len(neg_samples)))
+        neg_samples += random.sample(neg_samples_far, min(len(neg_samples_far), self.max_neg_samples - len(neg_samples)))
 
         if len(neg_samples) == 0:
             return [], [], []
 
         neg_samples_id, neg_samples_dist = list(zip(*neg_samples))
 
-        anchor_string = self.trees[tree].text[anchor_id]
-        neg_samples_string = [self.trees[tree].text[i] for i in neg_samples_id]
+        anchor_string = random.choice(self.trees[tree].text[anchor_id])
+        neg_samples_string = [random.choice(self.trees[tree].text[i]) for i in neg_samples_id]
 
 
         anchor_input_id = self.tokenize_one(anchor_string)
@@ -220,23 +221,34 @@ class TreeDataset(Dataset):
 
 
 if __name__ == "__main__":
-    loinc_tree_path = "D:/Projects/CODER/deps/codes/loinc/AccessoryFiles/MultiAxialHierarchy/MultiAxialHierarchy.csv"
-    loinc_map_path = "D:/Projects/CODER/deps/codes/loinc/LoincTableCore/LoincTableCore.csv"
-    phecode_path = "D:/Projects/CODER/deps/codes/icd_phecode/phecode_icd9_rolled.csv"
+    loinc_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_hierarchy.csv"
+    loinc_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_code2string.csv"
+    rxnorm_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_hierarchy.csv"
+    rxnorm_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_code2string.csv"
+    phecode_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_phecode_hierarchy.csv"
+    phecode_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_code2string.csv"
+    cpt_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_ccs_hierarchy.csv"
+    cpt_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_code2string.csv"
+
+
+
+    # umls_dataset = UMLSDataset(umls_folder="D:/Projects/CODER/deps/UMLS/2021AB/META",
+    #                            model_name_or_path="monologg/biobert_v1.1_pubmed",
+    #                            lang=None)
+    # dataloader = fixed_length_dataloader(umls_dataset, num_workers=4)
 
     tree_dataset = TreeDataset(loinc_tree_path=loinc_tree_path, 
         loinc_map_path=loinc_map_path, 
-        phecode_path=phecode_path,
+        rxnorm_tree_path=rxnorm_tree_path,
+        rxnorm_map_path=rxnorm_map_path,
+        cpt_tree_path=cpt_tree_path,
+        cpt_map_path=cpt_map_path,
         model_name_or_path="monologg/biobert_v1.1_pubmed")
+    dataloader = fixed_length_dataloader(tree_dataset, num_workers=4)
 
-    # umls_dataset = UMLSDataset(umls_folder="../umls",
-    #                            model_name_or_path="../biobert_v1.1",
-    #                            lang=None)
-    # ipdb.set_trace()
-    tree_dataloader = fixed_length_dataloader(tree_dataset, num_workers=4)
     now_time = time()
     index = 0
-    for batch in tree_dataloader:
+    for batch in dataloader:
         print(index)
         index += 1
         print(time() - now_time)

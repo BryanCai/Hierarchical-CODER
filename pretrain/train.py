@@ -68,16 +68,16 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
     while True:
         model.train()
 
-        tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
-        for _, batch in enumerate(tree_iterator):
-            anchor_ids        = batch[0].to(args.device)
-            neg_samples_ids   = batch[1].to(args.device)
-            neg_samples_dists = batch[2].to(args.device)
-            loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+        # tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
+        # for _, batch in enumerate(tree_iterator):
+        #     anchor_ids        = batch[0].to(args.device)
+        #     neg_samples_ids   = batch[1].to(args.device)
+        #     neg_samples_dists = batch[2].to(args.device)
+        #     loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
 
-            if args.gradient_accumulation_steps > 1:
-                loss = loss / args.gradient_accumulation_steps
-            loss.backward()
+        #     if args.gradient_accumulation_steps > 1:
+        #         loss = loss / args.gradient_accumulation_steps
+        #     loss.backward()
 
 
         umls_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
@@ -184,7 +184,10 @@ def run(args):
 
     tree_dataset = TreeDataset(loinc_tree_path=args.loinc_tree_path, 
         loinc_map_path=args.loinc_map_path, 
-        phecode_path=args.phecode_path,
+        rxnorm_tree_path=args.rxnorm_tree_path,
+        rxnorm_map_path=args.rxnorm_map_path,
+        cpt_tree_path=args.cpt_tree_path,
+        cpt_map_path=args.cpt_map_path,
         model_name_or_path=args.model_name_or_path)
 
     tree_dataloader = fixed_length_dataloader(
@@ -256,9 +259,24 @@ def main():
         help="Path to loinc map",
     )
     parser.add_argument(
-        "--phecode_path",
+        "--rxnorm_tree_path",
         type=str,
-        help="Path to phecode tree",
+        help="Path to rxnorm tree",
+    )
+    parser.add_argument(
+        "--rxnorm_map_path",
+        type=str,
+        help="Path to rxnorm map",
+    )
+    parser.add_argument(
+        "--cpt_tree_path",
+        type=str,
+        help="Path to cpt tree",
+    )
+    parser.add_argument(
+        "--cpt_map_path",
+        type=str,
+        help="Path to cpt map",
     )
     parser.add_argument(
         "--output_dir",

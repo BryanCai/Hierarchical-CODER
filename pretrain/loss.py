@@ -105,7 +105,7 @@ class HierarchicalLogLoss(nn.Module):
         super(HierarchicalLogLoss, self).__init__()
         self.base = base
 
-    def forward(self, dist_mat, tree_embeds, tree_mask, indices_tuple):
+    def forward(self, dist_mat, indices_tuple):
         a1, p, a2, n = indices_tuple
         pos_mask, neg_mask = torch.zeros_like(dist_mat), torch.zeros_like(dist_mat)
         pos_mask[a1, p] = 1
@@ -113,11 +113,9 @@ class HierarchicalLogLoss(nn.Module):
         pos_exp = self.base - dist_mat
         neg_exp = dist_mat - self.base
         pos_loss = sumlogexp(pos_exp, keep_mask=pos_mask.bool())
-        neg_loss = sumlogexp(neg_exp, keep_mask=neg_mask.bool())
+        # neg_loss = sumlogexp(neg_exp, keep_mask=neg_mask.bool())
 
-        tree_loss = masked_mse(dist_mat, tree_embeds, keep_mask=tree_mask)
-
-        return torch.mean(pos_loss + neg_loss + tree_loss)
+        return torch.mean(pos_loss)
 
 class HierarchicalTreeLoss(nn.Module):
     def __init__(self, base=0.5, **kwargs):
