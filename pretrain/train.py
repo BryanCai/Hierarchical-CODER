@@ -68,16 +68,16 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
     while True:
         model.train()
 
-        # tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
-        # for _, batch in enumerate(tree_iterator):
-        #     anchor_ids        = batch[0].to(args.device)
-        #     neg_samples_ids   = batch[1].to(args.device)
-        #     neg_samples_dists = batch[2].to(args.device)
-        #     loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+        tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
+        for _, batch in enumerate(tree_iterator):
+            anchor_ids        = batch[0].to(args.device)
+            neg_samples_ids   = batch[1].to(args.device)
+            neg_samples_dists = batch[2].to(args.device)
+            loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
 
-        #     if args.gradient_accumulation_steps > 1:
-        #         loss = loss / args.gradient_accumulation_steps
-        #     loss.backward()
+            if args.gradient_accumulation_steps > 1:
+                loss = loss / args.gradient_accumulation_steps
+            loss.backward()
 
 
         umls_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
