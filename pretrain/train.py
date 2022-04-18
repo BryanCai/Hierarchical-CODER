@@ -248,7 +248,6 @@ def main():
         type=str,
         help="Path to tree directory",
     )
-
     parser.add_argument(
         "--output_dir",
         default="output",

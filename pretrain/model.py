@@ -47,6 +47,7 @@ class UMLSPretrainedModel(nn.Module):
             nn.Embedding(self.max_tree_dist + 1, 1, padding_idx=self.max_tree_dist),
             nn.Tanh()
             )
+        self.tree_dist_embedding[0].weight = nn.Parameter(torch.tensor([[3], [1.4], [1.1], [0]]))
 
         self.tree_loss = HierarchicalTreeLoss()
 
