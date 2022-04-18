@@ -140,12 +140,12 @@ class TREE(object):
         with open(self.map_path) as f:
             reader = csv.reader(f)
             reader.__next__()
-            for row in tqdm(reader, ascii=True):
+            for row in reader:
                 current = row[0]
                 text = row[1]
                 self.text[current].add(text)
 
-        for current in tqdm(list(self.children), ascii=True):
+        for current in list(self.children):
             for child in self.children[current]:
                 self.grandchildren[current] = self.grandchildren[current].union(self.children[child])
 
@@ -169,8 +169,8 @@ if __name__ == "__main__":
     loinc_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_code2string.csv"
     rxnorm_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_hierarchy.csv"
     rxnorm_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_code2string.csv"
-    phecode_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_phecode_hierarchy.csv"
-    phecode_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_code2string.csv"
+    phecode_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/phecode_hierarchy.csv"
+    phecode_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/phecode2icd_string.csv"
     cpt_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_ccs_hierarchy.csv"
     cpt_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_code2string.csv"
 

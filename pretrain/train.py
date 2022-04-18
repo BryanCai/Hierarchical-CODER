@@ -182,12 +182,7 @@ def run(args):
     umls_dataloader = fixed_length_dataloader(
         umls_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
 
-    tree_dataset = TreeDataset(loinc_tree_path=args.loinc_tree_path, 
-        loinc_map_path=args.loinc_map_path, 
-        rxnorm_tree_path=args.rxnorm_tree_path,
-        rxnorm_map_path=args.rxnorm_map_path,
-        cpt_tree_path=args.cpt_tree_path,
-        cpt_map_path=args.cpt_map_path,
+    tree_dataset = TreeDataset(tree_dir=args.tree_dir,
         model_name_or_path=args.model_name_or_path)
 
     tree_dataloader = fixed_length_dataloader(
@@ -249,35 +244,11 @@ def main():
         help="Path to pre-trained model or shortcut name selected in the list: ",
     )
     parser.add_argument(
-        "--loinc_tree_path",
+        "--tree_dir",
         type=str,
-        help="Path to loinc tree",
+        help="Path to tree directory",
     )
-    parser.add_argument(
-        "--loinc_map_path",
-        type=str,
-        help="Path to loinc map",
-    )
-    parser.add_argument(
-        "--rxnorm_tree_path",
-        type=str,
-        help="Path to rxnorm tree",
-    )
-    parser.add_argument(
-        "--rxnorm_map_path",
-        type=str,
-        help="Path to rxnorm map",
-    )
-    parser.add_argument(
-        "--cpt_tree_path",
-        type=str,
-        help="Path to cpt tree",
-    )
-    parser.add_argument(
-        "--cpt_map_path",
-        type=str,
-        help="Path to cpt map",
-    )
+
     parser.add_argument(
         "--output_dir",
         default="output",

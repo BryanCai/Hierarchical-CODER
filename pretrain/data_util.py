@@ -11,7 +11,7 @@ from torch.utils.data.sampler import RandomSampler
 import ipdb
 from time import time
 import json
-
+from pathlib import Path
 
 def pad(list_ids, pad_length, pad_mark=0):
     output = []
@@ -157,11 +157,12 @@ def fixed_length_dataloader(dataset, fixed_length=96, num_workers=0):
 
 
 class TreeDataset(Dataset):
-    def __init__(self, loinc_tree_path, loinc_map_path, rxnorm_tree_path, rxnorm_map_path, cpt_tree_path, cpt_map_path, model_name_or_path, max_neg_samples=8, max_length=32):
+    def __init__(self, tree_dir, model_name_or_path, max_neg_samples=8, max_length=32):
+        tree_dir = Path(tree_dir)
+        tree_subdirs = [f for f in tree_dir.iterdir() if f.is_dir()]
         self.trees = {}
-        self.trees['loinc'] = TREE(loinc_tree_path, loinc_map_path)
-        self.trees['rxnorm'] = TREE(rxnorm_tree_path, rxnorm_map_path)
-        self.trees['cpt'] = TREE(cpt_tree_path, cpt_map_path)
+        for tree_subdir in tree_subdirs:
+            self.trees[tree_subdir.name] = TREE(tree_subdir/"hierarchy.csv", tree_subdir/"code2string.csv")
         self.obj_list = []
         self.len = 0
         for tree in self.trees:
@@ -230,6 +231,9 @@ if __name__ == "__main__":
     cpt_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_ccs_hierarchy.csv"
     cpt_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_code2string.csv"
 
+    tree_dir = "D:/Projects/CODER/Hierarchical-CODER/data/cleaned"
+
+
 
 
     # umls_dataset = UMLSDataset(umls_folder="D:/Projects/CODER/deps/UMLS/2021AB/META",
@@ -237,26 +241,35 @@ if __name__ == "__main__":
     #                            lang=None)
     # dataloader = fixed_length_dataloader(umls_dataset, num_workers=4)
 
-    tree_dataset = TreeDataset(loinc_tree_path=loinc_tree_path, 
-        loinc_map_path=loinc_map_path, 
-        rxnorm_tree_path=rxnorm_tree_path,
-        rxnorm_map_path=rxnorm_map_path,
-        cpt_tree_path=cpt_tree_path,
-        cpt_map_path=cpt_map_path,
+    tree_dataset = TreeDataset(tree_dir=tree_dir,
         model_name_or_path="monologg/biobert_v1.1_pubmed")
-    dataloader = fixed_length_dataloader(tree_dataset, num_workers=4)
 
-    now_time = time()
-    index = 0
-    for batch in dataloader:
-        print(index)
-        index += 1
-        print(time() - now_time)
-        now_time = time()
-        if index < 10:
-            for item in batch:
-                print(item.shape)
-            #print(batch)
-        else:
-            import sys
-            sys.exit()
+    for x in ["loinc", "rxnorm", "phecode", "cpt"]:
+        d = tree_dataset.trees[x]
+        print(len(d.children))
+        c = 0
+        t = 0
+        for i in d.children:
+            if len(d.children[i]) > 0:
+                t += 1
+            c += len(d.children[i])
+        print(c/t)
+
+    # dataloader = fixed_length_dataloader(tree_dataset, num_workers=4)
+
+
+
+    # now_time = time()
+    # index = 0
+    # for batch in dataloader:
+    #     print(index)
+    #     index += 1
+    #     print(time() - now_time)
+    #     now_time = time()
+    #     if index < 10:
+    #         for item in batch:
+    #             print(item.shape)
+    #         #print(batch)
+    #     else:
+    #         import sys
+    #         sys.exit()
