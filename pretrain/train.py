@@ -10,6 +10,7 @@ import numpy as np
 import argparse
 import time
 import pathlib
+import itertools
 #import ipdb
 # try:
 #     from torch.utils.tensorboard import SummaryWriter
@@ -68,66 +69,66 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
     while True:
         model.train()
 
-        tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
-        for _, batch in enumerate(tree_iterator):
-            anchor_ids        = batch[0].to(args.device)
-            neg_samples_ids   = batch[1].to(args.device)
-            neg_samples_dists = batch[2].to(args.device)
-            loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
-
-            if args.gradient_accumulation_steps > 1:
-                loss = loss / args.gradient_accumulation_steps
-            loss.backward()
-
-
-        umls_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
         batch_loss = 0.
         batch_sty_loss = 0.
         batch_cui_loss = 0.
         batch_re_loss = 0.
-        for _, batch in enumerate(umls_iterator):
-            input_ids_0 = batch[0].to(args.device)
-            input_ids_1 = batch[1].to(args.device)
-            input_ids_2 = batch[2].to(args.device)
-            cui_label_0 = batch[3].to(args.device)
-            cui_label_1 = batch[4].to(args.device)
-            cui_label_2 = batch[5].to(args.device)
-            sty_label_0 = batch[6].to(args.device)
-            sty_label_1 = batch[7].to(args.device)
-            sty_label_2 = batch[8].to(args.device)
-            # use batch[9] for re, use batch[10] for rel
-            if args.use_re:
-                re_label = batch[9].to(args.device)
-            else:
-                re_label = batch[10].to(args.device)
-            # for item in batch:
-            #     print(item.shape)
 
-            loss, (sty_loss, re_loss) = \
-                model.get_rel_loss(input_ids_0, input_ids_1, input_ids_2,
-                                   cui_label_0, cui_label_1, cui_label_2,
-                                   sty_label_0, sty_label_1, sty_label_2,
-                                   re_label)
-            batch_loss = float(loss.item())
-            batch_sty_loss = float(sty_loss.item())
-            batch_re_loss = float(re_loss.item())
+        batch_iterator = tqdm(itertools.zip_longest(tree_dataloader, umls_dataloader, fillvalue=None), desc="Iteration", ascii=True)
+        for tree_batch, umls_batch in batch_iterator:
+            if tree_batch is not None:
+                anchor_ids        = tree_batch[0].to(args.device)
+                neg_samples_ids   = tree_batch[1].to(args.device)
+                neg_samples_dists = tree_batch[2].to(args.device)
+                loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
 
-            # tensorboardX
-            writer.add_scalar(
-                'rel_count', umls_dataloader.batch_sampler.rel_sampler_count, global_step=global_step)
-            writer.add_scalar('batch_loss', batch_loss,
-                              global_step=global_step)
-            writer.add_scalar('batch_sty_loss', batch_sty_loss,
-                              global_step=global_step)
-            writer.add_scalar('batch_re_loss', batch_re_loss,
-                              global_step=global_step)
+                if args.gradient_accumulation_steps > 1:
+                    loss = loss / args.gradient_accumulation_steps
+                loss.backward()
 
-            if args.gradient_accumulation_steps > 1:
-                loss = loss / args.gradient_accumulation_steps
-            loss.backward()
+            if umls_batch is not None:
+                input_ids_0 = umls_batch[0].to(args.device)
+                input_ids_1 = umls_batch[1].to(args.device)
+                input_ids_2 = umls_batch[2].to(args.device)
+                cui_label_0 = umls_batch[3].to(args.device)
+                cui_label_1 = umls_batch[4].to(args.device)
+                cui_label_2 = umls_batch[5].to(args.device)
+                sty_label_0 = umls_batch[6].to(args.device)
+                sty_label_1 = umls_batch[7].to(args.device)
+                sty_label_2 = umls_batch[8].to(args.device)
+                # use umls_batch[9] for re, use umls_batch[10] for rel
+                if args.use_re:
+                    re_label = umls_batch[9].to(args.device)
+                else:
+                    re_label = umls_batch[10].to(args.device)
+                # for item in umls_batch:
+                #     print(item.shape)
 
-            umls_iterator.set_description("Rel_count: %s, Loss: %0.4f, Sty: %0.4f, Re: %0.4f" %
-                                           (umls_dataloader.batch_sampler.rel_sampler_count, batch_loss, batch_sty_loss, batch_re_loss))
+                loss, (sty_loss, re_loss) = \
+                    model.get_rel_loss(input_ids_0, input_ids_1, input_ids_2,
+                                       cui_label_0, cui_label_1, cui_label_2,
+                                       sty_label_0, sty_label_1, sty_label_2,
+                                       re_label)
+                batch_loss = float(loss.item())
+                batch_sty_loss = float(sty_loss.item())
+                batch_re_loss = float(re_loss.item())
+
+                # tensorboardX
+                writer.add_scalar(
+                    'rel_count', umls_dataloader.batch_sampler.rel_sampler_count, global_step=global_step)
+                writer.add_scalar('batch_loss', batch_loss,
+                                  global_step=global_step)
+                writer.add_scalar('batch_sty_loss', batch_sty_loss,
+                                  global_step=global_step)
+                writer.add_scalar('batch_re_loss', batch_re_loss,
+                                  global_step=global_step)
+
+                if args.gradient_accumulation_steps > 1:
+                    loss = loss / args.gradient_accumulation_steps
+                loss.backward()
+
+                batch_iterator.set_description("Rel_count: %s, Loss: %0.4f, Sty: %0.4f, Re: %0.4f" %
+                                               (umls_dataloader.batch_sampler.rel_sampler_count, batch_loss, batch_sty_loss, batch_re_loss))
 
             if (global_step + 1) % args.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(
@@ -187,6 +188,11 @@ def run(args):
 
     tree_dataloader = fixed_length_dataloader(
         tree_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
+
+    print('-------')
+    print(len(tree_dataset))
+    print(len(umls_dataset))
+    print('-------')
 
     if args.use_re:
         rel_label_count = len(umls_dataset.re2id)
