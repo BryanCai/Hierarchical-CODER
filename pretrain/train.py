@@ -52,10 +52,10 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
     print("***** Running training *****")
     print("  Total Steps =", t_total)
     print("  Steps needs to be trained=", t_total - args.shift)
-    print("  Instantaneous batch size per GPU =", args.train_batch_size)
+    print("  Instantaneous batch size per GPU =", args.umls_batch_size)
     print(
         "  Total train batch size (w. parallel, distributed & accumulation) =",
-        args.train_batch_size
+        args.umls_batch_size
         * args.gradient_accumulation_steps,
     )
     print("  Gradient Accumulation steps =", args.gradient_accumulation_steps)
@@ -181,13 +181,13 @@ def run(args):
     umls_dataset = UMLSDataset(
         umls_folder=args.umls_dir, model_name_or_path=args.model_name_or_path, lang=lang, json_save_path=args.output_dir)
     umls_dataloader = fixed_length_dataloader(
-        umls_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
+        umls_dataset, fixed_length=args.umls_batch_size, num_workers=args.num_workers)
 
     tree_dataset = TreeDataset(tree_dir=args.tree_dir,
         model_name_or_path=args.model_name_or_path)
 
     tree_dataloader = fixed_length_dataloader(
-        tree_dataset, fixed_length=args.train_batch_size, num_workers=args.num_workers)
+        tree_dataset, fixed_length=args.tree_batch_size, num_workers=args.num_workers)
 
     print('-------')
     print(len(tree_dataset))
@@ -277,7 +277,10 @@ def main():
     )
     parser.add_argument("--do_train", default=True, type=bool, help="Whether to run training.")
     parser.add_argument(
-        "--train_batch_size", default=256, type=int, help="Batch size per GPU/CPU for training.",
+        "--umls_batch_size", default=256, type=int, help="Batch size per GPU/CPU for umls training.",
+    )
+    parser.add_argument(
+        "--tree_batch_size", default=512, type=int, help="Batch size per GPU/CPU for tree training.",
     )
     parser.add_argument(
         "--gradient_accumulation_steps",
