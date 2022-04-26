@@ -43,11 +43,16 @@ class UMLSPretrainedModel(nn.Module):
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
         self.max_tree_dist = max_tree_dist
-        self.tree_dist_embedding = nn.Sequential(
-            nn.Embedding(self.max_tree_dist + 1, 1, padding_idx=self.max_tree_dist),
-            nn.Tanh()
-            )
-        self.tree_dist_embedding[0].weight = nn.Parameter(torch.tensor([[3], [1.4], [1.1], [0]]))
+        # self.tree_dist_embedding = nn.Sequential(
+        #     nn.Embedding(self.max_tree_dist + 1, 1, padding_idx=self.max_tree_dist),
+        #     nn.Tanh()
+        #     )
+        # self.tree_dist_embedding[0].weight = nn.Parameter(torch.tensor([[3], [1.4], [1.1], [0]]))
+
+        self.tree_dist_embedding = nn.Embedding(self.max_tree_dist + 1, 1, padding_idx=self.max_tree_dist)
+        self.tree_dist_embedding.weight = nn.Parameter(torch.tensor([[1], [0.9**2], [0.9**4], [0]]))
+        for param in self.tree_dist_embedding.parameters():
+            param.requires_grad = False
 
         self.tree_loss = HierarchicalTreeLoss()
 

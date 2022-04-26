@@ -176,28 +176,29 @@ class TreeDataset(Dataset):
         anchor_id, tree = self.obj_list[index]
         if anchor_id not in self.trees[tree].text:
             return [], [], []
-        neg_samples_close = []
-        neg_samples_far = []
+        neg_samples = []
 
-        neg_samples_close += [(i, 1) for i in self.trees[tree].children[anchor_id]]
-        neg_samples_far += [(i, 2) for i in self.trees[tree].grandchildren[anchor_id]]
-        if anchor_id in self.trees[tree].parent:
-            parent = self.trees[tree].parent[anchor_id]
-            neg_samples_close += [(parent, 1)]
-            neg_samples_far += [(i, 2) for i in self.trees[tree].children[parent] if i != anchor_id]
-            if parent in self.trees[tree].parent:
-                grandparent = self.trees[tree].parent[parent]
-                neg_samples_far += [(grandparent, 2)]
+        if tree == 'phecode':
+            if "." not in anchor_id:
+                return [], [], []
+            else:
+                level = 3 - len(anchor_id.split(".")[1])
+                neg_samples += [(i, level) for i in self.trees[tree].children[anchor_id]]
+                if anchor_id in self.trees[tree].parent:
+                    parent = self.trees[tree].parent[anchor_id]
+                    neg_samples += [(parent, level)]
+                    neg_samples += [(i, level) for i in self.trees[tree].children[parent] if i != anchor_id]
 
-        neg_samples_close = [i for i in neg_samples_close if i[0] in self.trees[tree].text]
-        neg_samples_far = [i for i in neg_samples_far if i[0] in self.trees[tree].text]
+        else:    
+            neg_samples += [(i, 2) for i in self.trees[tree].children[anchor_id]]
+            if anchor_id in self.trees[tree].parent:
+                parent = self.trees[tree].parent[anchor_id]
+                neg_samples += [(parent, 2)]
+                neg_samples += [(i, 2) for i in self.trees[tree].children[parent] if i != anchor_id]
 
-        if len(neg_samples_close) > self.max_neg_samples:
-            neg_samples = random.sample(neg_samples_close, self.max_neg_samples)
-        else:
-            neg_samples = neg_samples_close
 
-        neg_samples += random.sample(neg_samples_far, min(len(neg_samples_far), self.max_neg_samples - len(neg_samples)))
+        neg_samples = [i for i in neg_samples if i[0] in self.trees[tree].text]
+
 
         if len(neg_samples) == 0:
             return [], [], []
