@@ -199,6 +199,8 @@ class TreeDataset(Dataset):
 
         neg_samples = [i for i in neg_samples if i[0] in self.trees[tree].text]
 
+        if len(neg_samples) > self.max_neg_samples:
+            neg_samples = random.sample(neg_samples, self.max_neg_samples)
 
         if len(neg_samples) == 0:
             return [], [], []
