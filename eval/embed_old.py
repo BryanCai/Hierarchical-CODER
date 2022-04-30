@@ -2,7 +2,7 @@ import os
 import sys
 import torch
 import numpy as np
-from transformers import AutoTokenizer, AutoModel, AutoConfig, BertTokenizer, BertModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
 from tqdm import tqdm
 import random
 import string
@@ -76,57 +76,66 @@ def get_bert_embed(phrase_list, m, tok, normalize=True, summary_method="CLS", tq
     torch.cuda.empty_cache()
     return np.concatenate(output_list, axis=0)
 
-
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
+if __name__ == "__main__":
+    filename = "GanjinZero/UMLSBert_ENG"
+    config = AutoConfig.from_pretrained(filename)
+    tokenizer = AutoTokenizer.from_pretrained(filename)
+    # model = AutoModel.from_pretrained(
+    #     filename,
+    #     config=config).to(device)
+    model = torch.load('/home/tc24/BryanWork/Final_CODER.pth').to(device)
 
-def get_embeds(phrase_dict, output_path, model, tokenizer):
-    if os.path.exists(output_path):
-      os.remove(output_path)
+    phrase_dir = Path("/n/data1/hsph/biostat/celehs/lab/sm731/CUI-search")
+    """
+    # phrase_file_list = ["mayo-titles.txt", "medline-titles.txt"]
+    phrase_file_list = [x.name for x in list(phrase_dir.glob("./titles/processed/*.txt"))]
 
+    output_file = "article_title_embedding_coderpp.csv"
     embeds_list = []
-    for phrase_file, phrase_list in phrase_dict.items():
-        for sub_phrase_list in tqdm(chunker(phrase_list, 10000), total=len(phrase_list)//10000):    
-            embeds = get_bert_embed(sub_phrase_list, model, tokenizer, summary_method="MEAN", tqdm_bar=False)
-            embeds = pd.DataFrame(embeds)
-
-            assert len(sub_phrase_list) == embeds.shape[0]
-            embeds.insert(0, "source", phrase_file)
-            embeds.insert(1, "input", phrase_list)
-
-            embeds.to_csv(output_path, sep="|", mode="a", index=False, header=False)
-
-def get_sentences(phrase_dir):
-    phrase_dir = Path(phrase_dir)
-    phrase_file_list = [x.name for x in list(phrase_dir.glob("*.txt"))]
-
-    phrase_dict = {}
-
     for phrase_file in phrase_file_list:
-        with open(phrase_dir/phrase_file, encoding="ISO-8859-1") as f:
+        with open(phrase_dir/"titles"/phrase_file, encoding="ISO-8859-1") as f:
             phrase_list = f.readlines()
             phrase_list = [phrase.strip() for phrase in phrase_list]
 
-        phrase_dict[phrase_file] = phrase_list
+        embeds = get_bert_embed(phrase_list, model, tokenizer, summary_method="MEAN", tqdm_bar=True)
+        embeds = pd.DataFrame(embeds)
 
-    return phrase_dict
+        assert len(phrase_list) == embeds.shape[0]
 
+        embeds.insert(0, "source", phrase_file)
+        embeds.insert(1, "title", phrase_list)
 
-if __name__ == "__main__":
-    coder_filename = "GanjinZero/coder_eng"
-    coder_config = AutoConfig.from_pretrained(coder_filename)
-    coder_tokenizer = AutoTokenizer.from_pretrained(coder_filename)
-    coder_model = AutoModel.from_pretrained(
-        coder_filename,
-        config=coder_config).to(device)
+        embeds_list.append(embeds)
 
 
-    bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    bert_model = BertModel.from_pretrained("bert-base-uncased").to(device)
+    embeds = pd.concat(embeds_list)
+    embeds.to_csv(phrase_dir/"embeds"/output_file, sep="|")i
+    """
 
-    phrase_dict = get_sentences(Path("D:/Projects/CODER/deps/sentences"))
-    output_dir = Path("D:/Projects/CODER/deps/sentences")
+    dict_file = "/n/data1/hsph/biostat/celehs/lab/SHARE/EHR_DICTIONARY_MAPPING/dictionary/UMLS_2021_AB/dictionary.csv" 
+    output_file = "dict_embedding_coderpp_fixed.csv"
+    phrase_list = []
+    with open(dict_file) as f:
+        reader = csv.reader(f)
+        for row in tqdm(reader, ascii=True):
+            phrase_list.append(row[0])
 
-    get_embeds(phrase_dict, output_dir/"coder_embeds.csv", coder_model, coder_tokenizer)
-    get_embeds(phrase_dict, output_dir/"bert_embeds.csv", bert_model, bert_tokenizer)
+    for sub_phrase_list in tqdm(chunker(phrase_list, 10000), total=len(phrase_list)//10000):    
+        embeds = get_bert_embed(sub_phrase_list, model, tokenizer, summary_method="MEAN", tqdm_bar=False)
+        embeds = pd.DataFrame(embeds)
+
+        assert len(sub_phrase_list) == embeds.shape[0]
+        embeds.insert(0, "phrase", sub_phrase_list)
+
+        embeds.to_csv(phrase_dir/"embeds"/output_file, sep="|", mode="a", index=False, header=False)
+
+   
+#    phrase_list = ["Type 1 Diabetes", "Type 2 Diabetes"]
+#    embeds = get_bert_embed(phrase_list, model, tokenizer, summary_method="MEAN", tqdm_bar=True)
+#    print(np.dot(embeds[0], embeds[1])/(np.linalg.norm(embeds[0])*np.linalg.norm(embeds[1])))
+
+
+
