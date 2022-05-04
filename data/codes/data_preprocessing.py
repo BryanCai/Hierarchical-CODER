@@ -1,11 +1,13 @@
 import pandas as pd
+import ahocorasick
+from tqdm import tqdm
 
 class HierarchicalData():
     def __init__(self, icd9_phecode_path, icd10_phecode_path, loinc_path, rxnorm_path, cpt_ccs_path, cpt_path):
         self.icd9_phecode = pd.read_csv(icd9_phecode_path, dtype='str').dropna().reset_index(drop=True)
         self.icd10_phecode = pd.read_csv(icd10_phecode_path, dtype='str').dropna().reset_index(drop=True)
         self.loinc = pd.read_csv(loinc_path)
-        self.rxnorm = pd.read_csv(rxnorm_path)
+        self.rxnorm = pd.read_csv(rxnorm_path, dtype='str')
         self.cpt_ccs = pd.read_csv(cpt_ccs_path)
         self.cpt = pd.read_csv(cpt_path, sep='\t')
         self.cpt2string = {str(key): value for key, value in zip(self.cpt['CODE'], self.cpt['STR'])}
@@ -71,6 +73,13 @@ class HierarchicalData():
             self.loinc_code2string[loinc_code] = loinc_string
         # grand_grandparents -> grandparents -> parents -> loinc terms
         self.loinc_parents = list(self.loinc_part2term.keys())
+        self.loinc_third_layer = []
+        for parent_part, child_part in self.loinc_parent2child.items():
+            for child in child_part:
+                if child in self.loinc_part2term:
+                    self.loinc_third_layer.append(parent_part)
+                    break
+            
 
 
         print('number of loinc part + loinc term:', len(self.loinc_code2string))    
@@ -93,7 +102,28 @@ class HierarchicalData():
             self.rxnorm_code2string[parent_code] = parent_string
             self.rxnorm_code2string[child_code] = child_string
         self.rxnorm_parents = list(self.rxnorm_parent2child.keys())
-
+        parents = ahocorasick.Automaton()
+        for parent in self.rxnorm_parents:
+            parents.add_word(parent, '')
+        self.rxnorm_first_layer = ahocorasick.Automaton()
+        for idx in tqdm(range(len(self.rxnorm))):
+            child_code = self.rxnorm['RXCUI2'][idx]
+            if child_code not in parents:
+                self.rxnorm_first_layer.add_word(child_code, '')
+        self.rxnorm_second_layer = ahocorasick.Automaton()
+        for idx in tqdm(range(len(self.rxnorm))):
+            parent_code = self.rxnorm['RXCUI1'][idx]
+            for child in self.rxnorm_parent2child[parent_code]:
+                if child in self.rxnorm_first_layer:
+                    self.rxnorm_second_layer.add_word(parent_code, '')
+                    break
+        self.rxnorm_third_layer = ahocorasick.Automaton()
+        for idx in range(len(self.rxnorm)):
+            parent_code = self.rxnorm['RXCUI1'][idx]
+            for child in self.rxnorm_parent2child[parent_code]:
+                if child in self.rxnorm_second_layer:
+                    self.rxnorm_third_layer.add_word(parent_code, '')
+                    break
         print('number of rxnorm parents:', len(self.rxnorm_parents))
 
     def load_cpt_ccs(self):
@@ -130,17 +160,25 @@ class HierarchicalData():
                     print(phe1, phe2)
         df1 = pd.DataFrame(phecode_parent2child_data, columns=['Parent', 'Child'], dtype='str')
         df1 = df1.dropna()
-        df1.to_csv('phecode_hierarchy.csv', index=False)
+        df1.to_csv('icd_phecode/phecode_hierarchy.csv', index=False)
 
 
         phecode2icdstring_data = []
         for phecode, icd_set in self.phecode2icd.items():
             for icd in icd_set:
-                phecode2icdstring_data.append([phecode, self.icd2string[icd]])
-        df2 = pd.DataFrame(phecode2icdstring_data, columns=['Phecode', 'ICD string'], dtype='str')
+                if len(phecode) == 6:
+                    layer = 1
+                elif len(phecode) == 5:
+                    layer = 2
+                elif len(phecode) == 3:
+                    layer = 3
+                else:
+                    layer = 4
+                phecode2icdstring_data.append([phecode, self.icd2string[icd], layer])
+        df2 = pd.DataFrame(phecode2icdstring_data, columns=['Phecode', 'ICD string', 'Layer'], dtype='str')
         df2 = df2.dropna()
         # print(df.head)
-        df2.to_csv('phecode2icd_string.csv', index=False)
+        df2.to_csv('icd_phecode/phecode2icd_string.csv', index=False)
         
 
         # loinc
@@ -150,12 +188,23 @@ class HierarchicalData():
                 loinc_data.append([parent, child])
         df1 = pd.DataFrame(loinc_data, columns=['Parent', 'Child'], dtype='str')
         df1 = df1.dropna()
-        df1.to_csv('loinc_hierarchy.csv', index=False)
+        df1.to_csv('loinc/loinc_hierarchy.csv', index=False)
         
-        loinc_string_data = [[code, string] for code, string in self.loinc_code2string.items()]
-        df2 = pd.DataFrame(loinc_string_data, columns=['Loinc code', 'String'], dtype='str')
+        loinc_string_data = []
+        for code, string in self.loinc_code2string.items():
+            if code in self.loinc_part2term.values():
+                layer = 1
+            elif code in self.loinc_part2term.keys():
+                layer = 2
+            elif code in self.loinc_third_layer:
+                layer = 3
+            else:
+                layer = 4
+            loinc_string_data.append([code, string, layer])
+        # loinc_string_data = [[code, string] for code, string in self.loinc_code2string.items()]
+        df2 = pd.DataFrame(loinc_string_data, columns=['Loinc code', 'String', 'Layer'], dtype='str')
         df2 = df2.dropna()
-        df2.to_csv('loinc_code2string.csv', index=False)
+        df2.to_csv('loinc/loinc_code2string.csv', index=False)
 
         # rxnorm
         rxnorm_data = []
@@ -164,12 +213,23 @@ class HierarchicalData():
                 rxnorm_data.append([parent, child])
         df1 = pd.DataFrame(rxnorm_data, columns=['Parent', 'Child'], dtype='str')
         df1 = df1.dropna()
-        df1.to_csv('rxnorm_hierarchy.csv', index=False)
+        df1.to_csv('rxnorm/rxnorm_hierarchy.csv', index=False)
         
-        rxnorm_string_data = [[code, string] for code, string in self.rxnorm_code2string.items()]
-        df2 = pd.DataFrame(rxnorm_string_data, columns=['Rxnorm code', 'String'], dtype='str')
+        rxnorm_string_data = []
+        for code, string in self.rxnorm_code2string.items():
+            if code in self.rxnorm_first_layer:
+                layer = 1
+            elif code in self.rxnorm_second_layer:
+                layer = 2
+            elif code in self.rxnorm_third_layer:
+                layer = 3
+            else:
+                layer = 4
+            rxnorm_string_data.append([code, string, layer])
+        # rxnorm_string_data = [[code, string] for code, string in self.rxnorm_code2string.items()]
+        df2 = pd.DataFrame(rxnorm_string_data, columns=['Rxnorm code', 'String', 'Layer'], dtype='str')
         df2 = df2.dropna()
-        df2.to_csv('rxnorm_code2string.csv', index=False)      
+        df2.to_csv('rxnorm/rxnorm_code2string.csv', index=False)      
 
         # cpt-ccs
         cpt_ccs_data = []
@@ -178,12 +238,12 @@ class HierarchicalData():
                 cpt_ccs_data.append([ccs, cpt])
         df1 = pd.DataFrame(cpt_ccs_data, columns=['CCS', 'CPT'], dtype='str')
         df1 = df1.dropna()
-        df1.to_csv('cpt_ccs_hierarchy.csv', index=False)
+        df1.to_csv('cpt_ccs/cpt_ccs_hierarchy.csv', index=False)
 
-        cpt_string_data = [[code, string] for code, string in self.cpt2string.items()]
-        df2 = pd.DataFrame(cpt_string_data, columns=['CPT code', 'String'], dtype='str')
+        cpt_string_data = [[code, string, 1] for code, string in self.cpt2string.items()]
+        df2 = pd.DataFrame(cpt_string_data, columns=['CPT code', 'String', 'Layer'], dtype='str')
         df2 = df2.dropna()
-        df2.to_csv('cpt_code2string.csv', index=False)      
+        df2.to_csv('cpt_ccs/cpt_code2string.csv', index=False)      
 
         
 
