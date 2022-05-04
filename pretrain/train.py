@@ -74,7 +74,7 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
         batch_cui_loss = 0.
         batch_re_loss = 0.
 
-        batch_iterator = tqdm(itertools.zip_longest(tree_dataloader, umls_dataloader, fillvalue=None), desc="Iteration", ascii=True)
+        batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
         for tree_batch, umls_batch in batch_iterator:
             if tree_batch is not None:
                 anchor_ids        = tree_batch[0].to(args.device)
