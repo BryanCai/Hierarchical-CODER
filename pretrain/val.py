@@ -1,4 +1,5 @@
-from data_util import UMLSDataset, TreeDataset, fixed_length_dataloader
+from data_util import UMLSDataset, TreeDataset, UMLSHoldoutDataset, fixed_length_dataloader
+from torch.utils.data import DataLoader
 from model import UMLSPretrainedModel
 from transformers import AutoTokenizer, AutoModel, AutoConfig, BertTokenizer, BertModel
 from tqdm import tqdm, trange
@@ -18,7 +19,7 @@ device = torch.device("cuda:0")
 
 
 
-def eval(bert_model, tree_dataloader):
+def eval(bert_model, dataloader):
 
     bert_model.eval()
 
@@ -27,11 +28,11 @@ def eval(bert_model, tree_dataloader):
     neg_dists_all = []
     cos_dists_all = []
 
-    tree_iterator = tqdm(tree_dataloader, desc="Iteration", ascii=True)
-    for tree_batch in tree_iterator:
-        anchor_ids        = tree_batch[0].to(device)
-        neg_samples_ids   = tree_batch[1].to(device)
-        neg_samples_dists = tree_batch[2].to(device)
+    iterator = tqdm(dataloader, desc="Iteration", ascii=True)
+    for batch in iterator:
+        anchor_ids        = batch[0].to(device)
+        neg_samples_ids   = batch[1].to(device)
+        neg_samples_dists = batch[2].to(device)
         embed_anchor = torch.mean(bert_model(anchor_ids)[0], dim=1)
         embed_neg_samples = torch.mean(bert_model(neg_samples_ids)[0], dim=1)
         neg_dists_all.append(neg_samples_dists.cpu().detach().numpy())
@@ -63,8 +64,15 @@ if __name__ == "__main__":
 
     tree_dir = sys.argv[2]
     print(tree_dir)
+
+    holdout_file = sys.argv[3]
+    print(holdout_file)
+
     tree_dataset = TreeDataset(tree_dir=tree_dir, model_name_or_path="monologg/biobert_v1.1_pubmed", max_neg_samples=32)
-
     tree_dataloader = fixed_length_dataloader(tree_dataset, fixed_length=256, num_workers=1)
-
     eval(coder_model, tree_dataloader)
+
+    umls_holdout_dataset = UMLSHoldoutDataset(holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
+    umls_holdout_dataloader = DataLoader(umls_holdout_dataset, batch_size=128, shuffle=False)
+
+    eval(coder_model, umls_holdout_dataloader)

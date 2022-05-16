@@ -223,6 +223,29 @@ class TreeDataset(Dataset):
     def tokenize_one(self, string):
         return self.tokenizer.encode_plus(string, max_length=self.max_length, truncation=True, padding='max_length')['input_ids']
 
+class UMLSHoldoutDataset(Dataset):
+    def __init__(self, holdout_file, model_name_or_path, max_length=32):
+        self.data = pd.read_csv(holdout_file).dropna(subset=["STR1", "STR2", "type"])
+        self.len = self.data.shape[0]
+        self.max_length = max_length
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+
+    def __getitem__(self, index):
+        str1 = self.data.iloc[index]["STR1"]
+        str2 = self.data.iloc[index]["STR2"]
+        dist = 1 if self.data.iloc[index]["type"] == "similarity" else 2
+        str1_input_id = self.tokenize_one(str1)
+        str2_input_id = self.tokenize_one(str2)
+
+        return np.array(str1_input_id), np.array(str2_input_id), dist
+
+    def __len__(self):
+        return self.len
+
+
+    def tokenize_one(self, string):
+        return self.tokenizer.encode_plus(string, max_length=self.max_length, truncation=True, padding='max_length')['input_ids']
+
 
 if __name__ == "__main__":
     loinc_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_hierarchy.csv"
@@ -236,8 +259,8 @@ if __name__ == "__main__":
 
     tree_dir = "D:/Projects/CODER/Hierarchical-CODER/data/cleaned"
 
-
-
+    holdout_file = "D:/Projects/CODER/Hierarchical-CODER/data/umls_holdout.csv"
+    x = UMLSHoldoutDataset(holdout_file=holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
 
     # umls_dataset = UMLSDataset(umls_folder="D:/Projects/CODER/deps/UMLS/2021AB/META",
     #                            model_name_or_path="monologg/biobert_v1.1_pubmed",
