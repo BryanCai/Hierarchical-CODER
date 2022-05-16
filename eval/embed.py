@@ -84,7 +84,8 @@ def chunker(seq, size):
 def get_embeds(phrase_dict, output_dir, model, tokenizer):
     embeds_list = []
     for phrase_file, phrase_list in phrase_dict.items():
-        output_path = output_dir/(phrase_file + "_embeds.csv")
+        output_path = output_dir/(phrase_file.split(".")[0] + "_embeds.csv")
+        print("writing to {}".format(output_path))
         if os.path.exists(output_path):
           os.remove(output_path)
 
@@ -94,7 +95,7 @@ def get_embeds(phrase_dict, output_dir, model, tokenizer):
 
             assert len(sub_phrase_list) == embeds.shape[0]
             embeds.insert(0, "source", phrase_file)
-            embeds.insert(1, "input", phrase_list)
+            embeds.insert(1, "input", sub_phrase_list)
 
             embeds.to_csv(output_path, sep="|", mode="a", index=False, header=False)
 
@@ -126,8 +127,8 @@ if __name__ == "__main__":
     bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     bert_model = BertModel.from_pretrained("bert-base-uncased").to(device)
 
-    phrase_dict = get_sentences(Path("D:/Projects/CODER/deps/sentences"))
-    output_dir = Path("D:/Projects/CODER/deps/sentences")
+    phrase_dict = get_sentences(Path("/n/data1/hsph/biostat/celehs/lab/sm731/CUI-search/embeds/to_embed"))
+    output_dir = Path("/home/tc24/BryanWork/CODER/data/embed_output")
 
     get_embeds(phrase_dict, output_dir/"coder_embeds", coder_model, coder_tokenizer)
     get_embeds(phrase_dict, output_dir/"bert_embeds", bert_model, bert_tokenizer)
