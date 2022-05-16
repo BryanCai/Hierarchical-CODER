@@ -81,12 +81,13 @@ def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
 
-def get_embeds(phrase_dict, output_path, model, tokenizer):
-    if os.path.exists(output_path):
-      os.remove(output_path)
-
+def get_embeds(phrase_dict, output_dir, model, tokenizer):
     embeds_list = []
     for phrase_file, phrase_list in phrase_dict.items():
+        output_path = output_dir/(phrase_file + "_embeds.csv")
+        if os.path.exists(output_path):
+          os.remove(output_path)
+
         for sub_phrase_list in tqdm(chunker(phrase_list, 10000), total=len(phrase_list)//10000):    
             embeds = get_bert_embed(sub_phrase_list, model, tokenizer, summary_method="MEAN", tqdm_bar=False)
             embeds = pd.DataFrame(embeds)
@@ -128,5 +129,5 @@ if __name__ == "__main__":
     phrase_dict = get_sentences(Path("D:/Projects/CODER/deps/sentences"))
     output_dir = Path("D:/Projects/CODER/deps/sentences")
 
-    get_embeds(phrase_dict, output_dir/"coder_embeds.csv", coder_model, coder_tokenizer)
-    get_embeds(phrase_dict, output_dir/"bert_embeds.csv", bert_model, bert_tokenizer)
+    get_embeds(phrase_dict, output_dir/"coder_embeds", coder_model, coder_tokenizer)
+    get_embeds(phrase_dict, output_dir/"bert_embeds", bert_model, bert_tokenizer)
