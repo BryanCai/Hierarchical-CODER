@@ -18,7 +18,8 @@ class UMLSPretrainedModel(nn.Module):
                  rel_label_count, sty_label_count,
                  re_weight=1.0, sty_weight=0.1,
                  trans_loss_type="TransE", trans_margin=1.0,
-                 id2cui=None, cuitree=None, max_tree_dist=3):
+                 id2cui=None, cuitree=None, max_tree_dist=3,
+                 umls_neg_loss=False):
         super(UMLSPretrainedModel, self).__init__()
 
         self.device = device
@@ -39,7 +40,7 @@ class UMLSPretrainedModel(nn.Module):
         self.sty_loss_fn = nn.CrossEntropyLoss()
         self.sty_weight = sty_weight
 
-        self.pos_loss = HierarchicalLogLoss()
+        self.pos_loss = HierarchicalLogLoss(use_neg_loss=umls_neg_loss)
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
         self.max_tree_dist = max_tree_dist

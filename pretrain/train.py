@@ -223,7 +223,8 @@ def run(args):
                                     rel_label_count=rel_label_count,
                                     sty_label_count=len(umls_dataset.sty2id),
                                     re_weight=args.re_weight,
-                                    sty_weight=args.sty_weight).to(args.device)
+                                    sty_weight=args.sty_weight,
+                                    umls_neg_loss=args.umls_neg_loss).to(args.device)
         args.shift = 0
         model_load = True
 
@@ -321,6 +322,9 @@ def main():
                         help="Weight of sty.")
     parser.add_argument("--re_weight", type=float, default=1.0,
                         help="Weight of re.")
+
+    parser.add_argument("--umls_neg_loss", action="store_true",
+                        help="include negative loss for umls")
 
     args = parser.parse_args()
 

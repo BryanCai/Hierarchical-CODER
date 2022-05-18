@@ -179,11 +179,5 @@ if __name__ == "__main__":
     phecode = TREE(phecode_tree_path, phecode_map_path)
     cpt = TREE(cpt_tree_path, cpt_map_path)
     for d in [loinc, rxnorm, phecode, cpt]:
-        print(len(d.children))
-        c = 0
-        t = 0
-        for i in d.children:
-            if len(d.children[i]) > 0:
-                t += 1
-            c += len(d.children[i])
-        print(c/t)
+        print(d.tree_path)
+        print(len(set(d.parent.keys()).union(set(d.children.keys()))))
