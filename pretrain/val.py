@@ -8,6 +8,7 @@ from torch import nn
 import time
 import os
 import numpy as np
+import pandas as pd
 import argparse
 import time
 import pathlib
@@ -41,25 +42,31 @@ def eval(bert_model, dataloader):
 
     neg_dists_all = np.concatenate(neg_dists_all)
     cos_dists_all = np.concatenate(cos_dists_all)
-    print(roc_auc_score(2 - neg_dists_all, cos_dists_all))
+
+    return neg_dists_all, cos_dists_all
 
 
+def get_roc_tree(neg_dists, cos_dists):
+    df = pd.DataFrame({"neg_dist": neg_dists, "cos_dist": cos_dists})
+    df["class"] = df["neg_dist"].isin([1, 2]).astype(int)
+    print(roc_auc_score(df[df["neg_dist"].isin([1, 3])]["class"], df[df["neg_dist"].isin([1, 3])]["cos_dist"]))
+    print(roc_auc_score(df[df["neg_dist"].isin([2, 3])]["class"], df[df["neg_dist"].isin([2, 3])]["cos_dist"]))
 
 
 if __name__ == "__main__":
     filename = sys.argv[1]
 
-    print(filename)
-    model = torch.load(filename).to(device)
-    tokenizer = model.tokenizer
-    model = model.bert
+    # print(filename)
+    # model = torch.load(filename).to(device)
+    # tokenizer = model.tokenizer
+    # model = model.bert
 
-    # coder_filename = "GanjinZero/coder_eng"
-    # coder_config = AutoConfig.from_pretrained(coder_filename)
-    # coder_tokenizer = AutoTokenizer.from_pretrained(coder_filename)
-    # coder_model = AutoModel.from_pretrained(
-    #     coder_filename,
-    #     config=coder_config).to(device)
+    coder_filename = "GanjinZero/coder_eng"
+    coder_config = AutoConfig.from_pretrained(coder_filename)
+    coder_tokenizer = AutoTokenizer.from_pretrained(coder_filename)
+    model = AutoModel.from_pretrained(
+        coder_filename,
+        config=coder_config).to(device)
 
 
     tree_dir = sys.argv[2]
@@ -70,9 +77,10 @@ if __name__ == "__main__":
 
     tree_dataset = TreeDataset(tree_dir=tree_dir, model_name_or_path="monologg/biobert_v1.1_pubmed", max_neg_samples=32)
     tree_dataloader = fixed_length_dataloader(tree_dataset, fixed_length=256, num_workers=1)
-    eval(coder_model, tree_dataloader)
+    neg_dists, cos_dists = eval(model, tree_dataloader)
+    get_roc_tree(neg_dists, cos_dists)
 
-    umls_holdout_dataset = UMLSHoldoutDataset(holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
-    umls_holdout_dataloader = DataLoader(umls_holdout_dataset, batch_size=128, shuffle=False)
+    # umls_holdout_dataset = UMLSHoldoutDataset(holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
+    # umls_holdout_dataloader = DataLoader(umls_holdout_dataset, batch_size=128, shuffle=False)
 
-    eval(coder_model, umls_holdout_dataloader)
+    # eval(model, umls_holdout_dataloader)

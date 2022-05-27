@@ -157,7 +157,7 @@ def fixed_length_dataloader(dataset, fixed_length=96, num_workers=0):
 
 
 class TreeDataset(Dataset):
-    def __init__(self, tree_dir, model_name_or_path, max_neg_samples=8, max_length=32):
+    def __init__(self, tree_dir, model_name_or_path, max_neg_samples=16, max_length=32):
         tree_dir = Path(tree_dir)
         tree_subdirs = [f for f in tree_dir.iterdir() if f.is_dir()]
         self.trees = {}
@@ -176,36 +176,51 @@ class TreeDataset(Dataset):
         anchor_id, tree = self.obj_list[index]
         if anchor_id not in self.trees[tree].text:
             return [], [], []
-        neg_samples = []
+        close_neg_samples = []
+
+        far_neg_samples = []
+
 
         if tree == 'phecode':
             if "." not in anchor_id:
                 return [], [], []
             else:
                 level = 3 - len(anchor_id.split(".")[1])
-                neg_samples += [(i, level) for i in self.trees[tree].children[anchor_id]]
+                close_neg_samples += [(i, level) for i in self.trees[tree].children[anchor_id]]
                 if anchor_id in self.trees[tree].parent:
                     parent = self.trees[tree].parent[anchor_id]
-                    neg_samples += [(parent, level)]
-                    neg_samples += [(i, level) for i in self.trees[tree].children[parent] if i != anchor_id]
+                    close_neg_samples += [(parent, level)]
+                    close_neg_samples += [(i, level) for i in self.trees[tree].children[parent] if i != anchor_id]
 
         else:    
-            neg_samples += [(i, 2) for i in self.trees[tree].children[anchor_id]]
+            close_neg_samples += [(i, 2) for i in self.trees[tree].children[anchor_id]]
             if anchor_id in self.trees[tree].parent:
                 parent = self.trees[tree].parent[anchor_id]
-                neg_samples += [(parent, 2)]
-                neg_samples += [(i, 2) for i in self.trees[tree].children[parent] if i != anchor_id]
+                close_neg_samples += [(parent, 2)]
+                close_neg_samples += [(i, 2) for i in self.trees[tree].children[parent] if i != anchor_id]
 
 
-        neg_samples = [i for i in neg_samples if i[0] in self.trees[tree].text]
+        close_neg_samples = [i for i in close_neg_samples if i[0] in self.trees[tree].text]
 
-        if len(neg_samples) > self.max_neg_samples:
-            neg_samples = random.sample(neg_samples, self.max_neg_samples)
+        if len(close_neg_samples) > 0:
+            close_neg_samples_id, _ = list(zip(*close_neg_samples))
+            far_neg_samples = [(i, 3) for i in list(set(self.trees[tree].text.keys()) - set(close_neg_samples_id + (anchor_id,)))]
+        else:
+            far_neg_samples = [(i, 3) for i in list(set(self.trees[tree].text.keys()) - set([anchor_id]))]
+
+        if len(close_neg_samples) > self.max_neg_samples//2:
+            close_neg_samples = random.sample(close_neg_samples, self.max_neg_samples//2)
+
+        if len(far_neg_samples) > self.max_neg_samples//2:
+            far_neg_samples = random.sample(far_neg_samples, self.max_neg_samples//2)
+
+
+        neg_samples = close_neg_samples + far_neg_samples
+        neg_samples_id, neg_samples_dist = list(zip(*neg_samples))
 
         if len(neg_samples) == 0:
             return [], [], []
 
-        neg_samples_id, neg_samples_dist = list(zip(*neg_samples))
 
         anchor_string = random.choice(self.trees[tree].text[anchor_id])
         neg_samples_string = [random.choice(self.trees[tree].text[i]) for i in neg_samples_id]
@@ -248,19 +263,19 @@ class UMLSHoldoutDataset(Dataset):
 
 
 if __name__ == "__main__":
-    loinc_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_hierarchy.csv"
-    loinc_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_code2string.csv"
-    rxnorm_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_hierarchy.csv"
-    rxnorm_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_code2string.csv"
-    phecode_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_phecode_hierarchy.csv"
-    phecode_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_code2string.csv"
-    cpt_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_ccs_hierarchy.csv"
-    cpt_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_code2string.csv"
+    # loinc_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_hierarchy.csv"
+    # loinc_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/loinc/loinc_code2string.csv"
+    # rxnorm_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_hierarchy.csv"
+    # rxnorm_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/rxnorm/rxnorm_code2string.csv"
+    # phecode_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_phecode_hierarchy.csv"
+    # phecode_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/icd_code2string.csv"
+    # cpt_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_ccs_hierarchy.csv"
+    # cpt_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_code2string.csv"
 
-    tree_dir = "D:/Projects/CODER/Hierarchical-CODER/data/cleaned"
+    tree_dir = "D:/Projects/CODER/Hierarchical-CODER/data/cleaned/val_phecode"
 
-    holdout_file = "D:/Projects/CODER/Hierarchical-CODER/data/umls_holdout.csv"
-    x = UMLSHoldoutDataset(holdout_file=holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
+    # holdout_file = "D:/Projects/CODER/Hierarchical-CODER/data/umls_holdout.csv"
+    # x = UMLSHoldoutDataset(holdout_file=holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
 
     # umls_dataset = UMLSDataset(umls_folder="D:/Projects/CODER/deps/UMLS/2021AB/META",
     #                            model_name_or_path="monologg/biobert_v1.1_pubmed",
@@ -269,17 +284,19 @@ if __name__ == "__main__":
 
     tree_dataset = TreeDataset(tree_dir=tree_dir,
         model_name_or_path="monologg/biobert_v1.1_pubmed")
+    for i in tree_dataset:
+        print(i[2])
 
-    for x in ["loinc", "rxnorm", "phecode", "cpt"]:
-        d = tree_dataset.trees[x]
-        print(len(d.children))
-        c = 0
-        t = 0
-        for i in d.children:
-            if len(d.children[i]) > 0:
-                t += 1
-            c += len(d.children[i])
-        print(c/t)
+    # for x in ["loinc", "rxnorm", "phecode", "cpt"]:
+    #     d = tree_dataset.trees[x]
+    #     print(len(d.children))
+    #     c = 0
+    #     t = 0
+    #     for i in d.children:
+    #         if len(d.children[i]) > 0:
+    #             t += 1
+    #         c += len(d.children[i])
+    #     print(c/t)
 
     # dataloader = fixed_length_dataloader(tree_dataset, num_workers=4)
 
