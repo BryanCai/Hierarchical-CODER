@@ -56,18 +56,24 @@ def get_roc_tree(neg_dists, cos_dists):
 if __name__ == "__main__":
     filename = sys.argv[1]
 
-    # print(filename)
-    # model = torch.load(filename).to(device)
-    # tokenizer = model.tokenizer
-    # model = model.bert
+    print(filename)
+    model = torch.load(filename).to(device)
+    tokenizer = model.tokenizer
+    model = model.bert
 
     coder_filename = "GanjinZero/coder_eng"
     coder_config = AutoConfig.from_pretrained(coder_filename)
     coder_tokenizer = AutoTokenizer.from_pretrained(coder_filename)
-    model = AutoModel.from_pretrained(
+    coder_model = AutoModel.from_pretrained(
         coder_filename,
         config=coder_config).to(device)
 
+    sapbert_filename = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+    sapbert_config = AutoConfig.from_pretrained(coder_filename)
+    sapbert_tokenizer = AutoTokenizer.from_pretrained(coder_filename)
+    sapbert_model = AutoModel.from_pretrained(
+        sapbert_filename,
+        config=sapbert_config).to(device)
 
     tree_dir = sys.argv[2]
     print(tree_dir)
@@ -75,10 +81,12 @@ if __name__ == "__main__":
     holdout_file = sys.argv[3]
     print(holdout_file)
 
-    tree_dataset = TreeDataset(tree_dir=tree_dir, model_name_or_path="monologg/biobert_v1.1_pubmed", max_neg_samples=32)
-    tree_dataloader = fixed_length_dataloader(tree_dataset, fixed_length=256, num_workers=1)
-    neg_dists, cos_dists = eval(model, tree_dataloader)
-    get_roc_tree(neg_dists, cos_dists)
+
+    for m, t in [(model, tokenizer), (coder_model, coder_tokenizer), (sapbert_model, sapbert_tokenizer)]:
+        tree_dataset = TreeDataset(tree_dir=tree_dir, tokenizer=t, max_neg_samples=32)
+        tree_dataloader = fixed_length_dataloader(tree_dataset, fixed_length=256, num_workers=1)
+        neg_dists, cos_dists = eval(m, tree_dataloader)
+        get_roc_tree(neg_dists, cos_dists)
 
     # umls_holdout_dataset = UMLSHoldoutDataset(holdout_file, model_name_or_path="monologg/biobert_v1.1_pubmed")
     # umls_holdout_dataloader = DataLoader(umls_holdout_dataset, batch_size=128, shuffle=False)

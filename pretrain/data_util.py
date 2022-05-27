@@ -157,7 +157,7 @@ def fixed_length_dataloader(dataset, fixed_length=96, num_workers=0):
 
 
 class TreeDataset(Dataset):
-    def __init__(self, tree_dir, model_name_or_path, max_neg_samples=16, max_length=32):
+    def __init__(self, tree_dir, model_name_or_path=None, tokenizer=None, max_neg_samples=16, max_length=32):
         tree_dir = Path(tree_dir)
         tree_subdirs = [f for f in tree_dir.iterdir() if f.is_dir()]
         self.trees = {}
@@ -170,7 +170,10 @@ class TreeDataset(Dataset):
             self.len += len(self.trees[tree])
         self.max_neg_samples = max_neg_samples
         self.max_length = max_length
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+        if model_name_or_path is not None:
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+        else:
+            self.tokenizer = tokenizer
 
     def __getitem__(self, index):
         anchor_id, tree = self.obj_list[index]
