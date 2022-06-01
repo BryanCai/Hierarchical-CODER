@@ -69,6 +69,7 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
     while True:
         model.train()
 
+        tree_loss = 0
         batch_loss = 0.
         batch_sty_loss = 0.
         batch_cui_loss = 0.
@@ -81,6 +82,7 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
                 neg_samples_ids   = tree_batch[1].to(args.device)
                 neg_samples_dists = tree_batch[2].to(args.device)
                 loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+                tree_loss = float(loss.item())
 
                 if args.gradient_accumulation_steps > 1:
                     loss = loss / args.gradient_accumulation_steps
@@ -156,6 +158,10 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
                 # sty_parameter
                 writer.add_embedding(model.linear_sty.weight, metadata=umls_dataset.sty2id.keys(
                 ), global_step=global_step, tag="sty weight")
+
+            log_path = os.path.join(args.output_dir, 'log_file.csv')
+            with open(log_path, 'a') as f:
+                f.write("{}, {}, {}, {}\n".format(tree_loss, batch_loss, batch_sty_loss, batch_re_loss))
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 return None
