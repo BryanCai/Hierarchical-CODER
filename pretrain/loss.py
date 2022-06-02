@@ -103,7 +103,6 @@ class HierarchicalMultiSimilarityLoss(nn.Module):
 class HierarchicalLogLoss(nn.Module):
     def __init__(self, use_neg_loss, base=0.5, **kwargs):
         super(HierarchicalLogLoss, self).__init__()
-        print(use_neg_loss)
         self.use_neg_loss = use_neg_loss
         self.base = base
 

@@ -77,7 +77,7 @@ def train(args, model, umls_dataloader, tree_dataloader, umls_dataset):
 
         batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
         for tree_batch, umls_batch in batch_iterator:
-            if tree_batch is not None:
+            if tree_batch is not None and not args.no_tree_loss:
                 anchor_ids        = tree_batch[0].to(args.device)
                 neg_samples_ids   = tree_batch[1].to(args.device)
                 neg_samples_dists = tree_batch[2].to(args.device)
@@ -331,6 +331,10 @@ def main():
 
     parser.add_argument("--umls_neg_loss", action="store_true",
                         help="include negative loss for umls")
+
+
+    parser.add_argument("--no_tree_loss", action="store_true",
+                        help="remove tree loss")
 
     args = parser.parse_args()
 
