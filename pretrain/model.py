@@ -19,6 +19,7 @@ class UMLSPretrainedModel(nn.Module):
                  re_weight=1.0, sty_weight=0.1,
                  trans_loss_type="TransE", trans_margin=1.0,
                  id2cui=None, cuitree=None, max_tree_dist=3,
+                 loss_type = "log",
                  umls_neg_loss=False):
         super(UMLSPretrainedModel, self).__init__()
 
@@ -40,7 +41,11 @@ class UMLSPretrainedModel(nn.Module):
         self.sty_loss_fn = nn.CrossEntropyLoss()
         self.sty_weight = sty_weight
 
-        self.pos_loss = HierarchicalLogLoss(use_neg_loss=umls_neg_loss)
+        if loss_type == "log":
+            self.pos_loss = HierarchicalLogLoss(use_neg_loss=umls_neg_loss)
+        elif loss_type == "ms":
+            self.pos_loss = HierarchicalMultiSimilarityLoss()
+
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
         self.max_tree_dist = max_tree_dist
@@ -68,7 +73,7 @@ class UMLSPretrainedModel(nn.Module):
         self.sequence_summary = SequenceSummary(AutoConfig.from_pretrained(model_name_or_path)) # Now only used for XLNet
 
 
-    def log_loss(self, embeddings, labels):
+    def cui_loss(self, embeddings, labels):
         pairs = self.miner(embeddings, labels)        
         emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
         dist_mat = torch.matmul(emb_normalized, emb_normalized.t())
@@ -116,7 +121,7 @@ class UMLSPretrainedModel(nn.Module):
         sty_loss = self.sty_loss_fn(logits_sty, sty_label)
 
 
-        cui_loss = self.log_loss(pooled_output, cui_label)
+        cui_loss = self.cui_loss(pooled_output, cui_label)
 
         cui_0_output = pooled_output[0:use_len]
         cui_1_output = pooled_output[use_len:2 * use_len]

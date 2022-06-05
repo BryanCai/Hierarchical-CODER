@@ -230,6 +230,7 @@ def run(args):
                                     sty_label_count=len(umls_dataset.sty2id),
                                     re_weight=args.re_weight,
                                     sty_weight=args.sty_weight,
+                                    loss_type=args.loss_type,
                                     umls_neg_loss=args.umls_neg_loss).to(args.device)
         args.shift = 0
         model_load = True
@@ -272,6 +273,13 @@ def main():
         default=25000,
         type=int,
         help="Save step",
+    )
+
+    parser.add_argument(
+        "--loss_type", 
+        default="log",
+        type=str,
+        help="loss type for cui",
     )
 
     # Other parameters

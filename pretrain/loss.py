@@ -82,15 +82,13 @@ class HierarchicalMultiSimilarityLoss(nn.Module):
         self.beta = beta
         self.base = base
 
-    def forward(self, embeddings, labels, indices_tuple):
-        emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
-        mat = torch.matmul(emb_normalized, emb_normalized.t())
+    def forward(self, dist_mat, indices_tuple):
         a1, p, a2, n = indices_tuple
-        pos_mask, neg_mask = torch.zeros_like(mat), torch.zeros_like(mat)
+        pos_mask, neg_mask = torch.zeros_like(dist_mat), torch.zeros_like(dist_mat)
         pos_mask[a1, p] = 1
         neg_mask[a2, n] = 1
-        pos_exp = self.base - mat
-        neg_exp = mat - self.base
+        pos_exp = self.base - dist_mat
+        neg_exp = dist_mat - self.base
         pos_loss = (1.0 / self.alpha) * logsumexp(
             self.alpha * pos_exp, keep_mask=pos_mask.bool(), add_one=True
         )
