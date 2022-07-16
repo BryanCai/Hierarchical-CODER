@@ -1,0 +1,201 @@
+"Index"	"Chinese_term1"	"English_term1"	"Chinese_term2"	"English_term2"	"CUI1"	"CUI2"	"Similarity"	"Relativeness"
+1	"高血压"	"hypertension"	"心脏病"	"heart disease"	"C0020538"	"C0018799"	35	62.5
+2	"动脉硬化"	"arteriosclerosis"	"冠状动脉疾病"	"Coronary artery disease"	"C0003850"	"C0010054"	62.5	88.75
+3	"炎症"	"Inflammation"	"抗炎"	"Anti-inflammatory"	"C0021368"	"C0003209"	16.25	86.25
+4	"恶化"	"deterioration"	"不稳定"	"Unstable"	"C0868945"	"C0443343"	76.25	81.25
+5	"哮喘"	"Asthma"	"过敏性哮喘"	"Allergic asthma"	"C0004096"	"C0155877"	83.75	90
+6	"痛风"	"gout"	"尿酸"	"Uric acid"	"C0018099"	"C0041980"	21.25	96
+7	"布洛芬"	"Ibuprofen"	"止痛药物"	"Pain medication"	"C0020740"	"C0002771"	45	94.75
+8	"病毒感染"	"Viral infection"	"发炎"	"inflammation"	"C0042769"	"C0021368"	35	66.25
+9	"高血脂"	"Hyperlipidemia"	"高胆固醇"	"High cholesterol"	"C0020473"	"C1522133"	81.25	92
+10	"休克"	"shock"	"晕厥"	"Syncope"	"C0036974"	"C0039070"	47.25	62.25
+11	"心律失常"	"Arrhythmia"	"心律不齐"	"Arrhythmia"	"C0003811"	"C0003811"	98.5	97.25
+12	"急性感染"	"Acute infection"	"急性病"	"Acute disease"	"C0275518"	"C0001314"	35	57.5
+13	"腰腿痛"	"Low back pain"	"腰痛"	"lumbago"	"C0024031"	"C0024031"	71.25	85
+14	"泌尿外科"	"Urology"	"右肾"	"Right kidney"	"C0042077"	"C0227613"	30	81.25
+15	"加重"	"Aggravation"	"加剧"	"exacerbate"	"C0541889"	"C0436331"	77	82
+16	"老年性"	"Senile"	"白内障"	"cataract"	"C0392079"	"C0086543"	8.75	68.75
+17	"肋骨"	"rib"	"胸腔"	"Thoracic cavity"	"C0035561"	"C0230139"	10	68.75
+18	"腰椎"	"Lumbar spine"	"肾上腺"	"Adrenal gland"	"C0024091"	"C0001625"	6.25	17.5
+19	"泌尿道"	"Urinary tract"	"泌尿外科"	"Urology"	"C0042027"	"C0042077"	17.5	82.5
+20	"红细胞"	"Red blood cell"	"血小板"	"Platelet"	"C0014792"	"C0005821"	12.5	70
+21	"过敏性鼻炎"	"Allergic rhinitis"	"过敏"	"allergy"	"C2607914"	"C0020517"	51.25	84.75
+22	"青霉素"	"penicillin"	"急性扁桃体炎"	"Acute tonsillitis"	"C0030842"	"C0001361"	7.5	80
+23	"术前"	"Preoperative"	"麻醉"	"anesthesia"	"C0445204"	"C0278134"	7.5	65
+24	"左氧氟沙星"	"Levofloxacin"	"口服抗生素"	"Oral antibiotic"	"C0282386"	"C0559681"	38.75	79.75
+25	"足部"	"Foot"	"脚"	"foot"	"C0016504"	"C0016504"	97.5	97.5
+26	"肝硬化"	"Cirrhosis"	"慢性肝病"	"Chronic liver disease"	"C0023890"	"C0341439"	61.25	88.75
+27	"高血压性心脏病"	"Hypertensive heart disease"	"动脉硬化"	"arteriosclerosis"	"C0152105"	"C0003850"	53.75	87.5
+28	"总胆固醇"	"Total cholesterol"	"血脂"	"Blood lipid"	"C0543421"	"C0596192"	75	92.25
+29	"肺炎"	"pneumonia"	"咳嗽"	"cough"	"C0032285"	"C0010200"	47.5	86.5
+30	"升高"	"increase"	"太高"	"Too high"	"C0442805"	"C4036058"	56.25	86.25
+31	"心绞痛"	"angina pectoris"	"心脏病"	"heart disease"	"C0002962"	"C0018799"	62.5	86.75
+32	"类风湿关节炎"	"Rheumatoid Arthritis"	"关节痛"	"Joint pain"	"C0003873"	"C0003862"	52.5	93.75
+33	"类风湿关节炎"	"Rheumatoid Arthritis"	"氨甲喋呤"	"Methotrexate"	"C0003873"	"C0025677"	23.75	88.75
+34	"疼痛"	"pain"	"腹痛"	"stomach ache"	"C0030193"	"C0221512"	40	64.75
+35	"急性上呼吸道感染"	"Acute upper respiratory tract infection"	"肺炎"	"pneumonia"	"C0264222"	"C0032285"	47.5	69
+36	"流涕"	"running nose"	"感冒"	"cold"	"C1260880"	"C0009443"	56.25	89
+37	"干咳"	"dry cough"	"咳嗽"	"cough"	"C0850149"	"C0010200"	80	95.5
+38	"咳痰"	"sputum production"	"咳嗽"	"cough"	"C0242104"	"C0010200"	51.25	90
+39	"治疗"	"treatment"	"辅助检查"	"Auxiliary inspection"	"C0039798"	"NULL"	13.75	55
+40	"体温"	"body temperature"	"发烧"	"fever"	"C0005903"	"C0015967"	37.5	83.75
+41	"恶心呕吐"	"nausea and vomitting"	"止吐"	"Antiemetic"	"C0027498"	"C0003297"	17.5	86.25
+42	"咽痛"	"Sore throat"	"喉咙"	"throat"	"C0031350"	"C0031354"	35	82.5
+43	"周围型肺癌"	"Peripheral lung cancer"	"断层扫描"	"Computed tomography"	"NULL"	"C0040405"	6.25	58.75
+44	"X线透视"	"X-ray"	"断层扫描"	"Computed tomography"	"C0034571"	"C0040405"	37.5	81.25
+45	"心肌显像"	"myocardial perfusion imaging"	"冠心病"	"Coronary heart disease"	"C2350390"	"C0010054"	15	82.5
+46	"磁共振"	"Magnetic resonance"	"脑电图"	"EEG"	"C0028580"	"C0013819"	8.75	32.5
+47	"免疫抑制"	"Immunosuppressive"	"氨甲喋呤"	"Methotrexate"	"C0021081"	"C0025677"	45	85
+48	"支气管炎"	"bronchitis"	"哮喘"	"Asthma"	"C0006277"	"C0004096"	46.25	70
+49	"慢性腹泻"	"Chronic diarrhea"	"腹泻"	"diarrhea"	"C0401151"	"C0011991"	72.5	90
+50	"止痛剂"	"Analgesics"	"布洛芬"	"Ibuprofen"	"C0002771"	"C0020740"	52.5	91.25
+51	"扁桃体肿大"	"tonsillar hypertrophy"	"咽痛"	"Sore throat"	"C0272386"	"C0031350"	51.25	72.5
+52	"急性扁桃体炎"	"Acute tonsillitis"	"咽炎"	"pharyngitis"	"C0001361"	"C0031350"	62.5	77.5
+53	"高血糖"	"High blood sugar"	"糖尿病"	"diabetes"	"C0020456"	"C0011849"	70	93.5
+54	"防癌"	"Cancer prevention"	"抗癌"	"Anticancer"	"C0281206"	"C1548818"	42.25	77.5
+55	"下肢"	"Lower limb"	"腿部"	"Leg"	"C0023216"	"C0023216"	89.75	97.5
+56	"感染"	"infection"	"细菌"	"bacteria"	"C0009450"	"C0004611"	23.75	90
+57	"漫肿"	"edema"	"肿胀"	"swelling"	"C0013604"	"C0013604"	51.25	87.25
+58	"抗生素"	"antibiotic"	"感染"	"infection"	"C0003232"	"C0009450"	16.25	92.5
+59	"胎动"	"Fetal movement"	"怀孕"	"pregnancy"	"C0015946"	"C0032961"	44.75	92.25
+60	"妊娠期"	"Pregnancy"	"孕早期"	"Early pregnancy"	"C0032961"	"C0747845"	77.5	95
+61	"听力损失"	"Hearing loss"	"耳蜗电图"	"electrocochleography"	"C0011053"	"C0013805"	31.25	86.25
+62	"降压药"	"Antihypertensive drugs"	"抗高血压药"	"Antihypertensive drug"	"C0003364"	"C0003364"	96.25	97.5
+63	"肺炎杆菌"	"Klebsiella pneumoniae"	"头孢菌素类"	"Cephalosporins"	"C0001699"	"C2266959"	10	85
+64	"止痛"	"Pain relief"	"疼痛"	"pain"	"C0451615"	"C0030193"	15	86.25
+65	"纤维素"	"Fiber"	"便秘"	"constipation"	"C0225326"	"C0009806"	10	82.5
+66	"高血脂"	"Hyperlipidemia"	"高血压"	"hypertension"	"C0020473"	"C0020538"	23.75	66.25
+67	"眩晕"	"vertigo"	"头晕"	"dizziness"	"C0042571"	"C0012833"	73.75	87.5
+68	"肝肾"	"Liver and kidney"	"肝功能"	"liver function"	"C1268355"	"C0232741"	42.5	76.25
+69	"精神障碍"	"Mental disorder"	"语无伦次"	"Incoherent"	"C0004936"	"C0542044"	47.5	70
+70	"神志不清"	"delirium"	"思维障碍"	"thought disorder"	"C0011206"	"C2115875"	31.25	47.5
+71	"迟钝"	"slow"	"痴呆"	"dementia"	"C0439834"	"C0011265"	38.75	65
+72	"精神障碍"	"Mental disorder"	"妄想"	"delusion"	"C0004936"	"C0011253"	50	77.5
+73	"冠周炎"	"Pericoronitis"	"牙周感染"	"Periodontal infection"	"C0031055"	"C0747479"	78.5	88.5
+74	"药物依赖性"	"Drug dependence"	"药物成瘾"	"Drug addiction"	"C0038580"	"C0038580"	88.75	92.5
+75	"抗糖尿病药"	"Antidiabetic"	"降血糖作用"	"Hypoglycemic effect"	"C0935929"	"C2936720"	56.25	83.75
+76	"出生缺陷"	"Birth defect"	"先天愚型"	"Down syndrome"	"C0000768"	"C0013080"	33.75	83.75
+77	"血小板增多症"	"Thrombocytosis"	"凝血活酶"	"Thromboplastin"	"C0836924"	"C0040048"	23.75	62.5
+78	"皮肤癌"	"skin cancer"	"紫外线"	"Ultraviolet light"	"C0007114"	"C0041625"	8.75	76.25
+79	"支气管舒张"	"Bronchial dilation"	"干咳"	"dry cough"	"C0189463"	"C0850149"	22.5	53.75
+80	"支气管炎"	"bronchitis"	"支气管哮喘"	"Bronchial Asthma"	"C0006277"	"C0004096"	40	66.25
+81	"休克"	"shock"	"头晕"	"lightheadedness"	"C0036974"	"C0220870"	21	45
+82	"突发"	"sudden onset"	"急性"	"acute"	"C1272517"	"C0205178"	76.25	85.25
+83	"心血管系统"	"Cardiovascular System"	"冠状动脉疾病"	"Coronary artery disease"	"C0007226"	"C0010054"	43.75	84
+84	"肝癌"	"Liver cancer"	"化疗"	"Chemotherapy"	"C0345904"	"C0013216"	12.5	85
+85	"癌症"	"cancer"	"肝癌"	"Liver cancer"	"C0006826"	"C0345904"	45	82.5
+86	"淋巴结炎"	"Lymphadenitis"	"淋巴结肿大"	"swollen lymph nodes"	"C0024205"	"C0497156"	57.5	75
+87	"牙龈出血"	"bleeding gums"	"牙周感染"	"Periodontal infection"	"C0017565"	"C0747479"	41.25	81
+88	"前列腺素类"	"Prostaglandins"	"胃溃疡"	"Stomach ulcer"	"C0033554"	"C0038358"	7.5	57.5
+89	"混合型高脂血症"	"Mixed hyperlipidemia"	"他汀类"	"Statin"	"C0020474"	"C0360714"	15	78.75
+90	"甲磺酸倍他司汀"	"Betahistine mesylate"	"眩晕"	"dizziness"	"C0242200"	"C0012833"	8	78.75
+91	"口服降血糖药"	"Oral hypoglycemic agent"	"糖尿病"	"diabetes"	"C0359086"	"C0011849"	35	86.5
+92	"口服降血糖药"	"Oral hypoglycemic agent"	"二甲双胍类"	"Metformin"	"C0359086"	"C0025598"	67.5	91.5
+93	"乙酰氨基酚"	"Acetaminophen"	"发烧"	"fever"	"C0000970"	"C0015967"	13.75	90
+94	"咳痰"	"Expectoration"	"肺炎"	"pneumonia"	"C0038056"	"C0032285"	46.5	86.5
+95	"抗病毒"	"Antiviral"	"病毒感染"	"Viral infection"	"C0003451"	"C0042769"	28.75	90.25
+96	"咽"	"Pharynx"	"喉咙"	"throat"	"C0031354"	"C0031354"	60.25	79
+97	"恐怖"	"Terrifying"	"惊惕"	"Horror"	"C0558261"	"C4061714"	64	82.75
+98	"变硬"	"Harden"	"硬化"	"hardening"	"C0702118"	"C0702118"	84.75	93.5
+99	"抗炎作用"	"Anti-inflammatory effect"	"消炎"	"Anti-inflammatory"	"C1515999"	"C0003209"	84.75	93.75
+100	"杀菌"	"Sterilization"	"消毒"	"disinfection"	"C0038280"	"C0012683"	85	95
+101	"疗效"	"Efficacy"	"生成"	"generate"	"C1280519"	"NULL"	12.25	17.25
+102	"消除"	"eliminate"	"减少"	"cut back"	"NULL"	"C0561296"	43.75	65.25
+103	"移植"	"transplant"	"再植"	"Replant"	"C0040732"	"C0544725"	48.75	67.5
+104	"骨科"	"orthopedics"	"断指再植"	"Replantation of amputated finger"	"C0029355"	"C3512188"	18.75	76.25
+105	"骨科"	"orthopedics"	"心血管病"	"Cardiovascular disease"	"C0029355"	"C0007222"	5.5	6.75
+106	"血液凝固"	"Blood coagulation"	"凝血酶"	"Thrombin"	"C0005778"	"C0040018"	40	90.25
+107	"肾脏排泄"	"Renal excretion"	"代谢"	"metabolism"	"C1373187"	"C0025519"	31.25	80
+108	"肾脏排泄"	"Renal excretion"	"免疫"	"Immunology"	"C1373187"	"C0152036"	7	8.25
+109	"生理盐水"	"normal saline"	"移植"	"transplant"	"C0445115"	"C0040732"	5.5	6.75
+110	"抑制剂"	"Inhibitor"	"心血管病"	"Cardiovascular disease"	"C1999216"	"C0007222"	3	9.25
+111	"减轻"	"relieve"	"缓解"	"ease"	"C1301676"	"C1331418"	85	90
+112	"缓解"	"ease"	"增生"	"Hyperplasia"	"C1331418"	"C0020507"	8.25	27.5
+113	"胆固醇"	"cholesterol"	"抗菌素"	"Antibiotic"	"C0008377"	"C0003232"	5.75	4.5
+114	"眼药水"	"Eye drops"	"眼压增高"	"ocular hypertension"	"C0015399"	"C0028840"	8.75	62.5
+115	"总胆固醇"	"Total cholesterol"	"肥胖"	"obesity"	"C0543421"	"C0028754"	22.5	78.75
+116	"风热感冒"	"Acute upper respiratory infection"	"咽喉红肿"	"sore throat"	"C0264222"	"C0031350"	30	65
+117	"痛痒"	"Itching"	"温热"	"Warm"	"C0033774"	"C0687712"	9.25	33
+118	"咽痛"	"Sore throat"	"扁桃体"	"tonsil"	"C0031350"	"C0040421"	25	72.5
+119	"解除"	"Release"	"按压"	"Press"	"C0030685"	"NULL"	17.5	55
+120	"颈椎"	"Cervical vertebrae"	"脊椎"	"vertebrae"	"C0728985"	"C0549207"	57.5	83.75
+121	"背部"	"Back"	"脊椎"	"vertebrae"	"C0004600"	"C0549207"	36.25	68.75
+122	"肋骨"	"rib"	"腋窝"	"armpit"	"C0035561"	"C0004454"	13	40
+123	"剔除"	"Exclude"	"去除"	"Remove"	"C0332196"	"C0849355"	60	78.75
+124	"去除"	"Remove"	"止咳"	"Antitussive"	"C0849355"	"C0003449"	11.25	12.5
+125	"减轻"	"Lighten"	"解除"	"Release"	"C1306868"	"C0030685"	63.75	72.5
+126	"病毒感染"	"Viral infection"	"急性扁桃体炎"	"Acute tonsillitis"	"C0042769"	"C0001361"	20	65
+127	"细菌"	"bacterial"	"心血管病"	"Cardiovascular disease"	"C0521009"	"C0007222"	7.5	21.25
+128	"咽喉"	"throat"	"舌根"	"root of tongue"	"C0031354"	"C0226958"	37.5	57.5
+129	"腰背疼痛"	"Back pain"	"背部"	"Back"	"C0004604"	"C0004600"	21.25	75
+130	"消痛"	"Pain relief"	"咳嗽"	"cough"	"C0451615"	"C0010200"	6.25	26.25
+131	"疼痛缓解"	"Pain relief"	"总胆固醇"	"Total cholesterol"	"C0451615"	"C0543421"	25	26.25
+132	"视网膜病变"	"Retinopathy"	"眼睛"	"eye"	"C0035309"	"C0015392"	13.75	81.25
+133	"血液透析"	"Hemodialysis"	"肾"	"kidney"	"C0019004"	"C0022646"	17.5	82.5
+134	"血液透析"	"Hemodialysis"	"肾功能衰竭"	"Renal Failure"	"C0019004"	"C0035078"	28.75	91.25
+135	"青光眼"	"glaucoma"	"眼压增高"	"ocular hypertension"	"C0017601"	"C0028840"	88.5	93.5
+136	"鼻外伤"	"Nasal trauma"	"外力作用"	"External force"	"NULL"	"NULL"	28.75	57.5
+137	"撕裂伤"	"Tearing"	"外伤"	"trauma"	"C0043246"	"C0043250"	36.25	72.5
+138	"视野检查"	"visual field test"	"青光眼"	"glaucoma"	"C0042825"	"C0017601"	20	75
+139	"心跳停止"	"cardiac arrest"	"静脉压"	"Venous pressure"	"C0018790"	"C0042486"	6.75	52.5
+140	"明显增强"	"Significantly enhanced"	"抗氧化"	"antioxidants"	"NULL"	"C0003402"	4	4
+141	"急性肾小球肾炎"	"Acute glomerulonephritis"	"麻醉剂"	"Anesthetic"	"C0156221"	"C0002932"	3.75	17.5
+142	"胆固醇"	"cholesterol"	"消化道感染"	"Gastrointestinal infection"	"C0008377"	"C1264613"	3.75	7.5
+143	"尿道感染"	"urinary tract infection"	"肾"	"kidney"	"C0042029"	"C0022646"	16.25	53.75
+144	"淋巴结炎"	"Lymphadenitis"	"细菌"	"bacteria"	"C0024205"	"C0004611"	11.25	70
+145	"自身免疫病"	"Autoimmune disease"	"类风湿关节炎"	"Rheumatoid Arthritis"	"C0004364"	"C0003873"	22.5	83.75
+146	"类风湿关节炎"	"Rheumatoid Arthritis"	"腰肌劳损"	"lumbar strain"	"C0003873"	"C0262541"	7.5	16.25
+147	"精神压力"	"mental stress"	"头痛"	"headache"	"C0038443"	"C0018681"	8.75	52.5
+148	"血糖"	"blood sugar"	"心脏病"	"heart disease"	"C0005802"	"C0018799"	7.5	56.25
+149	"关节炎"	"arthritis"	"肾上腺"	"Adrenal gland"	"C0003864"	"C0001625"	7.5	8.75
+150	"急性胃炎"	"Acute gastritis"	"消化"	"digestion"	"C0149518"	"C0012238"	10	53.75
+151	"减弱"	"Weaken"	"衰退"	"decline"	"NULL"	"NULL"	73.75	87.5
+152	"精神压力"	"mental stress"	"情绪低落"	"Depression"	"C0038443"	"C0011570"	28.75	66.25
+153	"烦乱"	"agitation"	"头痛"	"headache"	"C0085631"	"C0018681"	12.5	43.75
+154	"软弱无力"	"weakness"	"麻醉剂"	"Anesthetic"	"C0004093"	"C0002932"	12.5	45
+155	"阻塞性肺病"	"obstructive pulmonary disease"	"哮喘"	"asthma"	"C0600260"	"C0004096"	66.25	81.25
+156	"足肿"	"Foot swelling"	"皮肤皲裂"	"Chapped skin"	"C0574002"	"C0549202"	13.75	33.75
+157	"呼吸"	"Able to breathe"	"肺炎"	"pneumonia"	"C0566270"	"C0032285"	8.75	60
+158	"预防感染"	"Behavior to prevent infection"	"止咳"	"Antitussive"	"C2585946"	"C0003449"	10	36.25
+159	"前胸"	"anterior chest"	"肩膀"	"shoulder"	"C0230132"	"C0037004"	13.75	31.25
+160	"慢性咽炎"	"Chronic pharyngitis"	"吞咽"	"Swallowing"	"C0155825"	"C0740170"	10	50
+161	"抗肿瘤"	"Antitumor"	"癌症"	"cancer"	"C2986475"	"C0006826"	13.75	81.25
+162	"脑细胞"	"Brain Cells"	"瘤细胞"	"Tumor cell"	"C0596208"	"C0431085"	5	13.75
+163	"免疫功能"	"Immune Function"	"暂时性"	"Temporary"	"C1817756"	"C0205374"	3.75	5
+164	"眼痒"	"Itchy eyes"	"慢性咳嗽"	"Chronic cough"	"C0022281"	"C0010201"	3.75	7.5
+165	"溃烂"	"fester"	"脓疱"	"Pustule"	"NULL"	"C0241157"	37.5	81.25
+166	"真菌感染"	"Fungal infection"	"金黄色葡萄球菌"	"Staphylococcus aureus"	"C0026946"	"C0038172"	11.25	33.75
+167	"不利于"	"Adverse effects"	"不足"	"Insufficient (qualifier)"	"C0879626"	"C0231180"	5.25	6.5
+168	"骨质增生症"	"bone spur"	"疼痛"	"pain"	"C1442903"	"C0030193"	13.75	53.75
+169	"上呼吸道"	"Upper respiratory tract"	"扁桃体"	"tonsil"	"C0458578"	"C0040421"	18.75	57.5
+170	"胸骨上窝"	"suprasternal notch"	"舌骨"	"Hyoid bone"	"C0222769"	"C0020417"	17.5	35
+171	"下腹痛"	"Lower abdominal pain"	"坠痛"	"throbbing pain"	"C0232495"	"C0278148"	58.75	88.75
+172	"急性脑血管病"	"Acute cerebrovascular disease"	"中风"	"Stroke"	"C0810006"	"C0038454"	86.25	91.25
+173	"痛风"	"gout"	"关节炎"	"arthritis"	"C0018099"	"C0003864"	56.25	86.25
+174	"胰腺炎"	"pancreatitis"	"淋巴细胞"	"Lymphocyte"	"C0030305"	"C0024264"	11.25	48.75
+175	"指间关节"	"Interphalangeal joint"	"手"	"hand"	"C1563055"	"C0018563"	38.5	81.25
+176	"鼻炎"	"rhinitis"	"内部"	"internal"	"C0035455"	"C0205102"	5.75	13.25
+177	"上呼吸道"	"Upper respiratory tract"	"下腹痛"	"Lower abdominal pain"	"C0458578"	"C0232495"	4.75	7.25
+178	"癌肿"	"Cancer"	"骨肿瘤"	"Bone tumor"	"C0006826"	"C0005967"	56.25	90
+179	"骨组织"	"Bone tissue"	"肺心病"	"Pulmonary heart disease"	"C0391978"	"C0034072"	4.25	5.5
+180	"口腔炎"	"Stomatitis"	"牙周炎"	"Periodontitis"	"C0038362"	"C0031099"	31.25	52.5
+181	"腹绞痛"	"Abdominal cramps"	"鼻炎"	"rhinitis"	"C0000729"	"C0035455"	3.25	4.5
+182	"趾间"	"Syndactyly between adjacent toes (in some patients)"	"淋巴结"	"Lymph node"	"C3809125"	"C0024204"	3	4.25
+183	"骨髓穿刺"	"Bone marrow biopsy"	"骨质增生症"	"hyperostosis"	"C0005954"	"C0020492"	11.25	45
+184	"抗菌药物"	"antibiotics"	"腹绞痛"	"Abdominal cramps"	"C0003232"	"C0000729"	11	17.5
+185	"溃疡"	"ulcer"	"口腔炎"	"Stomatitis"	"C0041582"	"C0038362"	28.75	50
+186	"皮炎"	"dermatitis"	"外部"	"external"	"C0011603"	"C0205101"	10	31.25
+187	"视神经炎"	"Optic neuritis"	"上呼吸道"	"Upper respiratory tract"	"C0029134"	"C0458578"	6.25	8.75
+188	"磁共振成像"	"Magnetic resonance imaging"	"检测手段"	"testing method"	"C0024485"	"C0039593"	31.25	63.75
+189	"甲状腺肿"	"Goiter"	"颈椎病"	"Cervical spondylosis"	"C0018021"	"C1384641"	8.5	16
+190	"慢性气管炎"	"Chronic bronchitis"	"心室"	"ventricle"	"C0008677"	"C0018827"	7.5	8.75
+191	"支气管扩张"	"Bronchiectasis"	"慢性咽喉炎"	"Chronic pharyngitis"	"C0006267"	"C0155825"	16.25	28.75
+192	"头痛"	"headache"	"多发性神经炎"	"Polyneuritis"	"C0018681"	"C0032541"	17.5	40
+193	"哮喘"	"asthma"	"支气管"	"bronchus"	"C0004096"	"C0006255"	31.25	77.5
+194	"皮炎"	"dermatitis"	"湿疹"	"eczema"	"C0011603"	"C0013595"	68.75	83.75
+195	"无异常"	"No abnormality"	"完好"	"intact"	"C3809765"	"C0205266"	72.5	85
+196	"止痛药物"	"Analgesics"	"薄膜衣片"	"film coated tablets"	"C0002771"	"C0308070"	23.75	42.5
+197	"截然"	"completely"	"狂躁"	"mania"	"C4036138"	"C0338831"	5	6.25
+198	"情感障碍"	"Affective disorder"	"神志不清"	"delirium"	"C0525045"	"C0011206"	12.5	25
+199	"肾组织"	"Kidney tissue"	"慢性萎缩性胃炎"	"Chronic atrophic gastritis"	"C0586762"	"C0017154"	6.25	7.5
+200	"脑溢血"	"intracerebral hemorrhage"	"中风"	"Stroke"	"C2937358"	"C0038454"	71.25	88.75
