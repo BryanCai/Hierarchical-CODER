@@ -13,6 +13,7 @@ import sys
 # sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical_CODER_new/sanity_check/simplify_ms_codified/')
 # sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical-CODER/pretrain')
 # from model import UMLSPretrainedModel
+sys.path.append('/home/tc24/BryanWork/CODER/sanity_check/clogit_codified/')
 import json
 from scipy.stats import spearmanr
 
@@ -23,9 +24,9 @@ class EvalRank():
         self.similar_score_ch, self.related_score_ch, self.string3, self.string4 = self.read_chinese_term_pairs(chinese_term_pair_path)
         self.model_name_or_path = model_name_or_path
         if model_name_or_path[-8:] == 'bert.pth':
-            self.model = torch.load(model_name_or_path, map_location=torch.device('cuda:1'))
+            self.model = torch.load(model_name_or_path, map_location=torch.device('cuda:0'))
         elif model_name_or_path[-4:] == '.pth':
-            self.model = torch.load(model_name_or_path, map_location=torch.device('cuda:1')).bert
+            self.model = torch.load(model_name_or_path, map_location=torch.device('cuda:0')).bert
             torch.save(self.model, model_name_or_path[:-4] + '_bert.pth')
         else:
             self.model = AutoModel.from_pretrained(model_name_or_path)
@@ -124,7 +125,7 @@ if __name__ == '__main__':
         similar_path='similar.txt',
         related_path='related.txt',
         chinese_term_pair_path='chinesetermpairs.txt',
-        model_name_or_path='/media/sdb1/Zengsihang/Hier_CODER/Hierarchical_CODER_new/sanity_check/simplify_ms_codified/output_250/model_5000_bert.pth',
+        model_name_or_path='/home/tc24/BryanWork/saved_models/output_clogit/model_5000.pth',
         tokenizer_name='monologg/biobert_v1.1_pubmed',
-        output_path='rank_res_sanity_250_mod_ms.json'
+        output_path='/home/tc24/BryanWork/saved_models/output_clogit/rank_res_5000.json'
     )

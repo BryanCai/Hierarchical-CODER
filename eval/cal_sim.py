@@ -12,7 +12,7 @@ import gc
 import argparse
 
 batch_size = 64
-device = torch.device("cuda:1")
+device = torch.device("cuda:0")
 
 def get_bert_embed(phrase_list, m, tok, normalize=True, summary_method="CLS", tqdm_bar=True):
     m = m.to(device)
