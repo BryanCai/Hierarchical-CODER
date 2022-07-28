@@ -27,9 +27,9 @@ def sumlogexp(x, keep_mask=None, dim=1):
     return output
 
 
-def clogit_partial(alpha, case_similarities, control_similarities):
-    a = torch.exp((-alpha)*case_similarities)/(torch.exp((-alpha)*case_similarities) + torch.sum(torch.exp((-alpha)*control_similarities)))
-    b = torch.exp(alpha*control_similarities)/(torch.exp(alpha*control_similarities) + torch.sum(torch.exp(alpha*case_similarities)))
+def clogit_partial(alpha, control_similarities, case_similarities):
+    a = torch.exp((-alpha)*control_similarities)/(torch.exp((-alpha)*control_similarities) + torch.sum(torch.exp((-alpha)*case_similarities)))
+    b = torch.exp(alpha*case_similarities)/(torch.exp(alpha*case_similarities) + torch.sum(torch.exp(alpha*control_similarities)))
 
     return torch.mean(torch.log(torch.cat((a, b))))
 
@@ -164,15 +164,14 @@ class ConditionalLogitLoss(nn.Module):
         self.alpha = alpha
         self.cos = nn.CosineSimilarity()
 
-    def forward(self, anchor_embed, neg_samples_embed, neg_dists):
-        cdist = self.cos(anchor_embed, neg_samples_embed)
+    def forward(self, anchor_embed, all_samples_embed, all_dists):
+        cdist = self.cos(anchor_embed, all_samples_embed)
         cdist = (cdist+1)/2
         loss = 0
 
-        for i in range(torch.max(neg_dists) - 1):
-            case_similarities = cdist[neg_dists <= i]
-            control_similarities = cdist[neg_dists > i]
-            loss += clogit_partial(self.alpha, case_similarities, control_similarities)
+        control_similarities = cdist[all_dists <= 0]
+        case_similarities = cdist[all_dists > 0]
+        loss += clogit_partial(self.alpha, control_similarities, case_similarities)
 
         return loss
 
