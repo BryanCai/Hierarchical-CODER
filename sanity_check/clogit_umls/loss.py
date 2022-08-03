@@ -183,8 +183,8 @@ class ConditionalLogitLoss(nn.Module):
         neg_mask[a2, n] = 1
 
 
-        case_similarities = dist_mat[pos_mask == 1]
-        control_similarities = dist_mat[neg_mask == 1]
+        control_similarities = dist_mat[pos_mask == 1]
+        case_similarities = dist_mat[neg_mask == 1]
 
         loss = clogit_partial(self.alpha, control_similarities, case_similarities)
 
