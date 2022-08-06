@@ -175,16 +175,11 @@ class ConditionalLogitLoss(nn.Module):
 
         return loss
 
-    def forward_miner(self, dist_mat, indices_tuple):
-
+    def forward_miner(self, embeddings, indices_tuple):
         a1, p, a2, n = indices_tuple
-        pos_mask, neg_mask = torch.zeros_like(dist_mat), torch.zeros_like(dist_mat)
-        pos_mask[a1, p] = 1
-        neg_mask[a2, n] = 1
 
-
-        control_similarities = dist_mat[pos_mask == 1]
-        case_similarities = dist_mat[neg_mask == 1]
+        control_similarities = self.cos(embeddings[a1], embeddings[p])
+        case_similarities = self.cos(embeddings[a2], embeddings[n])
 
         loss = clogit_partial(self.alpha, control_similarities, case_similarities)
 

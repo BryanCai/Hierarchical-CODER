@@ -35,13 +35,7 @@ def train(args, model, umls_dataloader, umls_dataset):
         {"params": [p for n, p in model.named_parameters() if any(
             nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
-    # for name, param in model.bert.named_parameters():
-    #     if name.startswith("encoder.layer"):
-    #         if name.startswith("encoder.layer.11"):
-    #             pass
-    #         else:
-    #             print(name)
-    #             param.requires_grad = False
+
 
     optimizer = AdamW(optimizer_grouped_parameters,
                       lr=args.learning_rate, eps=args.adam_epsilon)
@@ -188,7 +182,11 @@ def run(args):
     #             model_load = True
     if not model_load:
         os.makedirs(args.output_dir, exist_ok=True)
-        model = UMLSPretrainedModel(device=args.device, model_name_or_path=args.model_name_or_path).to(args.device)
+        model = UMLSPretrainedModel(device=args.device, model_name_or_path=args.model_name_or_path,
+                                    rel_label_count=rel_label_count,
+                                    sty_label_count=len(umls_dataset.sty2id),
+                                    re_weight=args.re_weight,
+                                    sty_weight=args.sty_weight).to(args.device)
         args.shift = 0
         model_load = True
 
