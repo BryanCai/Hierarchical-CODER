@@ -17,6 +17,7 @@ class UMLSPretrainedModel(nn.Module):
                  rel_label_count, sty_label_count,
                  re_weight=1.0, sty_weight=0.1,
                  trans_loss_type="TransE", trans_margin=1.0,
+                 clogit_alpha=2,
                  ):
         super(UMLSPretrainedModel, self).__init__()
 
@@ -40,7 +41,7 @@ class UMLSPretrainedModel(nn.Module):
 
 
 
-        self.cui_loss_fn = ConditionalLogitLoss()
+        self.cui_loss_fn = ConditionalLogitLoss(alpha=clogit_alpha)
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
 

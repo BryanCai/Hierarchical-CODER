@@ -186,7 +186,8 @@ def run(args):
                                     rel_label_count=rel_label_count,
                                     sty_label_count=len(umls_dataset.sty2id),
                                     re_weight=args.re_weight,
-                                    sty_weight=args.sty_weight).to(args.device)
+                                    sty_weight=args.sty_weight,
+                                    clogit_alpha=args.clogit_alpha).to(args.device)
         args.shift = 0
         model_load = True
 
@@ -281,6 +282,9 @@ def main():
                         help="include negative loss for umls")
     parser.add_argument("--eval_data_path", type=str, default=None)
     parser.add_argument("--coder_path", type=str, default=None)
+
+    parser.add_argument("--clogit_alpha", type=float, default=2,
+                        help="alpha for clogit loss.")
 
     args = parser.parse_args()
 
