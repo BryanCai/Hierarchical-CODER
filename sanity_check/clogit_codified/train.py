@@ -165,7 +165,9 @@ def run(args):
     if not model_load:
         if not os.path.exists(args.output_dir):
             os.makedirs(args.output_dir)
-        model = UMLSPretrainedModel(device=args.device, model_name_or_path=args.model_name_or_path).to(args.device)
+        model = UMLSPretrainedModel(device=args.device, model_name_or_path=args.model_name_or_path,
+                                    clogit_alpha=args.clogit_alpha).to(args.device)
+
         if args.coder_path[-4:] == ".pth":
             coder = torch.load(args.coder_path, map_location=args.device).to(args.device)
         else:
@@ -259,6 +261,8 @@ def main():
     parser.add_argument("--eval_data_path", type=str, default=None)
     parser.add_argument("--coder_path", type=str, default=None)
 
+    parser.add_argument("--clogit_alpha", type=float, default=2,
+                        help="alpha for clogit loss.")
 
     args = parser.parse_args()
 

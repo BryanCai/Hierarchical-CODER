@@ -15,7 +15,8 @@ from pytorch_metric_learning import losses, miners
 
 class UMLSPretrainedModel(nn.Module):
     def __init__(self, device, model_name_or_path,
-                 max_tree_dist=3):
+                 max_tree_dist=3,
+                 clogit_alpha=2):
         super(UMLSPretrainedModel, self).__init__()
 
         self.device = device
@@ -42,7 +43,7 @@ class UMLSPretrainedModel(nn.Module):
 
         # self.tree_loss = HierarchicalTreeLoss()
         # self.tree_loss = HierarchicalTreeLogLoss()
-        self.tree_loss = ConditionalLogitLoss()
+        self.tree_loss = ConditionalLogitLoss(alpha=clogit_alpha)
         self.tree_loss_fn = losses.MultiSimilarityLoss(alpha=2, beta=50)
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
