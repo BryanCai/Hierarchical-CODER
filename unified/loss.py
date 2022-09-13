@@ -167,20 +167,27 @@ class ConditionalLogitLoss(nn.Module):
     def forward(self, anchor_embed, all_samples_embed, all_dists):
         cdist = self.cos(anchor_embed, all_samples_embed)
         cdist = (cdist+1)/2
-        loss = 0
 
         control_similarities = cdist[all_dists <= 0]
         case_similarities = cdist[all_dists > 0]
-        loss += clogit_partial(self.alpha, control_similarities, case_similarities)
+        loss = clogit_partial(self.alpha, control_similarities, case_similarities)
 
         return loss
+
+
+    def forward_re(self, anchor_embed, pos_embed, neg_embed):        
+        control_similarities = (self.cos(anchor_embed, pos_embed) + 1)/2
+        case_similarities = (self.cos(anchor_embed, neg_embed) + 1)/2
+        loss = clogit_partial(self.alpha, control_similarities, case_similarities)
+
+        return loss
+
 
     def forward_miner(self, embeddings, indices_tuple):
         a1, p, a2, n = indices_tuple
 
         control_similarities = self.cos(embeddings[a1], embeddings[p])
         case_similarities = self.cos(embeddings[a2], embeddings[n])
-
         loss = clogit_partial(self.alpha, control_similarities, case_similarities)
 
         return loss

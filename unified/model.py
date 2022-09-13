@@ -28,9 +28,8 @@ class UMLSPretrainedModel(nn.Module):
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
 
-    def calculate_loss(self, embeddings, labels):
+    def calculate_cui_loss(self, embeddings, labels):
         pairs = self.miner(embeddings, labels)
-
         loss = self.batch_loss_fn.forward_miner(embeddings, pairs)
         return loss
 
@@ -53,21 +52,15 @@ class UMLSPretrainedModel(nn.Module):
 
         use_len = input_ids_0.shape[0]
 
-        pooled_output = self.get_sentence_feature(
-            input_ids)  # (3 * pair) * re_label
-        logits_sty = self.linear_sty(pooled_output)
-        sty_loss = self.sty_loss_fn(logits_sty, sty_label)
+        pooled_output = self.get_sentence_feature(input_ids)
 
-
-        cui_loss = self.calculate_loss(pooled_output, cui_label)
+        cui_loss = self.calculate_cui_loss(pooled_output, cui_label)
 
         cui_0_output = pooled_output[0:use_len]
         cui_1_output = pooled_output[use_len:2 * use_len]
         cui_2_output = pooled_output[2 * use_len:]
-        re_output = self.re_embedding(re_label)
-        re_loss = self.re_loss_fn(
-            cui_0_output, cui_1_output, cui_2_output, re_output)
+        re_loss = self.batch_loss_fn.forward_re(cui_0_output, cui_1_output, cui_2_output)
 
-        loss = self.sty_weight * sty_loss + cui_loss + self.re_weight * re_loss
+        loss = cui_loss + re_loss
 
         return loss

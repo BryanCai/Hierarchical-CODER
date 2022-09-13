@@ -182,11 +182,7 @@ def run(args):
     #             model_load = True
     if not model_load:
         os.makedirs(args.output_dir, exist_ok=True)
-        model = UMLSPretrainedModel(device=args.device, model_name_or_path=args.model_name_or_path,
-                                    rel_label_count=rel_label_count,
-                                    sty_label_count=len(umls_dataset.sty2id),
-                                    re_weight=args.re_weight,
-                                    sty_weight=args.sty_weight,
+        model = UMLSPretrainedModel(base_model=args.model_name_or_path,
                                     clogit_alpha=args.clogit_alpha).to(args.device)
         args.shift = 0
         model_load = True
