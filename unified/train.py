@@ -183,7 +183,8 @@ def run(args):
     if not model_load:
         os.makedirs(args.output_dir, exist_ok=True)
         model = UMLSPretrainedModel(base_model=args.model_name_or_path,
-                                    clogit_alpha=args.clogit_alpha).to(args.device)
+                                    clogit_alpha=args.clogit_alpha,
+                                    sim_dim=args.sim_dim).to(args.device)
         args.shift = 0
         model_load = True
 
@@ -281,6 +282,9 @@ def main():
 
     parser.add_argument("--clogit_alpha", type=float, default=2,
                         help="alpha for clogit loss.")
+
+    parser.add_argument("--sim_dim", type=int, default=500,
+                        help="dimension to use for similarity")
 
     args = parser.parse_args()
 

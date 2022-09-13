@@ -15,10 +15,12 @@ from trans import TransE
 class UMLSPretrainedModel(nn.Module):
     def __init__(self, base_model,
                  clogit_alpha=2,
+                 sim_dim=500,
                  ):
         super(UMLSPretrainedModel, self).__init__()
 
         self.base_model = base_model
+        self.sim_dim = sim_dim
 
         self.bert = AutoModel.from_pretrained(base_model)
         self.tokenizer = AutoTokenizer.from_pretrained(base_model)
@@ -28,9 +30,15 @@ class UMLSPretrainedModel(nn.Module):
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
 
-    def calculate_cui_loss(self, embeddings, labels):
-        pairs = self.miner(embeddings, labels)
-        loss = self.batch_loss_fn.forward_miner(embeddings, pairs)
+    def calculate_sim_loss(self, embeddings, labels):
+        sim_embeddings = embeddings[:,:self.sim_dim]
+        pairs = self.miner(sim_embeddings, labels)
+        loss = self.batch_loss_fn.forward_miner(sim_embeddings, pairs)
+        return loss
+
+
+    def calculate_re_loss(self, re_0_embeddings, re_1_embeddings, random_embeddings):
+        loss = self.batch_loss_fn.forward_re(re_0_embeddings, re_1_embeddings, random_embeddings)
         return loss
 
 
@@ -54,12 +62,12 @@ class UMLSPretrainedModel(nn.Module):
 
         pooled_output = self.get_sentence_feature(input_ids)
 
-        cui_loss = self.calculate_cui_loss(pooled_output, cui_label)
+        cui_loss = self.calculate_sim_loss(pooled_output, cui_label)
 
         cui_0_output = pooled_output[0:use_len]
         cui_1_output = pooled_output[use_len:2 * use_len]
         cui_2_output = pooled_output[2 * use_len:]
-        re_loss = self.batch_loss_fn.forward_re(cui_0_output, cui_1_output, cui_2_output)
+        re_loss = self.calculate_re_loss(cui_0_output, cui_1_output, cui_2_output)
 
         loss = cui_loss + re_loss
 
