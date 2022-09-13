@@ -1,0 +1,1 @@
+python train.py --model_name_or_path monologg/biobert_v1.1_pubmed --umls_dir D:/Projects/CODER/deps/UMLS/2021AB/META --eval_data_path ../../eval/all_relations_with_neg.csv --save_step 5000 --umls_batch_size 64 --max_steps 30000 --output_dir output --warmup_steps 0
