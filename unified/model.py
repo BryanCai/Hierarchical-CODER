@@ -52,8 +52,8 @@ class UMLSPretrainedModel(nn.Module):
     def forward(self,
                 input_ids_0, input_ids_1, input_ids_2,
                 cui_label_0, cui_label_1, cui_label_2,
-                sty_label_0, sty_label_1, sty_label_2,
-                re_label):
+                sty_label_0, sty_label_1, sty_label_2
+                ):
         input_ids = torch.cat((input_ids_0, input_ids_1, input_ids_2), 0)
         cui_label = torch.cat((cui_label_0, cui_label_1, cui_label_2))
         sty_label = torch.cat((sty_label_0, sty_label_1, sty_label_2))

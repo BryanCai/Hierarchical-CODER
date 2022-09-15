@@ -55,7 +55,7 @@ def train(args, model, umls_dataloader, umls_dataset):
 
     print("***** Running training *****")
     print("  Total Steps =", t_total)
-    print("  Steps needs to be trained=", t_total - args.shift)
+    print("  Steps needs to be trained=", t_total)
     print("  Instantaneous batch size per GPU =", args.umls_batch_size)
     print(
         "  Total train batch size (w. parallel, distributed & accumulation) =",
@@ -66,9 +66,6 @@ def train(args, model, umls_dataloader, umls_dataset):
 
     model.zero_grad()
 
-    for i in range(args.shift):
-        scheduler.step()
-    global_step = args.shift
 
     while True:
         model.train()
@@ -87,19 +84,11 @@ def train(args, model, umls_dataloader, umls_dataset):
                 sty_label_0 = umls_batch[6].to(args.device)
                 sty_label_1 = umls_batch[7].to(args.device)
                 sty_label_2 = umls_batch[8].to(args.device)
-                # use umls_batch[9] for re, use umls_batch[10] for rel
-                if args.use_re:
-                    re_label = umls_batch[9].to(args.device)
-                else:
-                    re_label = umls_batch[10].to(args.device)
-                # for item in umls_batch:
-                #     print(item.shape)
-
                 loss = \
                     model(input_ids_0, input_ids_1, input_ids_2,
                                        cui_label_0, cui_label_1, cui_label_2,
                                        sty_label_0, sty_label_1, sty_label_2,
-                                       re_label)
+                                       )
                 batch_loss = float(loss.item())
 
                 # tensorboardX
@@ -158,35 +147,13 @@ def run(args):
     print(len(umls_dataset))
     print('-------')
 
-    if args.use_re:
-        rel_label_count = len(umls_dataset.re2id)
-    else:
-        rel_label_count = len(umls_dataset.rel2id)
 
 
-    model_load = False
-    # if os.path.exists(args.output_dir):
-    #     save_list = []
-    #     for f in os.listdir(args.output_dir):
-    #         if f[0:5] == "model" and f[-4:] == ".pth":
-    #             save_list.append(int(f[6:-4]))
-    #     if len(save_list) > 0:
-    #         args.shift = max(save_list)
-    #         if os.path.exists(os.path.join(args.output_dir, 'last_model.pth')):
-    #             model = torch.load(os.path.join(
-    #                 args.output_dir, 'last_model.pth')).to(args.device)
-    #             model_load = True
-    #         else:
-    #             model = torch.load(os.path.join(
-    #                 args.output_dir, f'model_{max(save_list)}.pth')).to(args.device)
-    #             model_load = True
-    if not model_load:
-        os.makedirs(args.output_dir, exist_ok=True)
-        model = UMLSPretrainedModel(base_model=args.model_name_or_path,
-                                    clogit_alpha=args.clogit_alpha,
-                                    sim_dim=args.sim_dim).to(args.device)
-        args.shift = 0
-        model_load = True
+    os.makedirs(args.output_dir, exist_ok=True)
+    model = UMLSPretrainedModel(base_model=args.model_name_or_path,
+                                clogit_alpha=args.clogit_alpha,
+                                sim_dim=args.sim_dim).to(args.device)
+    model_load = True
 
     if args.do_train:
         torch.save(args, os.path.join(args.output_dir, 'training_args.bin'))
@@ -241,7 +208,7 @@ def main():
         default=8,
         help="Number of updates steps to accumulate before performing a backward/update pass.",
     )
-    parser.add_argument("--learning_rate", default=2e-5,
+    parser.add_argument("--learning_rate", default=2e-6,
                         type=float, help="The initial learning rate for Adam.")
     parser.add_argument("--weight_decay", default=0.01,
                         type=float, help="Weight decay if we apply some.")
@@ -262,21 +229,12 @@ def main():
                         help="random seed for initialization")
     parser.add_argument("--schedule", type=str, default="linear",
                         choices=["linear", "cosine", "constant"], help="Schedule.")
-    parser.add_argument("--trans_margin", type=float, default=1.0,
-                        help="Margin of TransE.")
-    parser.add_argument("--use_re", default=False, type=bool,
-                        help="Whether to use re or rel.")
     parser.add_argument("--num_workers", default=1, type=int,
                         help="Num workers for data loader, only 0 can be used for Windows")
     parser.add_argument("--lang", default='eng', type=str, choices=["eng", "all"],
                         help="language range, eng or all")
-    parser.add_argument("--sty_weight", type=float, default=0.0,
-                        help="Weight of sty.")
-    parser.add_argument("--re_weight", type=float, default=1.0,
-                        help="Weight of re.")
 
-    parser.add_argument("--umls_neg_loss", action="store_true",
-                        help="include negative loss for umls")
+
     parser.add_argument("--eval_data_path", type=str, default=None)
     parser.add_argument("--coder_path", type=str, default=None)
 
