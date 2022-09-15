@@ -210,7 +210,15 @@ def run(args):
     model = UMLSPretrainedModel(base_model=args.model_name_or_path,
                                 clogit_alpha=args.clogit_alpha,
                                 sim_dim=args.sim_dim).to(args.device)
-    model_load = True
+
+
+    if args.fine_tune:
+        if args.coder_path[-4:] == ".pth":
+            coder = torch.load(args.coder_path, map_location=args.device).to(args.device)
+        else:
+            coder = AutoModel.from_pretrained(args.coder_path).to(args.device)
+        model.bert = coder
+
 
     torch.save(args, os.path.join(args.output_dir, 'training_args.bin'))
     train(args, model, umls_dataloader, tree_dataloader)
@@ -310,6 +318,9 @@ def main():
 
     parser.add_argument("--fine_tune", action="store_true",
                         help="freeze all but last layer")
+
+    parser.add_argument("--coder_path", type=str, default=None)
+
 
     args = parser.parse_args()
 
