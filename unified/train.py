@@ -65,7 +65,7 @@ def train(args, model, umls_dataloader, umls_dataset):
     print("  Gradient Accumulation steps =", args.gradient_accumulation_steps)
 
     model.zero_grad()
-
+    global_step=0
 
     while True:
         model.train()
