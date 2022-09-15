@@ -241,7 +241,7 @@ def main():
     parser.add_argument("--clogit_alpha", type=float, default=2,
                         help="alpha for clogit loss.")
 
-    parser.add_argument("--sim_dim", type=int, default=500,
+    parser.add_argument("--sim_dim", type=int, default=-1,
                         help="dimension to use for similarity")
 
     args = parser.parse_args()
