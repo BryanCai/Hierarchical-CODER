@@ -319,8 +319,6 @@ def main():
     parser.add_argument("--fine_tune", action="store_true",
                         help="freeze all but last layer")
 
-    parser.add_argument("--coder_path", type=str, default=None)
-
 
     args = parser.parse_args()
 
