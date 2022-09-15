@@ -1,7 +1,8 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from data_util import UMLSDataset, fixed_length_dataloader
+from data_util import UMLSDataset, TreeDataset, fixed_length_dataloader
+from sampler_util import my_collate_fn
 from model import UMLSPretrainedModel
 from transformers import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup, get_constant_schedule_with_warmup, AutoModel, AutoTokenizer
 from tqdm import tqdm, trange
@@ -14,14 +15,10 @@ import argparse
 import time
 import pathlib
 import itertools
-#import ipdb
-# try:
-#     from torch.utils.tensorboard import SummaryWriter
-# except:
 from tensorboardX import SummaryWriter
 
 
-def train(args, model, umls_dataloader, umls_dataset):
+def train(args, model, umls_dataloader, tree_dataloader):
     writer = SummaryWriter(comment='umls')
 
     t_total = args.max_steps
@@ -35,6 +32,14 @@ def train(args, model, umls_dataloader, umls_dataset):
         {"params": [p for n, p in model.named_parameters() if any(
             nd in n for nd in no_decay)], "weight_decay": 0.0},
     ]
+
+    if args.fine_tune:
+        for name, param in model.bert.named_parameters():
+            if name.startswith("encoder.layer"):
+                if name.startswith("encoder.layer.11"):
+                    pass
+                else:
+                    param.requires_grad = False
 
 
     optimizer = AdamW(optimizer_grouped_parameters,
@@ -54,15 +59,6 @@ def train(args, model, umls_dataloader, umls_dataset):
         )
 
     print("***** Running training *****")
-    print("  Total Steps =", t_total)
-    print("  Steps needs to be trained=", t_total)
-    print("  Instantaneous batch size per GPU =", args.umls_batch_size)
-    print(
-        "  Total train batch size (w. parallel, distributed & accumulation) =",
-        args.umls_batch_size
-        * args.gradient_accumulation_steps,
-    )
-    print("  Gradient Accumulation steps =", args.gradient_accumulation_steps)
 
     model.zero_grad()
     global_step=0
@@ -70,55 +66,107 @@ def train(args, model, umls_dataloader, umls_dataset):
     while True:
         model.train()
 
-        batch_loss = 0.
-        # batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
-        batch_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
-        for umls_batch in batch_iterator:
-            if umls_batch is not None:
-                input_ids_0 = umls_batch[0].to(args.device)
-                input_ids_1 = umls_batch[1].to(args.device)
-                input_ids_2 = umls_batch[2].to(args.device)
-                cui_label_0 = umls_batch[3].to(args.device)
-                cui_label_1 = umls_batch[4].to(args.device)
-                cui_label_2 = umls_batch[5].to(args.device)
-                sty_label_0 = umls_batch[6].to(args.device)
-                sty_label_1 = umls_batch[7].to(args.device)
-                sty_label_2 = umls_batch[8].to(args.device)
-                loss = \
-                    model(input_ids_0, input_ids_1, input_ids_2,
-                                       cui_label_0, cui_label_1, cui_label_2,
-                                       sty_label_0, sty_label_1, sty_label_2,
-                                       )
-                batch_loss = float(loss.item())
 
-                # tensorboardX
-                writer.add_scalar(
-                    'rel_count', umls_dataloader.batch_sampler.rel_sampler_count, global_step=global_step)
-                writer.add_scalar('batch_loss', batch_loss,
-                                  global_step=global_step)
+        if not args.fine_tune:
+            batch_loss = 0.
+            # batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
+            batch_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
+            for umls_batch in batch_iterator:
+                if umls_batch is not None:
+                    input_ids_0 = umls_batch[0].to(args.device)
+                    input_ids_1 = umls_batch[1].to(args.device)
+                    input_ids_2 = umls_batch[2].to(args.device)
+                    cui_label_0 = umls_batch[3].to(args.device)
+                    cui_label_1 = umls_batch[4].to(args.device)
+                    cui_label_2 = umls_batch[5].to(args.device)
+                    sty_label_0 = umls_batch[6].to(args.device)
+                    sty_label_1 = umls_batch[7].to(args.device)
+                    sty_label_2 = umls_batch[8].to(args.device)
+                    loss =  model.get_umls_loss(input_ids_0, input_ids_1, input_ids_2,
+                                                cui_label_0, cui_label_1, cui_label_2,
+                                                sty_label_0, sty_label_1, sty_label_2)
+                    batch_loss = float(loss.item())
 
-                if args.gradient_accumulation_steps > 1:
-                    loss = loss / args.gradient_accumulation_steps
-                loss.backward()
+                    writer.add_scalar('batch_loss', batch_loss, global_step=global_step)
+                    batch_iterator.set_description("Loss: {:.4f}".format(batch_loss))
 
-                batch_iterator.set_description("Rel_count: %s, Loss: %0.4f" %
-                                               (umls_dataloader.batch_sampler.rel_sampler_count, batch_loss))
+                    if args.gradient_accumulation_steps > 1:
+                        loss = loss / args.gradient_accumulation_steps
+                    loss.backward()
 
-            if (global_step + 1) % args.gradient_accumulation_steps == 0:
-                torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), args.max_grad_norm)
-                optimizer.step()
-                scheduler.step()  # Update learning rate schedule
-                model.zero_grad()
 
-            global_step += 1
-            if global_step % args.save_step == 0 and global_step > 0:
-                save_path = os.path.join(
-                    args.output_dir, f'model_{global_step}.pth')
-                torch.save(model, save_path)
+                if (global_step + 1) % args.gradient_accumulation_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(
+                        model.parameters(), args.max_grad_norm)
+                    optimizer.step()
+                    scheduler.step()  # Update learning rate schedule
+                    model.zero_grad()
 
-            if args.max_steps > 0 and global_step > args.max_steps:
-                return None
+                global_step += 1
+                if global_step % args.save_step == 0 and global_step > 0:
+                    save_path = os.path.join(
+                        args.output_dir, f'model_{global_step}.pth')
+                    torch.save(model, save_path)
+
+                if args.max_steps > 0 and global_step > args.max_steps:
+                    return None
+
+        else:
+            batch_loss = 0.
+
+            batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
+            for tree_batch, umls_batch in batch_iterator:
+                if tree_batch is not None:
+                    anchor_ids        = tree_batch[0].to(args.device)
+                    neg_samples_ids   = tree_batch[1].to(args.device)
+                    neg_samples_dists = tree_batch[2].to(args.device)
+                    loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+                    tree_loss = float(loss.item())
+
+                    if args.gradient_accumulation_steps > 1:
+                        loss = loss / args.gradient_accumulation_steps
+                    loss.backward()
+
+                if umls_batch is not None:
+                    input_ids_0 = umls_batch[0].to(args.device)
+                    input_ids_1 = umls_batch[1].to(args.device)
+                    input_ids_2 = umls_batch[2].to(args.device)
+                    cui_label_0 = umls_batch[3].to(args.device)
+                    cui_label_1 = umls_batch[4].to(args.device)
+                    cui_label_2 = umls_batch[5].to(args.device)
+                    sty_label_0 = umls_batch[6].to(args.device)
+                    sty_label_1 = umls_batch[7].to(args.device)
+                    sty_label_2 = umls_batch[8].to(args.device)
+
+                    loss =  model.get_umls_loss(input_ids_0, input_ids_1, input_ids_2,
+                                                cui_label_0, cui_label_1, cui_label_2,
+                                                sty_label_0, sty_label_1, sty_label_2)
+                    batch_loss = float(loss.item())
+
+                    writer.add_scalar('batch_loss', batch_loss, global_step=global_step)
+                    batch_iterator.set_description("Loss: {:.4f}".format(batch_loss))
+
+                    if args.gradient_accumulation_steps > 1:
+                        loss = loss / args.gradient_accumulation_steps
+                    loss.backward()
+
+
+
+                if (global_step + 1) % args.gradient_accumulation_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(
+                        model.parameters(), args.max_grad_norm)
+                    optimizer.step()
+                    scheduler.step()  # Update learning rate schedule
+                    model.zero_grad()
+
+                global_step += 1
+                if global_step % args.save_step == 0 and global_step > 0:
+                    save_path = os.path.join(
+                        args.output_dir, f'model_{global_step}.pth')
+                    torch.save(model, save_path)
+
+                if args.max_steps > 0 and global_step > args.max_steps:
+                    return None
 
 
     return None
@@ -143,7 +191,16 @@ def run(args):
     umls_dataloader = fixed_length_dataloader(
         umls_dataset, fixed_length=args.umls_batch_size, num_workers=args.num_workers)
 
+
+    tree_dataset = TreeDataset(tree_dir=args.tree_dir,
+        model_name_or_path=args.model_name_or_path,
+        eval_data_path=args.eval_data_path)
+
+    tree_dataloader = fixed_length_dataloader(
+        tree_dataset, fixed_length=args.tree_batch_size, num_workers=args.num_workers)
+
     print('-------')
+    print(len(tree_dataset))
     print(len(umls_dataset))
     print('-------')
 
@@ -155,10 +212,9 @@ def run(args):
                                 sim_dim=args.sim_dim).to(args.device)
     model_load = True
 
-    if args.do_train:
-        torch.save(args, os.path.join(args.output_dir, 'training_args.bin'))
-        train(args, model, umls_dataloader, umls_dataset)
-        torch.save(model, os.path.join(args.output_dir, 'last_model.pth'))
+    torch.save(args, os.path.join(args.output_dir, 'training_args.bin'))
+    train(args, model, umls_dataloader, tree_dataloader)
+    torch.save(model, os.path.join(args.output_dir, 'last_model.pth'))
 
     return None
 
@@ -170,6 +226,11 @@ def main():
         default="../umls",
         type=str,
         help="UMLS dir",
+    )
+    parser.add_argument(
+        "--tree_dir",
+        type=str,
+        help="Path to tree directory",
     )
     parser.add_argument(
         "--model_name_or_path",
@@ -198,9 +259,11 @@ def main():
         help="The maximum total input sequence length after tokenization. Sequences longer "
         "than this will be truncated, sequences shorter will be padded.",
     )
-    parser.add_argument("--do_train", default=True, type=bool, help="Whether to run training.")
     parser.add_argument(
         "--umls_batch_size", default=256, type=int, help="Batch size per GPU/CPU for umls training.",
+    )
+    parser.add_argument(
+        "--tree_batch_size", default=512, type=int, help="Batch size per GPU/CPU for tree training.",
     )
     parser.add_argument(
         "--gradient_accumulation_steps",
@@ -244,8 +307,14 @@ def main():
     parser.add_argument("--sim_dim", type=int, default=-1,
                         help="dimension to use for similarity")
 
+
+    parser.add_argument("--fine_tune", action="store_true",
+                        help="freeze all but last layer")
+
     args = parser.parse_args()
 
+
+    print(args.fine_tune)
     run(args)
 
 

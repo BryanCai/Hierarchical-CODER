@@ -49,11 +49,11 @@ class UMLSPretrainedModel(nn.Module):
         return pooled_output
 
 
-    def forward(self,
-                input_ids_0, input_ids_1, input_ids_2,
-                cui_label_0, cui_label_1, cui_label_2,
-                sty_label_0, sty_label_1, sty_label_2
-                ):
+    def get_umls_loss(self,
+                      input_ids_0, input_ids_1, input_ids_2,
+                      cui_label_0, cui_label_1, cui_label_2,
+                      sty_label_0, sty_label_1, sty_label_2
+                      ):
         input_ids = torch.cat((input_ids_0, input_ids_1, input_ids_2), 0)
         cui_label = torch.cat((cui_label_0, cui_label_1, cui_label_2))
         sty_label = torch.cat((sty_label_0, sty_label_1, sty_label_2))
@@ -71,4 +71,12 @@ class UMLSPretrainedModel(nn.Module):
 
         loss = cui_loss + re_loss
 
+        return loss
+
+
+    def get_tree_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
+        anchor_output = self.get_sentence_feature(anchor_ids)
+        all_samples_output = self.get_sentence_feature(all_samples_ids)
+        loss = self.batch_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists)
+        
         return loss

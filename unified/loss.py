@@ -164,7 +164,7 @@ class ConditionalLogitLoss(nn.Module):
         self.alpha = alpha
         self.cos = nn.CosineSimilarity()
 
-    def forward(self, anchor_embed, all_samples_embed, all_dists):
+    def forward_dist(self, anchor_embed, all_samples_embed, all_dists):
         cdist = self.cos(anchor_embed, all_samples_embed)
         cdist = (cdist+1)/2
 
