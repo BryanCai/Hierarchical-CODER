@@ -18,7 +18,7 @@ import itertools
 from tensorboardX import SummaryWriter
 
 
-def train(args, model, umls_dataloader, tree_dataloader):
+def train(args, model, umls_dataloader, tree_dataloader=None):
     writer = SummaryWriter(comment='umls')
 
     t_total = args.max_steps
@@ -66,10 +66,8 @@ def train(args, model, umls_dataloader, tree_dataloader):
     while True:
         model.train()
 
-
         if not args.fine_tune:
             batch_loss = 0.
-            # batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
             batch_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
             for umls_batch in batch_iterator:
                 if umls_batch is not None:
@@ -192,12 +190,16 @@ def run(args):
         umls_dataset, fixed_length=args.umls_batch_size, num_workers=args.num_workers)
 
 
-    tree_dataset = TreeDataset(tree_dir=args.tree_dir,
-        model_name_or_path=args.model_name_or_path,
-        eval_data_path=args.eval_data_path)
+    if args.fine_tune:
+        tree_dataset = TreeDataset(tree_dir=args.tree_dir,
+            model_name_or_path=args.model_name_or_path,
+            eval_data_path=args.eval_data_path)
 
-    tree_dataloader = fixed_length_dataloader(
-        tree_dataset, fixed_length=args.tree_batch_size, num_workers=args.num_workers)
+        tree_dataloader = fixed_length_dataloader(
+            tree_dataset, fixed_length=args.tree_batch_size, num_workers=args.num_workers)
+    else:
+        tree_dataloader=None
+
 
     print('-------')
     print(len(tree_dataset))
