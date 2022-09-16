@@ -201,13 +201,6 @@ def run(args):
         tree_dataloader=None
 
 
-    print('-------')
-    print(len(tree_dataset))
-    print(len(umls_dataset))
-    print('-------')
-
-
-
     os.makedirs(args.output_dir, exist_ok=True)
     model = UMLSPretrainedModel(base_model=args.model_name_or_path,
                                 clogit_alpha=args.clogit_alpha,
