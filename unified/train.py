@@ -66,7 +66,7 @@ def train(args, model, umls_dataloader, tree_dataloader=None):
     while True:
         model.train()
 
-        if not args.fine_tune:
+        if not args.use_tree:
             batch_loss = 0.
             batch_iterator = tqdm(umls_dataloader, desc="Iteration", ascii=True)
             for umls_batch in batch_iterator:
@@ -111,7 +111,6 @@ def train(args, model, umls_dataloader, tree_dataloader=None):
 
         else:
             batch_loss = 0.
-
             batch_iterator = tqdm(zip(itertools.cycle(tree_dataloader), umls_dataloader), desc="Iteration", ascii=True)
             for tree_batch, umls_batch in batch_iterator:
                 if tree_batch is not None:
@@ -190,7 +189,7 @@ def run(args):
         umls_dataset, fixed_length=args.umls_batch_size, num_workers=args.num_workers)
 
 
-    if args.fine_tune:
+    if args.use_tree:
         tree_dataset = TreeDataset(tree_dir=args.tree_dir,
             model_name_or_path=args.model_name_or_path,
             eval_data_path=args.eval_data_path)
@@ -314,6 +313,9 @@ def main():
     parser.add_argument("--fine_tune", action="store_true",
                         help="freeze all but last layer")
 
+
+    parser.add_argument("--use_tree", action="store_true",
+                        help="include tree data")
 
     args = parser.parse_args()
 
