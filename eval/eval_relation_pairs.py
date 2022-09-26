@@ -10,12 +10,7 @@ from load_umls import UMLS
 import os
 from random import sample
 import sys
-# sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical_CODER_new/sanity_check/simplify_ms_codified/')
-# sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical-CODER/pretrain')
-sys.path.append('../sanity_check/rank_loss/')
-# sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical_CODER_new/sanity_check/mod_ms_rel')
-sys.path.append('/home/tc24/BryanWork/CODER/sanity_check/clogit_codified/')
-# from model import UMLSPretrainedModel
+sys.path.append('/home/tc24/BryanWork/CODER/sanity_check/unified/')
 import json
 
 class AllRelDataset():
