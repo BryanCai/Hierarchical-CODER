@@ -10,10 +10,7 @@ from load_umls import UMLS
 import os
 from random import sample
 import sys
-# sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical_CODER_new/sanity_check/simplify_ms_codified/')
-# sys.path.append('/media/sdb1/Zengsihang/Hier_CODER/Hierarchical-CODER/pretrain')
-# from model import UMLSPretrainedModel
-sys.path.append('/home/tc24/BryanWork/CODER/sanity_check/clogit_codified/')
+sys.path.append('/home/tc24/BryanWork/CODER/unified/')
 import json
 from scipy.stats import spearmanr
 
