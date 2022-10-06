@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 import numpy as np
 import random
+import json
 from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
 from scipy.stats import spearmanr
@@ -194,6 +195,8 @@ def run(args):
 
         print(i, output[i])
 
+    with open(args.output_path, 'w') as fp:
+        json.dump(output, fp, indent=4)
 
 
 
@@ -233,6 +236,13 @@ if __name__ == '__main__':
         default=100000,
         type=int,
         help="number of random samples",
+    )
+
+    parser.add_argument(
+        "--output_path",
+        default="./output.json",
+        type=str,
+        help="output file path",
     )
 
     args = parser.parse_args()
