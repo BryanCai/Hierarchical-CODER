@@ -186,7 +186,7 @@ def run(args):
 
         random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, args.device)
 
-        label = [0]*len(cos_sim) + [1]*len(random_cos_sim)
+        label = [1]*len(cos_sim) + [0]*len(random_cos_sim)
 
         fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
         auc_score = auc(fpr, tpr)
