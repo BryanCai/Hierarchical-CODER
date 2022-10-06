@@ -6,6 +6,7 @@ import random
 import json
 from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
+from tqdm import tqdm
 from scipy.stats import spearmanr
 from sklearn.metrics import roc_curve, auc
 
@@ -16,7 +17,7 @@ def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, b
     for phrase in phrase_list:
         input_ids.append(tokenizer.encode_plus(
             phrase, max_length=32, add_special_tokens=True,
-            truncation=True, pad_to_max_length=True)['input_ids'])
+            truncation=True, padding="max_length")['input_ids'])
         # print(len(input_ids))
     model.eval()
 
@@ -44,7 +45,7 @@ def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, b
                 output = embed
             else:
                 output = torch.cat((output, embed), dim=0)
-            if tqdm_bar:
+            if show_progress:
                 pbar.update(min(now_count + batch_size, count) - now_count)
             now_count = min(now_count + batch_size, count)
             del input_gpu_0
@@ -199,6 +200,45 @@ def run(args):
         json.dump(output, fp, indent=4)
 
 
+def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, random_samples):
+    data_dir = Path(data_dir)
+    model = load_model(model_name_or_path, device)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+
+    if model_name_or_path.find('SapBERT') > 0:
+        embed_fun = get_sapbert_embed
+    else:
+        embed_fun = get_bert_embed
+
+
+    output = {}
+    for f in ["Similar.csv", "Relate.csv"]:
+        data = read_rank_csv(data_dir/f)
+        cos_sim = get_cos_sim(embed_fun, data["string1"], data["string2"], model, tokenizer, device)
+
+        output[str(f)] = spearmanr(cos_sim, data["score"])[0]
+        print(f, output[str(f)])
+
+    pair_data, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv")
+
+    for i in pair_data:
+        cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, device)
+        tree1, tree2 = i[0].split("-")
+        random_terms1 = random.choices(tree_data[tree1], k=random_samples)
+        random_terms2 = random.choices(tree_data[tree2], k=random_samples)
+
+        random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, device)
+
+        label = [1]*len(cos_sim) + [0]*len(random_cos_sim)
+
+        fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
+        output[str(i)] = auc(fpr, tpr)
+
+        print(i, output[str(i)])
+
+    with open(output_path, 'w') as fp:
+        json.dump(output, fp, indent=4)
+
 
 
 if __name__ == '__main__':
@@ -233,7 +273,7 @@ if __name__ == '__main__':
 
     parser.add_argument(
         "--random_samples",
-        default=100000,
+        default=10000,
         type=int,
         help="number of random samples",
     )
@@ -246,4 +286,64 @@ if __name__ == '__main__':
     )
 
     args = parser.parse_args()
-    run(args)
+
+    # run(args)
+
+    model_name_or_path_list = ["cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                               "GanjinZero/coder_eng",
+                               "/home/tc24/BryanWork/saved_models/output_unified_1/model_20000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_1/model_360000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_3/model_20000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_3/model_300000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_1/model_1000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_1/model_7000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_2/model_1000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_2/model_10000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_3/model_2000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_3/model_10000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_4/model_2000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_4/model_10000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_5/model_10000_bert.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_5/model_20000_bert.pth",
+                               ]
+    tokenizer_list = ["cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                      "GanjinZero/coder_eng",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      ]
+    output_path_list = ["sapbert.json",
+                        "coder.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_1/output_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_1/output_360000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_3/outputl_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_3/output_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_1/output_1000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_1/output_7000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_2/output_1000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_2/output_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_3/output_2000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_3/output_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_4/output_2000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_4/output_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_5/output_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_5/output_20000.json",
+                        ]
+
+    for i in range(len(model_name_or_path_list)):
+        m = model_name_or_path_list[i]
+        t = tokenizer_list[i]
+        o = output_path_list[i]
+        print(m)
+        run_many(m, t, o, args.data_dir, args.device, args.random_samples)
