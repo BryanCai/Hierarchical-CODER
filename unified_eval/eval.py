@@ -5,6 +5,7 @@ import torch
 import numpy as np
 from transformers import AutoModel, AutoTokenizer
 from scipy.stats import spearmanr
+import random
 
 
 def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
@@ -110,11 +111,49 @@ def load_model(model_name_or_path, device):
 def read_rank_csv(path):
     a = pd.read_csv(path)
     d = {"score": a.Mean.tolist(),
-    "string1": a.Eng_Term1.tolist(),
-    "string2": a.Eng_Term2.tolist()
-    }
+         "string1": a.Eng_Term1.tolist(),
+         "string2": a.Eng_Term2.tolist()}
     return d
 
+
+
+def read_relation_pairs(path):
+    a = pd.read_csv(path, dtype=str).dropna(subset=["STR1", "STR2"])
+    a.pair.replace({"LAB-LAB": "LOINC-LOINC", "PheCode-LAB": "PheCode-LOINC"}, inplace=True)
+    pair_data = {}
+    for pair_type in a.pair.unique():
+        b = a[a.pair == pair_type]
+        if pair_type != "CUI-CUI":
+            for rel_type in b.type.unique():
+                pair_data[(pair_type, rel_type)] = {"string1": b[b.type == rel_type].STR1.tolist(),
+                                                    "string2": b[b.type == rel_type].STR2.tolist()}
+        else:
+            for rel_type in b.RELA.unique():
+                pair_data[(pair_type, rel_type)] = {"string1": b[b.RELA == rel_type].STR1.tolist(),
+                                                    "string2": b[b.RELA == rel_type].STR2.tolist()}
+
+    a["tree1"] = a.code1.apply(lambda x: str(x).split(":")[0])
+    a["tree2"] = a.code2.apply(lambda x: str(x).split(":")[0])
+
+    tree_data = {}
+    for tree in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
+        x = set()
+        x.update(a[a.tree1 == tree].STR1)
+        x.update(a[a.tree2 == tree].STR2)
+        tree_data[tree] = list(x)
+
+    x = set()
+    x.update(a[a.CUI1.isna() == False].STR1)
+    x.update(a[a.CUI2.isna() == False].STR2)
+    tree_data["CUI"] = list(x)
+
+    return pair_data, tree_data
+
+
+def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device):
+    embed1 = embed_fun(string_list1, model, tokenizer, device, normalize=True)
+    embed2 = embed_fun(string_list1, model, tokenizer, device, normalize=True)
+    return = [np.dot(a, b) for a, b in zip(embed1, embed2)]
 
 
 def run(args):
@@ -131,16 +170,28 @@ def run(args):
     output = {}
     for f in ["Similar.csv", "Relate.csv"]:
         data = read_rank_csv(data_dir/f)
-        embed1 = embed_fun(data["string1"], model, tokenizer, args.device, normalize=True)
-        embed2 = embed_fun(data["string2"], model, tokenizer, args.device, normalize=True)
-        cos_sim = [np.dot(a, b) for a, b in zip(embedA, embedB)]
+        cos_sim = get_cos_sim(embed_fun, data["string1"], data["string2"], model, tokenizer, args.device)
 
         output[f] = spearmanr(cos_sim, data["score"])[0]
         print(f, output[f])
 
+    pair_data, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv")
 
+    for i in pair_data:
+        cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, args.device)
+        tree1, tree2 = i[0].split("-")
+        random_terms1 = random.choices(tree_data[tree1], k=args.random_samples)
+        random_terms2 = random.choices(tree_data[tree2], k=args.random_samples)
 
+        random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, args.device)
 
+        label = [0]*len(cos_sim) + [1]*len(random_cos_sim)
+
+        fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
+        auc_score = auc(fpr, tpr)
+        output[i] = auc_score
+
+        print(i, output[i])
 
 
 
@@ -176,6 +227,12 @@ if __name__ == '__main__':
         help="tokenizer path",
     )
 
+    parser.add_argument(
+        "--random_samples",
+        default=100000,
+        type=int,
+        help="number of random samples",
+    )
 
     args = parser.parse_args()
     run(args)
