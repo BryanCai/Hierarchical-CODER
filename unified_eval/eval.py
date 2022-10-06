@@ -1,11 +1,12 @@
 import argparse
 import pandas as pd
-from pathlib import Path
 import torch
 import numpy as np
+import random
+from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
 from scipy.stats import spearmanr
-import random
+from sklearn.metrics import roc_curve, auc
 
 
 def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
@@ -152,8 +153,8 @@ def read_relation_pairs(path):
 
 def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device):
     embed1 = embed_fun(string_list1, model, tokenizer, device, normalize=True)
-    embed2 = embed_fun(string_list1, model, tokenizer, device, normalize=True)
-    return = [np.dot(a, b) for a, b in zip(embed1, embed2)]
+    embed2 = embed_fun(string_list2, model, tokenizer, device, normalize=True)
+    return [np.dot(a, b) for a, b in zip(embed1, embed2)]
 
 
 def run(args):
