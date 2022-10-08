@@ -4,11 +4,14 @@ import torch
 import numpy as np
 import random
 import json
+import sys
 from pathlib import Path
 from transformers import AutoModel, AutoTokenizer
 from tqdm import tqdm
 from scipy.stats import spearmanr
 from sklearn.metrics import roc_curve, auc
+# sys.path.append('/home/tc24/BryanWork/CODER/coder_base/')
+sys.path.append('/home/tc24/BryanWork/CODER/unified/')
 
 
 def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
@@ -289,56 +292,17 @@ if __name__ == '__main__':
 
     # run(args)
 
-    model_name_or_path_list = ["cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
-                               "GanjinZero/coder_eng",
-                               "/home/tc24/BryanWork/saved_models/output_unified_1/model_20000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_1/model_360000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_3/model_20000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_3/model_300000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_1/model_1000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_1/model_7000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_2/model_1000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_2/model_10000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_3/model_2000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_3/model_10000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_4/model_2000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_4/model_10000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_5/model_10000_bert.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_5/model_20000_bert.pth",
+    model_name_or_path_list = [
+                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
                                ]
-    tokenizer_list = ["cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
-                      "GanjinZero/coder_eng",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
+    tokenizer_list = [
+                      # "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       ]
-    output_path_list = ["sapbert.json",
-                        "coder.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_1/output_20000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_1/output_360000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_3/outputl_20000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_3/output_300000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_1/output_1000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_1/output_7000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_2/output_1000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_2/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_3/output_2000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_3/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_4/output_2000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_4/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_5/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_5/output_20000.json",
+    output_path_list = [
+                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output_300000.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):

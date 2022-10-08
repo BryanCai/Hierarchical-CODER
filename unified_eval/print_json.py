@@ -53,22 +53,8 @@ def run(file):
 
 if __name__ == '__main__':
     # file = sys.argv[1]
-    output_path_list = ["sapbert.json",
-                        "coder.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_1/output_20000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_1/output_360000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_3/outputl_20000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_3/output_300000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_1/output_1000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_1/output_7000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_2/output_1000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_2/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_3/output_2000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_3/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_4/output_2000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_4/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_5/output_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_5/output_20000.json",
+    output_path_list = ["/home/tc24/BryanWork/saved_models/output_coder_base/output_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output_300000.json",
                         ]
 
     for i in output_path_list:
