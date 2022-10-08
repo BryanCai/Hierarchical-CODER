@@ -30,6 +30,9 @@ class UMLSPretrainedModel(nn.Module):
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
 
+        self.ms_loss_fn = losses.MultiSimilarityLoss(alpha=2, beta=50)
+
+
     def calculate_sim_loss(self, embeddings, labels):
         sim_embeddings = embeddings[:,:self.sim_dim]
         pairs = self.miner(sim_embeddings, labels)
@@ -73,6 +76,27 @@ class UMLSPretrainedModel(nn.Module):
 
         return loss
 
+
+    def ms_loss(self, pooled_output, label):
+        pairs = self.miner(pooled_output, label)
+        loss = self.ms_loss_fn(pooled_output, label, pairs)
+        return loss
+
+    def get_ms_umls_loss(self,
+                         input_ids_0, input_ids_1, input_ids_2,
+                         cui_label_0, cui_label_1, cui_label_2,
+                         sty_label_0, sty_label_1, sty_label_2
+                         ):
+        input_ids = torch.cat((input_ids_0, input_ids_1, input_ids_2), 0)
+        cui_label = torch.cat((cui_label_0, cui_label_1, cui_label_2))
+
+        use_len = input_ids_0.shape[0]
+
+        pooled_output = self.get_sentence_feature(input_ids)
+
+        cui_loss = self.ms_loss(pooled_output, cui_label)
+
+        return cui_loss
 
     def get_tree_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
         anchor_output = self.get_sentence_feature(anchor_ids)

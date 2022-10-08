@@ -80,9 +80,15 @@ def train(args, model, umls_dataloader, tree_dataloader=None):
                     sty_label_0 = umls_batch[6].to(args.device)
                     sty_label_1 = umls_batch[7].to(args.device)
                     sty_label_2 = umls_batch[8].to(args.device)
-                    loss =  model.get_umls_loss(input_ids_0, input_ids_1, input_ids_2,
-                                                cui_label_0, cui_label_1, cui_label_2,
-                                                sty_label_0, sty_label_1, sty_label_2)
+
+                    if args.use_ms_loss:
+                        loss =  model.get_ms_umls_loss(input_ids_0, input_ids_1, input_ids_2,
+                                                       cui_label_0, cui_label_1, cui_label_2,
+                                                       sty_label_0, sty_label_1, sty_label_2)
+                    else:
+                        loss =  model.get_umls_loss(input_ids_0, input_ids_1, input_ids_2,
+                                                    cui_label_0, cui_label_1, cui_label_2,
+                                                    sty_label_0, sty_label_1, sty_label_2)
                     batch_loss = float(loss.item())
 
                     writer.add_scalar('batch_loss', batch_loss, global_step=global_step)
@@ -135,9 +141,16 @@ def train(args, model, umls_dataloader, tree_dataloader=None):
                     sty_label_1 = umls_batch[7].to(args.device)
                     sty_label_2 = umls_batch[8].to(args.device)
 
-                    loss =  model.get_umls_loss(input_ids_0, input_ids_1, input_ids_2,
-                                                cui_label_0, cui_label_1, cui_label_2,
-                                                sty_label_0, sty_label_1, sty_label_2)
+
+
+                    if args.use_ms_loss:
+                        loss =  model.get_ms_umls_loss(input_ids_0, input_ids_1, input_ids_2,
+                                                       cui_label_0, cui_label_1, cui_label_2,
+                                                       sty_label_0, sty_label_1, sty_label_2)
+                    else:
+                        loss =  model.get_umls_loss(input_ids_0, input_ids_1, input_ids_2,
+                                                    cui_label_0, cui_label_1, cui_label_2,
+                                                    sty_label_0, sty_label_1, sty_label_2)
                     batch_loss = float(loss.item())
 
                     writer.add_scalar('batch_loss', batch_loss, global_step=global_step)
@@ -316,6 +329,11 @@ def main():
 
     parser.add_argument("--use_tree", action="store_true",
                         help="include tree data")
+
+
+    parser.add_argument("--use_ms_loss", action="store_true",
+                        help="use multisimilarity loss")
+
 
     args = parser.parse_args()
 
