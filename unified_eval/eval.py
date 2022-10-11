@@ -107,7 +107,6 @@ def load_model(model_name_or_path, device):
         model = torch.load(model_name_or_path, map_location=torch.device(device))
     elif model_name_or_path[-4:] == '.pth':
         model = torch.load(model_name_or_path, map_location=torch.device(device)).bert
-        torch.save(model, model_name_or_path[:-4] + '_bert.pth')
     else:
         model = AutoModel.from_pretrained(model_name_or_path)
     return model

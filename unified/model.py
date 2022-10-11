@@ -45,6 +45,12 @@ class UMLSPretrainedModel(nn.Module):
         return loss
 
 
+
+    def calculate_ms_loss(self, pooled_output, label):
+        pairs = self.miner(pooled_output, label)
+        loss = self.ms_loss_fn(pooled_output, label, pairs)
+        return loss
+
     def get_sentence_feature(self, input_ids):
         # bert, albert, roberta
         outputs = self.bert(input_ids)
@@ -67,20 +73,15 @@ class UMLSPretrainedModel(nn.Module):
 
         cui_loss = self.calculate_sim_loss(pooled_output, cui_label)
 
-        cui_0_output = pooled_output[0:use_len]
-        cui_1_output = pooled_output[use_len:2 * use_len]
-        cui_2_output = pooled_output[2 * use_len:]
-        re_loss = self.calculate_re_loss(cui_0_output, cui_1_output, cui_2_output)
+        # cui_0_output = pooled_output[0:use_len]
+        # cui_1_output = pooled_output[use_len:2 * use_len]
+        # cui_2_output = pooled_output[2 * use_len:]
+        # re_loss = self.calculate_re_loss(cui_0_output, cui_1_output, cui_2_output)
 
-        loss = cui_loss + re_loss
+        # loss = cui_loss + re_loss
 
-        return loss
+        return cui_loss
 
-
-    def ms_loss(self, pooled_output, label):
-        pairs = self.miner(pooled_output, label)
-        loss = self.ms_loss_fn(pooled_output, label, pairs)
-        return loss
 
     def get_ms_umls_loss(self,
                          input_ids_0, input_ids_1, input_ids_2,
@@ -94,7 +95,7 @@ class UMLSPretrainedModel(nn.Module):
 
         pooled_output = self.get_sentence_feature(input_ids)
 
-        cui_loss = self.ms_loss(pooled_output, cui_label)
+        cui_loss = self.calculate_ms_loss(pooled_output, cui_label)
 
         return cui_loss
 
