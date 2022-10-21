@@ -123,7 +123,12 @@ def train(args, model, umls_dataloader, tree_dataloader=None):
                     anchor_ids        = tree_batch[0].to(args.device)
                     neg_samples_ids   = tree_batch[1].to(args.device)
                     neg_samples_dists = tree_batch[2].to(args.device)
-                    loss = model.get_tree_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+
+
+                    if args.use_ms_loss:
+                        loss = model.get_tree_ms_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
+                    else:
+                        loss = model.get_tree_clogit_loss(anchor_ids, neg_samples_ids, neg_samples_dists)
                     tree_loss = float(loss.item())
 
                     if args.gradient_accumulation_steps > 1:

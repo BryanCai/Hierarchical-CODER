@@ -92,8 +92,9 @@ class HierarchicalMultiSimilarityLoss(nn.Module):
         self.alpha = alpha
         self.beta = beta
         self.base = base
+        self.cos = nn.CosineSimilarity()
 
-    def forward(self, embeddings, labels, indices_tuple):
+    def forward_umls(self, embeddings, labels, indices_tuple):
         emb_normalized = torch.nn.functional.normalize(embeddings, p=2, dim=1)
         mat = torch.matmul(emb_normalized, emb_normalized.t())
         a1, p, a2, n = indices_tuple
@@ -110,6 +111,13 @@ class HierarchicalMultiSimilarityLoss(nn.Module):
         )
 
         return torch.mean(pos_loss + neg_loss)
+
+    def forward_tree(self, anchor_embed, neg_samples_embed, neg_dists_embed):
+        cdist = self.cos(anchor_embed, neg_samples_embed)
+        pos_loss = (1.0 / self.alpha) * neg_dists_embed*torch.log(torch.add(torch.exp(self.alpha*(self.base - cdist)), 1))
+        neg_loss = (1.0 / self.beta) *(1 - neg_dists_embed)*torch.log(torch.add(torch.exp(self.beta*(cdist - self.base)), 1))
+        return torch.mean(pos_loss + neg_loss)
+
 
 class HierarchicalLogLoss(nn.Module):
     def __init__(self, use_neg_loss, base=0.5, **kwargs):

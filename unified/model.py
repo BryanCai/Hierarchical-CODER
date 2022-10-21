@@ -7,7 +7,7 @@ from transformers.modeling_utils import SequenceSummary
 from torch import nn
 import torch.nn.functional as F
 import torch
-from loss import ConditionalLogitLoss
+from loss import ConditionalLogitLoss, HierarchicalMultiSimilarityLoss
 from pytorch_metric_learning import losses, miners
 from trans import TransE
 
@@ -18,7 +18,7 @@ class UMLSPretrainedModel(nn.Module):
                  sim_dim=500,
                  ):
         super(UMLSPretrainedModel, self).__init__()
-
+        
         self.base_model = base_model
         self.sim_dim = sim_dim
 
@@ -26,29 +26,35 @@ class UMLSPretrainedModel(nn.Module):
         self.tokenizer = AutoTokenizer.from_pretrained(base_model)
 
 
-        self.batch_loss_fn = ConditionalLogitLoss(alpha=clogit_alpha)
+        self.clogit_loss_fn = ConditionalLogitLoss(alpha=clogit_alpha)
+        self.ms_loss_fn = HierarchicalMultiSimilarityLoss(alpha=2, beta=2)
+
+
         self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
 
+        self.max_tree_dist = 2
+        self.tree_dist_embedding = nn.Embedding(self.max_tree_dist + 1, 1, padding_idx=self.max_tree_dist)
+        self.tree_dist_embedding.weight = nn.Parameter(torch.tensor([[1], [0.9**2], [0.9**4], [0]]))
+        for param in self.tree_dist_embedding.parameters():
+            param.requires_grad = False
 
-        self.ms_loss_fn = losses.MultiSimilarityLoss(alpha=2, beta=50)
 
 
     def calculate_sim_loss(self, embeddings, labels):
         sim_embeddings = embeddings[:,:self.sim_dim]
         pairs = self.miner(sim_embeddings, labels)
-        loss = self.batch_loss_fn.forward_miner(sim_embeddings, pairs)
+        loss = self.clogit_loss_fn.forward_miner(sim_embeddings, pairs)
         return loss
 
 
     def calculate_re_loss(self, re_0_embeddings, re_1_embeddings, random_embeddings):
-        loss = self.batch_loss_fn.forward_re(re_0_embeddings, re_1_embeddings, random_embeddings)
+        loss = self.clogit_loss_fn.forward_re(re_0_embeddings, re_1_embeddings, random_embeddings)
         return loss
-
 
 
     def calculate_ms_loss(self, pooled_output, label):
         pairs = self.miner(pooled_output, label)
-        loss = self.ms_loss_fn(pooled_output, label, pairs)
+        loss = self.ms_loss_fn.forward_umls(pooled_output, label, pairs)
         return loss
 
     def get_sentence_feature(self, input_ids):
@@ -99,9 +105,22 @@ class UMLSPretrainedModel(nn.Module):
 
         return cui_loss
 
-    def get_tree_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
+
+
+    def get_tree_clogit_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
         anchor_output = self.get_sentence_feature(anchor_ids)
         all_samples_output = self.get_sentence_feature(all_samples_ids)
-        loss = self.batch_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists)
+        loss = self.clogit_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists)
         
+        return loss
+
+
+    def get_tree_ms_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
+        anchor_output = self.get_sentence_feature(anchor_ids)
+        all_samples_output = self.get_sentence_feature(all_samples_ids)
+
+        all_dists_output = self.tree_dist_embedding(all_samples_dists)
+
+        loss = self.ms_loss_fn.forward_tree(anchor_output, all_samples_output, all_dists_output)
+
         return loss
