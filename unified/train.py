@@ -226,7 +226,7 @@ def run(args):
 
     if args.fine_tune:
         if args.coder_path[-4:] == ".pth":
-            coder = torch.load(args.coder_path, map_location=args.device).to(args.device)
+            coder = torch.load(args.coder_path, map_location=args.device).bert.to(args.device)
         else:
             coder = AutoModel.from_pretrained(args.coder_path).to(args.device)
         model.bert = coder
