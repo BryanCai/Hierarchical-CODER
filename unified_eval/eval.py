@@ -292,16 +292,16 @@ if __name__ == '__main__':
     # run(args)
 
     model_name_or_path_list = [
-                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_1/model_500000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_2/model_60000.pth",
                                ]
     tokenizer_list = [
-                      # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       ]
     output_path_list = [
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_1/output_500000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_2/output_60000.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
