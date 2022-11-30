@@ -241,14 +241,13 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
     x["term1"] = x.apply(lambda row: random.choice(tree_data["PheCode"][row["code1"]]), axis=1)
     x["term2"] = x.apply(lambda row: random.choice(tree_data["PheCode"][row["code2"]]), axis=1)
 
-    cos_sim = pd.Series(get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device))
-    label = x["dist"]
+    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device)
 
-    for case in [(0, 1), (0, 2), (1, 2)]:
-        case_label = [0]*sum(x["dist"] == case[0]) + [1]*sum(x["dist"] == case[1])
-        case_sim = cos_sim[x["dist"] == case[0]].tolist() + cos_sim[x["dist"] == case[1]].tolist()
+    for case in [(1, 2), (1, 3), (2, 3)]:
+        case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
+        case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
 
-        fpr, tpr, thresholds = roc_curve(case_labels, case_sim)
+        fpr, tpr, thresholds = roc_curve(case_label, case_sim)
         auc_score = auc(fpr, tpr)
         output[str(case)] = auc_score
         print(case, output[str(case)])
