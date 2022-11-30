@@ -171,15 +171,26 @@ class ConditionalLogitLoss(nn.Module):
         self.alpha = alpha
         self.cos = nn.CosineSimilarity()
 
-    def forward_dist(self, anchor_embed, all_samples_embed, all_dists):
+    def forward_dist(self, anchor_embed, all_samples_embed, all_dists, multi_category=False):
         cdist = self.cos(anchor_embed, all_samples_embed)
         cdist = (cdist+1)/2
 
-        control_similarities = cdist[all_dists <= 0]
-        case_similarities = cdist[all_dists > 0]
-        loss = clogit_partial(self.alpha, control_similarities, case_similarities)
 
-        return loss
+        if multi_category:
+            loss = 0
+            min_dist = np.min(all_dists)
+            max_dist = np.max(all_dists)
+            for i in range(min_dist, max_dist):
+                for j in range(i + 1, max_dist + 1):
+                    control_similarities = cdist[all_dists == i]
+                    case_similarities = cdist[all_dists == j]
+                    loss += clogit_partial(self.alpha, control_similarities, case_similarities)
+            return loss
+        else:
+            control_similarities = cdist[all_dists <= 0]
+            case_similarities = cdist[all_dists > 0]
+            loss = clogit_partial(self.alpha, control_similarities, case_similarities)
+            return loss
 
 
     def forward_re(self, anchor_embed, pos_embed, neg_embed):        

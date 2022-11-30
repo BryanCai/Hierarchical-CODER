@@ -16,6 +16,7 @@ class UMLSPretrainedModel(nn.Module):
     def __init__(self, base_model,
                  clogit_alpha=2,
                  sim_dim=500,
+                 multi_category=False
                  ):
         super(UMLSPretrainedModel, self).__init__()
         
@@ -110,7 +111,7 @@ class UMLSPretrainedModel(nn.Module):
     def get_tree_clogit_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
         anchor_output = self.get_sentence_feature(anchor_ids)
         all_samples_output = self.get_sentence_feature(all_samples_ids)
-        loss = self.clogit_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists)
+        loss = self.clogit_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists, multi_category=multi_category)
         
         return loss
 

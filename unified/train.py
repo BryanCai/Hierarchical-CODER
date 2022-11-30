@@ -221,7 +221,8 @@ def run(args):
     os.makedirs(args.output_dir, exist_ok=True)
     model = UMLSPretrainedModel(base_model=args.model_name_or_path,
                                 clogit_alpha=args.clogit_alpha,
-                                sim_dim=args.sim_dim).to(args.device)
+                                sim_dim=args.sim_dim
+                                multi_category=args.multi_category).to(args.device)
 
 
     if args.fine_tune:
@@ -326,6 +327,10 @@ def main():
 
     parser.add_argument("--sim_dim", type=int, default=-1,
                         help="dimension to use for similarity")
+
+
+    parser.add_argument("--multi_category", action="store_true",
+                        help="use multiple categories for tree loss")
 
 
     parser.add_argument("--fine_tune", action="store_true",
