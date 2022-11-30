@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import networkx as nx
 
 
 def logsumexp(x, keep_mask=None, add_one=True, dim=1):

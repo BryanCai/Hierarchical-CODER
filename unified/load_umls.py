@@ -3,7 +3,6 @@ from tqdm import tqdm
 import re
 from random import shuffle
 import pickle
-import networkx as nx
 #import ipdb
 import ahocorasick
 import pandas as pd

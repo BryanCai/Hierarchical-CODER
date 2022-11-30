@@ -12,6 +12,37 @@ from scipy.stats import spearmanr
 from sklearn.metrics import roc_curve, auc
 # sys.path.append('/home/tc24/BryanWork/CODER/coder_base/')
 sys.path.append('/home/tc24/BryanWork/CODER/unified/')
+from itertools import combinations
+import time
+
+def dist_PheCode(code1, code2):
+    def split_PheCode(code):
+        out = []
+        if "." in code:
+            out.append(code.split(".")[0])
+            for i in range(len(code.split(".")[1])):
+                out.append(code.split(".")[1][i])
+            for i in range(2 - len(code.split(".")[1])):
+                out.append(None)
+        else:
+            out = [code, None, None]
+        return out
+
+    if code1 == code2:
+        return 0
+
+    split1 = split_PheCode(code1)
+    split2 = split_PheCode(code2)
+
+    if split1[0] == split2[0]:
+        assert not (split1[1] is None and split2[1] is None)
+        if split1[1] == split2[1]:
+            assert not (split1[2] is None and split2[2] is None)
+            return 1
+        else:
+            return 2
+    else:
+        return 3
 
 
 def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
@@ -140,19 +171,38 @@ def read_relation_pairs(path):
     a["tree1"] = a.code1.apply(lambda x: str(x).split(":")[0])
     a["tree2"] = a.code2.apply(lambda x: str(x).split(":")[0])
 
+    a["num1"] = a.code1.apply(lambda x: "" if len(str(x).split(":")) < 2 else str(x).split(":")[1])
+    a["num2"] = a.code2.apply(lambda x: "" if len(str(x).split(":")) < 2 else str(x).split(":")[1])
+
     tree_data = {}
+    for i in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
+        tree_data[i] = {}
+    for i in range(a.shape[0]):
+        if a["tree1"].iloc[i] in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
+            if a["num1"].iloc[i] in tree_data[a["tree1"].iloc[i]]:
+                tree_data[a["tree1"].iloc[i]][a["num1"].iloc[i]].append(a["STR1"].iloc[i])
+            else:
+                tree_data[a["tree1"].iloc[i]][a["num1"].iloc[i]] = [a["STR1"].iloc[i]]
+
+        if a["tree2"].iloc[i] in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
+            if a["num2"].iloc[i] in tree_data[a["tree2"].iloc[i]]:
+                tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]].append(a["STR2"].iloc[i])
+            else:
+                tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]] = [a["STR2"].iloc[i]]
+
+    tree_terms = {}
     for tree in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
         x = set()
         x.update(a[a.tree1 == tree].STR1)
         x.update(a[a.tree2 == tree].STR2)
-        tree_data[tree] = list(x)
+        tree_terms[tree] = list(x)
 
     x = set()
     x.update(a[a.CUI1.isna() == False].STR1)
     x.update(a[a.CUI2.isna() == False].STR2)
-    tree_data["CUI"] = list(x)
+    tree_terms["CUI"] = list(x)
 
-    return pair_data, tree_data
+    return pair_data, tree_terms, tree_data
 
 
 def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device):
@@ -160,46 +210,6 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
     embed2 = embed_fun(string_list2, model, tokenizer, device, normalize=True)
     return [np.dot(a, b) for a, b in zip(embed1, embed2)]
 
-
-def run(args):
-    data_dir = Path(args.data_dir)
-    model = load_model(args.model_name_or_path, args.device)
-    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
-
-    if args.model_name_or_path.find('SapBERT') > 0:
-        embed_fun = get_sapbert_embed
-    else:
-        embed_fun = get_bert_embed
-
-
-    output = {}
-    for f in ["Similar.csv", "Relate.csv"]:
-        data = read_rank_csv(data_dir/f)
-        cos_sim = get_cos_sim(embed_fun, data["string1"], data["string2"], model, tokenizer, args.device)
-
-        output[f] = spearmanr(cos_sim, data["score"])[0]
-        print(f, output[f])
-
-    pair_data, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv")
-
-    for i in pair_data:
-        cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, args.device)
-        tree1, tree2 = i[0].split("-")
-        random_terms1 = random.choices(tree_data[tree1], k=args.random_samples)
-        random_terms2 = random.choices(tree_data[tree2], k=args.random_samples)
-
-        random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, args.device)
-
-        label = [1]*len(cos_sim) + [0]*len(random_cos_sim)
-
-        fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
-        auc_score = auc(fpr, tpr)
-        output[i] = auc_score
-
-        print(i, output[i])
-
-    with open(args.output_path, 'w') as fp:
-        json.dump(output, fp, indent=4)
 
 
 def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, random_samples):
@@ -221,13 +231,34 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
         output[str(f)] = spearmanr(cos_sim, data["score"])[0]
         print(f, output[str(f)])
 
-    pair_data, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv")
+    pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv")
+
+
+    x = pd.DataFrame(combinations(tree_data["PheCode"].keys(), 2), columns=["code1", "code2"])
+    x["dist"] = x.apply(lambda row: dist_PheCode(row["code1"], row["code2"]), axis=1)
+
+    x = pd.concat([x[x["dist"] == 1], x[x["dist"] == 2], x[x["dist"] == 3].sample(100000)])
+    x["term1"] = x.apply(lambda row: random.choice(tree_data["PheCode"][row["code1"]]), axis=1)
+    x["term2"] = x.apply(lambda row: random.choice(tree_data["PheCode"][row["code2"]]), axis=1)
+
+    cos_sim = pd.Series(get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device))
+    label = x["dist"]
+
+    for case in [(0, 1), (0, 2), (1, 2)]:
+        case_label = [0]*sum(x["dist"] == case[0]) + [1]*sum(x["dist"] == case[1])
+        case_sim = cos_sim[x["dist"] == case[0]].tolist() + cos_sim[x["dist"] == case[1]].tolist()
+
+        fpr, tpr, thresholds = roc_curve(case_labels, case_sim)
+        auc_score = auc(fpr, tpr)
+        output[str(case)] = auc_score
+        print(case, output[str(case)])
+
 
     for i in pair_data:
         cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, device)
         tree1, tree2 = i[0].split("-")
-        random_terms1 = random.choices(tree_data[tree1], k=random_samples)
-        random_terms2 = random.choices(tree_data[tree2], k=random_samples)
+        random_terms1 = random.choices(tree_terms[tree1], k=random_samples)
+        random_terms2 = random.choices(tree_terms[tree2], k=random_samples)
 
         random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, device)
 
@@ -289,19 +320,27 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+
+
     # run(args)
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_1/model_500000.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_2/model_60000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
                                ]
     tokenizer_list = [
                       "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       ]
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_1/output_500000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_mod_ms_2/output_60000.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output1_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output1_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output1_300000.json"
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output1_20000.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
