@@ -328,8 +328,10 @@ if __name__ == '__main__':
                                "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
                                "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
                                "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
                                ]
     tokenizer_list = [
+                      "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
@@ -338,8 +340,9 @@ if __name__ == '__main__':
     output_path_list = [
                         "/home/tc24/BryanWork/saved_models/output_coder_base/output1_300000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ms/output1_300000.json",
-                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output1_300000.json"
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output1_300000.json",
                         "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output1_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output1_10000.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
