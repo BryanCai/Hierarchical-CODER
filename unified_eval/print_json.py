@@ -23,7 +23,6 @@ def run(file):
               "('LOINC-LOINC', 'similarity')",
               "('PheCode-CCS', 'related')",
               "('PheCode-LOINC', 'related')",
-
               ]:
         print(data[i])
     print("\n")
@@ -49,6 +48,8 @@ def run(file):
               "('CUI-CUI', 'may be caused by')"
               ]:
         print(data[i])
+
+    print("\n")
 
 
     for i in ["(1, 2)",
