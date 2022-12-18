@@ -14,6 +14,7 @@ from sklearn.metrics import roc_curve, auc
 sys.path.append('/home/tc24/BryanWork/CODER/unified/')
 from itertools import combinations
 import time
+from collections import Counter
 
 def dist_PheCode(code1, code2):
     def split_PheCode(code):
@@ -180,15 +181,15 @@ def read_relation_pairs(path):
     for i in range(a.shape[0]):
         if a["tree1"].iloc[i] in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
             if a["num1"].iloc[i] in tree_data[a["tree1"].iloc[i]]:
-                tree_data[a["tree1"].iloc[i]][a["num1"].iloc[i]].append(a["STR1"].iloc[i])
+                tree_data[a["tree1"].iloc[i]][a["num1"].iloc[i]].add(a["STR1"].iloc[i].lower())
             else:
-                tree_data[a["tree1"].iloc[i]][a["num1"].iloc[i]] = [a["STR1"].iloc[i]]
+                tree_data[a["tree1"].iloc[i]][a["num1"].iloc[i]] = set([a["STR1"].iloc[i].lower()])
 
         if a["tree2"].iloc[i] in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
             if a["num2"].iloc[i] in tree_data[a["tree2"].iloc[i]]:
-                tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]].append(a["STR2"].iloc[i])
+                tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]].add(a["STR2"].iloc[i].lower())
             else:
-                tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]] = [a["STR2"].iloc[i]]
+                tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]] = set([a["STR2"].iloc[i].lower()])
 
     tree_terms = {}
     for tree in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
@@ -238,12 +239,27 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
     x["dist"] = x.apply(lambda row: dist_PheCode(row["code1"], row["code2"]), axis=1)
 
     x = pd.concat([x[x["dist"] == 1], x[x["dist"] == 2], x[x["dist"] == 3].sample(100000)])
-    x["term1"] = x.apply(lambda row: random.choice(tree_data["PheCode"][row["code1"]]), axis=1)
-    x["term2"] = x.apply(lambda row: random.choice(tree_data["PheCode"][row["code2"]]), axis=1)
+    x["term1"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code1"]])), axis=1)
+    x["term2"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code2"]])), axis=1)
+
+    code_list = []
+    term1_list = []
+    term2_list = []
+    for i in tree_data["PheCode"]:
+        terms = list(tree_data["PheCode"][i])
+        for j in range(len(terms)//2):
+            idx = list(range(len(tree_data["PheCode"][i])))
+            random.shuffle(idx)
+            code_list.append(i)
+            term1_list.append(terms[2*j])
+            term2_list.append(terms[2*j + 1])
+
+    y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
+    x = pd.concat([x, y], ignore_index=True)
 
     x["cos_sim"] = get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device)
 
-    for case in [(1, 2), (1, 3), (2, 3)]:
+    for case in combinations(range(4), 2):
         case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
         case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
 
@@ -267,6 +283,11 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
         output[str(i)] = auc(fpr, tpr)
 
         print(i, output[str(i)])
+
+    
+    example1_cos_sim = get_cos_sim(embed_fun, ["Type 1 Diabetes"], ["Type 2 Diabetes"], model, tokenizer, device)
+    output["example1_cos_sim"] = example1_cos_sim[0]
+
 
     with open(output_path, 'w') as fp:
         json.dump(output, fp, indent=4)
@@ -322,6 +343,7 @@ if __name__ == '__main__':
 
 
     # run(args)
+
 
     model_name_or_path_list = [
                                "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
