@@ -19,9 +19,10 @@ class UMLSPretrainedModel(nn.Module):
                  multi_category=False
                  ):
         super(UMLSPretrainedModel, self).__init__()
-        
+
         self.base_model = base_model
         self.sim_dim = sim_dim
+        self.multi_category = multi_category
 
         self.bert = AutoModel.from_pretrained(base_model)
         self.tokenizer = AutoTokenizer.from_pretrained(base_model)
@@ -111,7 +112,7 @@ class UMLSPretrainedModel(nn.Module):
     def get_tree_clogit_loss(self, anchor_ids, all_samples_ids, all_samples_dists):
         anchor_output = self.get_sentence_feature(anchor_ids)
         all_samples_output = self.get_sentence_feature(all_samples_ids)
-        loss = self.clogit_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists, multi_category=multi_category)
+        loss = self.clogit_loss_fn.forward_dist(anchor_output, all_samples_output, all_samples_dists, multi_category=self.multi_category)
         
         return loss
 
