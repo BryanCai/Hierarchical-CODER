@@ -242,8 +242,6 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
     x["term1"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code1"]])), axis=1)
     x["term2"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code2"]])), axis=1)
 
-    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device)
-
     code_list = []
     term1_list = []
     term2_list = []
@@ -259,7 +257,9 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
     y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
     x = pd.concat([x, y], ignore_index=True)
 
-    for case in [combinations(range(4), 2)]:
+    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device)
+
+    for case in combinations(range(4), 2):
         case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
         case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
 
