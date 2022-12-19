@@ -52,12 +52,22 @@ def run(file):
     print("\n")
 
 
-    for i in ["(1, 2)",
+    for i in ["(0, 1)",
+              "(0, 2)",
+              "(0, 3)",
+              "(1, 2)",
               "(1, 3)",
               "(2, 3)",
               ]:
         print(data[i])
 
+    print("\n")
+
+    for i in ["example1_cos_sim",
+              ]:
+        print(data[i])
+
+    print("\n")
 
 if __name__ == '__main__':
     # file = sys.argv[1]
