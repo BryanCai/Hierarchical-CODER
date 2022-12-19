@@ -77,6 +77,7 @@ if __name__ == '__main__':
                         "/home/tc24/BryanWork/saved_models/old/output_unified_3/output1_300000.json",
                         "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output1_20000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output1_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output1_10000.json",
                         ]
 
     for i in output_path_list:
