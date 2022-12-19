@@ -221,7 +221,7 @@ def run(args):
     os.makedirs(args.output_dir, exist_ok=True)
     model = UMLSPretrainedModel(base_model=args.model_name_or_path,
                                 clogit_alpha=args.clogit_alpha,
-                                sim_dim=args.sim_dim
+                                sim_dim=args.sim_dim,
                                 multi_category=args.multi_category).to(args.device)
 
 
@@ -349,6 +349,7 @@ def main():
 
 
     print(args.fine_tune)
+    print(args.multi_category)
     run(args)
 
 
