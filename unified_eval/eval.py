@@ -259,7 +259,7 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
     y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
     x = pd.concat([x, y], ignore_index=True)
 
-    for case in combinations(range(4), 2):
+    for case in [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]:
         case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
         case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
 
