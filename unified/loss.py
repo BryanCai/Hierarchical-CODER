@@ -178,8 +178,8 @@ class ConditionalLogitLoss(nn.Module):
 
         if multi_category:
             loss = 0
-            min_dist = np.min(all_dists)
-            max_dist = np.max(all_dists)
+            min_dist = min(all_dists)
+            max_dist = max(all_dists)
             for i in range(min_dist, max_dist):
                 for j in range(i + 1, max_dist + 1):
                     control_similarities = cdist[all_dists == i]
