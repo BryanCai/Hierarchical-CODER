@@ -259,24 +259,17 @@ class TreeDataset(Dataset):
             return [], [], []
 
         all_samples_id, all_samples_dist = list(zip(*all_samples))
-        # neg_samples_id, neg_samples_dist = list(zip(*neg_samples))
 
-        anchor_string = random.choice(self.trees[tree].text[anchor_id])
-        # neg_samples_string = [random.choice(self.trees[tree].text[i]) for i in neg_samples_id]
+        anchor_strings = [random.choice(self.trees[tree].text[anchor_id]) for i in range(len(all_samples_input_id))]
         all_samples_string = [random.choice(self.trees[tree].text[i]) for i in all_samples_id]
-        # if tree == 'phecode':
-        #     all_samples_id = [i.split('.')[0] if '.' in i and i.split('.')[0] in self.anchorid2cont_idx else i for i in all_samples_id]
 
 
-        anchor_input_id = self.tokenize_one(anchor_string)
-        # neg_samples_input_id = [self.tokenize_one(s) for s in neg_samples_string]
+        anchor_input_ids = [self.tokenize_one(s) for s in anchor_strings]
         all_samples_input_id = [self.tokenize_one(s) for s in all_samples_string]
 
         all_samples_cont_idx = [self.anchorid2cont_idx[i] for i in all_samples_id]
 
-        # return [anchor_input_id]*len(neg_samples_input_id), neg_samples_input_id, neg_samples_dist
-        return [anchor_input_id]*len(all_samples_input_id), all_samples_input_id, all_samples_dist
-        # return all_samples_input_id, all_samples_cont_idx
+        return anchor_input_ids, all_samples_input_id, all_samples_dist
 
     def __len__(self):
         return self.len
