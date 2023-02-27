@@ -328,8 +328,8 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
 
     
     example1_cos_sim = get_cos_sim(embed_fun, ["Type 1 Diabetes"], ["Type 2 Diabetes"], model, tokenizer, device)
-    output["example1_cos_sim"] = example1_cos_sim[0]
-
+    output["example1_cos_sim"] = float(example1_cos_sim[0])
+    print("example1_cos_sim", output["example1_cos_sim"])
 
     with open(output_path, 'w') as fp:
         json.dump(output, fp, indent=4)
