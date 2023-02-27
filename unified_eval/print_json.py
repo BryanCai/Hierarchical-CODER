@@ -72,12 +72,12 @@ def run(file):
 if __name__ == '__main__':
     # file = sys.argv[1]
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/output_coder_base/output1_300000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output1_300000.json",
-                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output1_300000.json",
-                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output1_20000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output1_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output1_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         ]
 
     for i in output_path_list:

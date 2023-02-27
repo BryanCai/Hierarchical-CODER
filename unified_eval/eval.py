@@ -399,27 +399,27 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
                                "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
                                ]
     tokenizer_list = [
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       ]
     output_path_list = [
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         ]
 
