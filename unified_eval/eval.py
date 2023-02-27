@@ -12,9 +12,27 @@ from scipy.stats import spearmanr
 from sklearn.metrics import roc_curve, auc
 # sys.path.append('/home/tc24/BryanWork/CODER/coder_base/')
 sys.path.append('/home/tc24/BryanWork/CODER/unified/')
+sys.path.append('D:/Projects/CODER/Hierarchical-CODER/unified')
+from load_trees import TREE
 from itertools import combinations
 import time
 from collections import Counter
+import csv
+import re
+
+
+def clean(term, lower=True, clean_NOS=True, clean_bracket=True, clean_dash=True):
+    term = " " + term + " "
+    if lower:
+        term = term.lower()
+    if clean_NOS:
+        term = term.replace(" NOS ", " ").replace(" nos ", " ")
+    if clean_bracket:
+        term = re.sub(u"\\(.*?\\)", "", term)
+    if clean_dash:
+        term = term.replace("-", " ")
+    term = " ".join([w for w in term.split() if w])
+    return term
 
 def dist_PheCode(code1, code2):
     def split_PheCode(code):
@@ -154,8 +172,8 @@ def read_rank_csv(path):
 
 
 
-def read_relation_pairs(path):
-    a = pd.read_csv(path, dtype=str).dropna(subset=["STR1", "STR2"])
+def read_relation_pairs(data_path, tree_path):
+    a = pd.read_csv(data_path, dtype=str).dropna(subset=["STR1", "STR2"])
     a.pair.replace({"LAB-LAB": "LOINC-LOINC", "PheCode-LAB": "PheCode-LOINC"}, inplace=True)
     pair_data = {}
     for pair_type in a.pair.unique():
@@ -175,6 +193,9 @@ def read_relation_pairs(path):
     a["num1"] = a.code1.apply(lambda x: "" if len(str(x).split(":")) < 2 else str(x).split(":")[1])
     a["num2"] = a.code2.apply(lambda x: "" if len(str(x).split(":")) < 2 else str(x).split(":")[1])
 
+
+
+
     tree_data = {}
     for i in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
         tree_data[i] = {}
@@ -190,6 +211,27 @@ def read_relation_pairs(path):
                 tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]].add(a["STR2"].iloc[i].lower())
             else:
                 tree_data[a["tree2"].iloc[i]][a["num2"].iloc[i]] = set([a["STR2"].iloc[i].lower()])
+
+
+    phecode_term_data = {}
+    with open(tree_path/"phecode"/"code2string.csv") as f:
+        reader = csv.reader(f)
+        reader.__next__()
+        for row in reader:
+            current = row[0]
+            text = row[1]
+            if current not in phecode_term_data:
+                phecode_term_data[current] = set([clean(text)])
+            phecode_term_data[current].add(clean(text))
+    unknown_codes = []
+    for i in tree_data["PheCode"]:
+        if i not in phecode_term_data:
+            unknown_codes.append(i)
+        else:
+            tree_data["PheCode"][i] = phecode_term_data[i]
+    for i in unknown_codes:
+        del tree_data["PheCode"][i]
+
 
     tree_terms = {}
     for tree in ['LOINC', 'PheCode', 'RXNORM', 'CCS']:
@@ -213,8 +255,9 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
 
 
 
-def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, random_samples):
+def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, device, random_samples):
     data_dir = Path(data_dir)
+    tree_dir = Path(tree_dir)
     model = load_model(model_name_or_path, device)
     tokenizer = AutoTokenizer.from_pretrained(tokenizer)
 
@@ -232,7 +275,7 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
         output[str(f)] = spearmanr(cos_sim, data["score"])[0]
         print(f, output[str(f)])
 
-    pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv")
+    pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
 
 
     x = pd.DataFrame(combinations(tree_data["PheCode"].keys(), 2), columns=["code1", "code2"])
@@ -286,8 +329,8 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
 
     
     example1_cos_sim = get_cos_sim(embed_fun, ["Type 1 Diabetes"], ["Type 2 Diabetes"], model, tokenizer, device)
-    output["example1_cos_sim"] = example1_cos_sim[0]
-
+    output["example1_cos_sim"] = float(example1_cos_sim[0])
+    print("example1_cos_sim", output["example1_cos_sim"])
 
     with open(output_path, 'w') as fp:
         json.dump(output, fp, indent=4)
@@ -295,12 +338,22 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, device, rando
 
 
 if __name__ == '__main__':
+    # tree_dir = Path("D:/Projects/CODER/Hierarchical-CODER/data/cleaned/train")
+    # data_dir = Path("./data")
+    # pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--data_dir",
         default="./data",
         type=str,
         help="eval data directory",
+    )
+
+    parser.add_argument(
+        "--tree_dir",
+        type=str,
+        help="Path to tree directory",
     )
 
     parser.add_argument(
@@ -346,28 +399,28 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
                                "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
                                ]
     tokenizer_list = [
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       ]
     output_path_list = [
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output1_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ms/output1_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_3/output1_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output1_20000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output1_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output1_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
@@ -375,4 +428,4 @@ if __name__ == '__main__':
         t = tokenizer_list[i]
         o = output_path_list[i]
         print(m)
-        run_many(m, t, o, args.data_dir, args.device, args.random_samples)
+        run_many(m, t, o, args.data_dir, args.tree_dir, args.device, args.random_samples)
