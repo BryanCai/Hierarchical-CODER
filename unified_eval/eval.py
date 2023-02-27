@@ -257,6 +257,7 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
 
 def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, device, random_samples):
     data_dir = Path(data_dir)
+    tree_dir = Path(tree_dir)
     model = load_model(model_name_or_path, device)
     tokenizer = AutoTokenizer.from_pretrained(tokenizer)
 
