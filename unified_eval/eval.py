@@ -350,17 +350,6 @@ if __name__ == '__main__':
     # run_many(m, t, o, args.data_dir, args.tree_dir, args.device, args.random_samples)
 
 
-    tree_dir = Path("D:/Projects/CODER/Hierarchical-CODER/data/cleaned/train")
-    data_dir = Path("./data")
-
-    m = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
-    t = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
-    o = "./output.json"
-
-    run_many(m, t, o, data_dir, tree_dir, "cuda:0", 10000)
-
-
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--data_dir",
