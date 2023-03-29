@@ -300,7 +300,7 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
     y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
     x = pd.concat([x, y], ignore_index=True)
 
-    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"], x["term2"], model, tokenizer, args.device)
+    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
 
     for case in combinations(range(4), 2):
         case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
@@ -341,6 +341,25 @@ if __name__ == '__main__':
     # tree_dir = Path("D:/Projects/CODER/Hierarchical-CODER/data/cleaned/train")
     # data_dir = Path("./data")
     # pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
+
+    # tree_dir = Path("D:/Projects/CODER/Hierarchical-CODER/data/cleaned/train")
+    # data_dir = Path("./data")
+    # # pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
+
+    # run_many(None, None, None, data_dir, tree_dir, None, None)
+    # run_many(m, t, o, args.data_dir, args.tree_dir, args.device, args.random_samples)
+
+
+    tree_dir = Path("D:/Projects/CODER/Hierarchical-CODER/data/cleaned/train")
+    data_dir = Path("./data")
+
+    m = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+    t = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+    o = "./output.json"
+
+    run_many(m, t, o, data_dir, tree_dir, "cuda:0", 10000)
+
+
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -399,28 +418,34 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
-                               "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
-                               "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
-                               "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
+                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               # "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
+                               # "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
+                               # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
+                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
+                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
+                               "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                               "GanjinZero/UMLSBert_ENG",
                                ]
     tokenizer_list = [
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
-                      "monologg/biobert_v1.1_pubmed",
+                      # "monologg/biobert_v1.1_pubmed",
+                      # "monologg/biobert_v1.1_pubmed",
+                      # "monologg/biobert_v1.1_pubmed",
+                      # "monologg/biobert_v1.1_pubmed",
+                      # "monologg/biobert_v1.1_pubmed",
+                      # "monologg/biobert_v1.1_pubmed",
+                      "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                      "GanjinZero/UMLSBert_ENG",
                       ]
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
-                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
-                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
-                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
+                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
+                        # "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
+                        # "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
+                        # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
+                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
+                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
