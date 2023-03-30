@@ -260,7 +260,7 @@ class TreeDataset(Dataset):
 
         all_samples_id, all_samples_dist = list(zip(*all_samples))
 
-        anchor_strings = [random.choice(self.trees[tree].text[anchor_id]) for i in range(len(all_samples_input_id))]
+        anchor_strings = [random.choice(self.trees[tree].text[anchor_id]) for i in range(len(all_samples_id))]
         all_samples_string = [random.choice(self.trees[tree].text[i]) for i in all_samples_id]
 
 

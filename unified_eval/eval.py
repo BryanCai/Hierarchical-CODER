@@ -415,6 +415,7 @@ if __name__ == '__main__':
                                # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
                                "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                "GanjinZero/UMLSBert_ENG",
+                               "monologg/biobert_v1.1_pubmed",
                                ]
     tokenizer_list = [
                       # "monologg/biobert_v1.1_pubmed",
@@ -425,6 +426,7 @@ if __name__ == '__main__':
                       # "monologg/biobert_v1.1_pubmed",
                       "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                       "GanjinZero/UMLSBert_ENG",
+                      "monologg/biobert_v1.1_pubmed",
                       ]
     output_path_list = [
                         # "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
@@ -435,6 +437,7 @@ if __name__ == '__main__':
                         # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1.1",
                         ]
 
     for i in range(len(model_name_or_path_list)):
