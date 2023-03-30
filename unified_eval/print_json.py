@@ -78,6 +78,9 @@ if __name__ == '__main__':
                         "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1.1",
                         ]
 
     for i in output_path_list:
