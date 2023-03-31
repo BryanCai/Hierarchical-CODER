@@ -13,6 +13,7 @@ from sklearn.metrics import roc_curve, auc
 # sys.path.append('/home/tc24/BryanWork/CODER/coder_base/')
 sys.path.append('/home/tc24/BryanWork/CODER/unified/')
 sys.path.append('D:/Projects/CODER/Hierarchical-CODER/unified')
+from cadec_eval import cadec_eval
 from load_trees import TREE
 from itertools import combinations
 import time
@@ -327,13 +328,27 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
 
         print(i, output[str(i)])
 
-    
-    example1_cos_sim = get_cos_sim(embed_fun, ["Type 1 Diabetes"], ["Type 2 Diabetes"], model, tokenizer, device)
-    output["example1_cos_sim"] = float(example1_cos_sim[0])
-    print("example1_cos_sim", output["example1_cos_sim"])
+
+
+    output["cadec"] = cadec_eval(model, tokenizer)
+
+    example_pairs = [
+                     ("Type 1 Diabetes", "Type 2 Diabetes"),
+                     ("Parkinson's disease", "Lewy body dementia"),
+                     ("Alzheimer's disease", "Dementia"),
+                     ("Osteoarthritis", "Rheumatoid Arthritis"),
+                     ("adenocarcinoma", "squamous cell carcinoma"),
+                    ]
+
+    term1_list, term2_list = list(zip(*example_pairs))
+    example_cos_sim = get_cos_sim(embed_fun, term1_list, term2_list, model, tokenizer, device)
+    for (i, sim) in enumerate(example_cos_sim):
+        output["example" + str(i) + "_cos_sim"] = float(sim)
+        print("example" + str(i) + "_cos_sim", output["example" + str(i) + "_cos_sim"])
 
     with open(output_path, 'w') as fp:
         json.dump(output, fp, indent=4)
+
 
 
 
@@ -407,34 +422,34 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
                                "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                "GanjinZero/UMLSBert_ENG",
                                "monologg/biobert_v1.1_pubmed",
                                ]
     tokenizer_list = [
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                       "GanjinZero/UMLSBert_ENG",
                       "monologg/biobert_v1.1_pubmed",
                       ]
     output_path_list = [
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1.1",
