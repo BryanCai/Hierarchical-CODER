@@ -375,7 +375,7 @@ if __name__ == '__main__':
 
     parser.add_argument(
         "--tree_dir",
-        default = "/home/tc24/BryanWork/CODER/data/cleaned/all"
+        default="/home/tc24/BryanWork/CODER/data/cleaned/all",
         type=str,
         help="Path to tree directory",
     )
