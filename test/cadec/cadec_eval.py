@@ -6,7 +6,8 @@ import numpy as np
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 import sys
-sys.path.insert(1, "/home/tc24/BryanWork/CODER/pretrain")
+# sys.path.insert(1, "/home/tc24/BryanWork/CODER/pretrain")
+sys.path.append('/home/tc24/BryanWork/CODER/unified/')
 from model import UMLSPretrainedModel
 
 
