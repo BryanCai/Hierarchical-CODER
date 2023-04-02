@@ -66,6 +66,13 @@ def run(file):
     print("\n")
 
     for i in [
+              "cadec",
+              ]:
+        print(data[i])
+
+    print("\n")
+
+    for i in [
               "example1_cos_sim",
               "example2_cos_sim",
               "example3_cos_sim",
