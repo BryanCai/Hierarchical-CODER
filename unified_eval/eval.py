@@ -13,6 +13,7 @@ from sklearn.metrics import roc_curve, auc
 # sys.path.append('/home/tc24/BryanWork/CODER/coder_base/')
 sys.path.append('/home/tc24/BryanWork/CODER/unified/')
 sys.path.append('D:/Projects/CODER/Hierarchical-CODER/unified')
+from model import UMLSPretrainedModel
 from cadec_eval import cadec_eval
 from load_trees import TREE
 from itertools import combinations
@@ -340,7 +341,7 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
                      ("adenocarcinoma", "squamous cell carcinoma"),
                     ]
 
-    term1_list, term2_list = list(zip(*example_pairs))
+    term1_list, term2_list = map(list, zip(*example_pairs))
     example_cos_sim = get_cos_sim(embed_fun, term1_list, term2_list, model, tokenizer, device)
     for (i, sim) in enumerate(example_cos_sim):
         output["example" + str(i) + "_cos_sim"] = float(sim)
