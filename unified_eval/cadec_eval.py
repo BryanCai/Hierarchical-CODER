@@ -103,13 +103,13 @@ def eval(m, tok, task_name, top_k=3, summary_method=None):
         acc_1, acc_k = eval_one(m, tok, os.path.join(task_name, p), top_k, summary_method=summary_method)
         acc_1_list.append(acc_1)
         acc_k_list.append(acc_k)
-    print(task_name, summary_method)
-    print(f"top_k={top_k}")
-    print(acc_1_list)
-    print(acc_k_list)
-    print(sum(acc_1_list) / 5, sum(acc_k_list) / 5)
+    # print(task_name, summary_method)
+    # print(f"top_k={top_k}")
+    # print(acc_1_list)
+    # print(acc_k_list)
+    # print(sum(acc_1_list) / 5, sum(acc_k_list) / 5)
 
-    return None
+    return (sum(acc_1_list) / 5, sum(acc_k_list) / 5)
 
 
 def load_vectors(filename):
