@@ -436,12 +436,12 @@ if __name__ == '__main__':
                                "monologg/biobert_v1.1_pubmed",
                                ]
     tokenizer_list = [
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                       "GanjinZero/UMLSBert_ENG",
