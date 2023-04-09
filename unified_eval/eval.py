@@ -6,7 +6,7 @@ import random
 import json
 import sys
 from pathlib import Path
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer, BioGptTokenizer, BioGptForCausalLM
 from tqdm import tqdm
 from scipy.stats import spearmanr
 from sklearn.metrics import roc_curve, auc
@@ -154,14 +154,20 @@ def get_sapbert_embed(phrase_list, model, tokenizer, device, show_progress=False
 
 
 
-def load_model(model_name_or_path, device):
+def load_model_and_tokenizer(model_name_or_path, tokenizer, device):
     if model_name_or_path[-8:] == 'bert.pth':
         model = torch.load(model_name_or_path, map_location=torch.device(device))
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer)
     elif model_name_or_path[-4:] == '.pth':
         model = torch.load(model_name_or_path, map_location=torch.device(device)).bert
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+    elif "biogpt" in model_name_or_path:
+        model = BioGptForCausalLM.from_pretrained(model_name_or_path)
+        tokenizer = BioGptTokenizer.from_pretrained(tokenizer)
     else:
         model = AutoModel.from_pretrained(model_name_or_path)
-    return model
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+    return model, tokenizer
 
 
 
@@ -260,8 +266,7 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
 def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, device, random_samples):
     data_dir = Path(data_dir)
     tree_dir = Path(tree_dir)
-    model = load_model(model_name_or_path, device)
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+    model, tokenizer = load_model_and_tokenizer(model_name_or_path, tokenizer, device)
 
     if model_name_or_path.find('SapBERT') > 0:
         embed_fun = get_sapbert_embed
