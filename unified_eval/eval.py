@@ -354,11 +354,11 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
     tree_dir = Path(tree_dir)
     model, tokenizer = load_model_and_tokenizer(model_name_or_path, tokenizer, device)
 
-    if model_name_or_path.find('SapBERT') > 0:
+    if model_name_or_path.find('SapBERT') >= 0:
         embed_fun = get_sapbert_embed
-    elif model_name_or_path.find('biogpt') > 0:
+    elif model_name_or_path.find('biogpt') >= 0:
         embed_fun = get_biogpt_embed
-    elif model_name_or_path.find('distilbert') > 0:
+    elif model_name_or_path.find('distilbert') >= 0:
         embed_fun = get_distilbert_embed
     else:
         embed_fun = get_bert_embed
@@ -423,8 +423,6 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
         output[str(i)] = auc(fpr, tpr)
 
         print(i, output[str(i)])
-
-
 
     output["cadec"] = cadec_eval(model, tokenizer, embed_fun)
 
@@ -519,46 +517,46 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
                                # "/home/tc24/BryanWork/saved_models/output_unified_ms/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
-                               # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_3/model_300000.pth",
+                               "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/model_20000.pth",
                                # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
-                               # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
                                # "/home/tc24/BryanWork/saved_models/output_unified_ft_9/model_10000.pth",
-                               # "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
-                               # "GanjinZero/UMLSBert_ENG",
-                               # "monologg/biobert_v1.1_pubmed",
+                               "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                               "GanjinZero/UMLSBert_ENG",
+                               "monologg/biobert_v1.1_pubmed",
                                "microsoft/biogpt",
                                "distilbert-base-uncased",
                                ]
 
     tokenizer_list = [
+                      "monologg/biobert_v1.1_pubmed",
                       # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       # "monologg/biobert_v1.1_pubmed",
+                      "monologg/biobert_v1.1_pubmed",
                       # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "monologg/biobert_v1.1_pubmed",
-                      # "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
-                      # "GanjinZero/UMLSBert_ENG",
-                      # "monologg/biobert_v1.1_pubmed",
+                      "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                      "GanjinZero/UMLSBert_ENG",
+                      "monologg/biobert_v1.1_pubmed",
                       "microsoft/biogpt",
                       "distilbert-base-uncased",
                       ]
 
     output_path_list = [
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
                         # "/home/tc24/BryanWork/saved_models/output_unified_ms/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
-                        # "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_3/output2_300000.json",
+                        "/home/tc24/BryanWork/saved_models/old/output_unified_ft_5/output2_20000.json",
                         # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
-                        # "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         # "/home/tc24/BryanWork/saved_models/output_unified_ft_9/output2_10000.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert.json",
                         ]
