@@ -382,7 +382,7 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
 
 
 
-    output["cadec"] = cadec_eval(model, tokenizer)
+    output["cadec"] = cadec_eval(model, tokenizer, embed_fun)
 
     example_pairs = [
                      ("Type 1 Diabetes", "Type 2 Diabetes"),
