@@ -196,7 +196,49 @@ def get_sapbert_embed(phrase_list, model, tokenizer, device, show_progress=False
     
     return dense_embeds
 
+def get_distilbert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
+    model = model.to(device)
+    input_ids = []
+    for phrase in phrase_list:
+        input_ids.append(tokenizer.encode_plus(
+            phrase, max_length=32, add_special_tokens=True,
+            truncation=True, padding="max_length")['input_ids'])
+        # print(len(input_ids))
+    model.eval()
 
+    count = len(input_ids)
+    now_count = 0
+    output_list = []
+    with torch.no_grad():
+        if show_progress:
+            pbar = tqdm(total=count)
+        while now_count < count:
+            input_gpu_0 = torch.LongTensor(input_ids[now_count:min(
+                now_count + batch_size, count)]).to(device)
+            if summary_method == "CLS":
+                embed = model(input_gpu_0).last_hidden_state[:,1,:]
+            if summary_method == "MEAN":
+                embed = torch.mean(model(input_gpu_0).last_hidden_state, dim=1)
+            if normalize:
+                embed_norm = torch.norm(
+                    embed, p=2, dim=1, keepdim=True).clamp(min=1e-12)
+                embed = embed / embed_norm
+            if now_count % 1000000 == 0:
+                if now_count != 0:
+                    output_list.append(output.cpu().numpy())
+                    del output
+                output = embed
+            else:
+                output = torch.cat((output, embed), dim=0)
+            if show_progress:
+                pbar.update(min(now_count + batch_size, count) - now_count)
+            now_count = min(now_count + batch_size, count)
+            del input_gpu_0
+        if show_progress:
+            pbar.close()
+    output_list.append(output.cpu().numpy())
+    del output
+    return np.concatenate(output_list, axis=0)
 
 def load_model_and_tokenizer(model_name_or_path, tokenizer, device):
     if model_name_or_path[-8:] == 'bert.pth':
@@ -316,6 +358,8 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
         embed_fun = get_sapbert_embed
     elif model_name_or_path.find('biogpt') > 0:
         embed_fun = get_biogpt_embed
+    elif model_name_or_path.find('distilbert') > 0:
+        embed_fun = get_distilbert_embed
     else:
         embed_fun = get_bert_embed
 
