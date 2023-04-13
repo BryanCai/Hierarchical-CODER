@@ -250,6 +250,9 @@ def load_model_and_tokenizer(model_name_or_path, tokenizer, device):
     elif "biogpt" in model_name_or_path:
         model = BioGptForCausalLM.from_pretrained(model_name_or_path)
         tokenizer = BioGptTokenizer.from_pretrained(tokenizer)
+    elif "SapBERT" in model_name_or_path:
+        model = AutoModel.from_pretrained(model_name_or_path, from_tf=True)
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer)
     else:
         model = AutoModel.from_pretrained(model_name_or_path)
         tokenizer = AutoTokenizer.from_pretrained(tokenizer)
@@ -354,11 +357,11 @@ def run_many(model_name_or_path, tokenizer, output_path, data_dir, tree_dir, dev
     tree_dir = Path(tree_dir)
     model, tokenizer = load_model_and_tokenizer(model_name_or_path, tokenizer, device)
 
-    if model_name_or_path.find('SapBERT') >= 0:
+    if 'SapBERT' in model_name_or_path:
         embed_fun = get_sapbert_embed
-    elif model_name_or_path.find('biogpt') >= 0:
+    elif 'biogpt' in model_name_or_path:
         embed_fun = get_biogpt_embed
-    elif model_name_or_path.find('distilbert') >= 0:
+    elif 'distilbert' in model_name_or_path:
         embed_fun = get_distilbert_embed
     else:
         embed_fun = get_bert_embed
