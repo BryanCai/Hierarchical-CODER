@@ -130,9 +130,9 @@ def get_biogpt_embed(phrase_list, model, tokenizer, device, show_progress=False,
             input_gpu_0 = torch.LongTensor(input_ids[now_count:min(
                 now_count + batch_size, count)]).to(device)
             if summary_method == "CLS":
-                embed = model(input_gpu_0, output_hidden_states=True).hidden_states[0][:,1,:]
+                embed = model(input_gpu_0, output_hidden_states=True).hidden_states[-1][:,0,:]
             if summary_method == "MEAN":
-                embed = torch.mean(model(input_gpu_0, output_hidden_states=True).hidden_states[0], dim=1)
+                embed = torch.mean(model(input_gpu_0, output_hidden_states=True).hidden_states[-1], dim=1)
             if normalize:
                 embed_norm = torch.norm(
                     embed, p=2, dim=1, keepdim=True).clamp(min=1e-12)
@@ -216,7 +216,7 @@ def get_distilbert_embed(phrase_list, model, tokenizer, device, show_progress=Fa
             input_gpu_0 = torch.LongTensor(input_ids[now_count:min(
                 now_count + batch_size, count)]).to(device)
             if summary_method == "CLS":
-                embed = model(input_gpu_0).last_hidden_state[:,1,:]
+                embed = model(input_gpu_0).last_hidden_state[:,0,:]
             if summary_method == "MEAN":
                 embed = torch.mean(model(input_gpu_0).last_hidden_state, dim=1)
             if normalize:
@@ -527,6 +527,8 @@ if __name__ == '__main__':
                                # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/model_10000.pth",
                                "/home/tc24/BryanWork/saved_models/output_unified_ft_8/model_10000.pth",
                                # "/home/tc24/BryanWork/saved_models/output_unified_ft_9/model_10000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_pubmed_base/model_200000.pth",
+                               "/home/tc24/BryanWork/saved_models/output_unified_ft_11/model_10000.pth",
                                "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                "GanjinZero/UMLSBert_ENG",
                                "monologg/biobert_v1.1_pubmed",
@@ -542,6 +544,8 @@ if __name__ == '__main__':
                       # "monologg/biobert_v1.1_pubmed",
                       "monologg/biobert_v1.1_pubmed",
                       # "monologg/biobert_v1.1_pubmed",
+                      "microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract",
+                      "microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract",
                       "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                       "GanjinZero/UMLSBert_ENG",
                       "monologg/biobert_v1.1_pubmed",
@@ -557,6 +561,8 @@ if __name__ == '__main__':
                         # "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
                         # "/home/tc24/BryanWork/saved_models/output_unified_ft_9/output2_10000.json",
+                       "/home/tc24/BryanWork/saved_models/output_unified_pubmed_base/output2_200000.pth",
+                       "/home/tc24/BryanWork/saved_models/output_unified_ft_11/output2_10000.pth",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
