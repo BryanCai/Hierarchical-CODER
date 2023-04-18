@@ -17,9 +17,9 @@ device = "cuda:0"
 def cadec_eval(model, tokenizer, embed_fun):
 
     top_k = 3
-    return eval(model, tokenizer, embed_fun, './data/cadec', top_k=top_k, summary_method="CLS")
+    return eval(model, tokenizer, embed_fun, './data/cadec', top_k=top_k, summary_method="CLS") + eval(model, tokenizer, './data/psytar_disjoint_folds', top_k=top_k, summary_method="CLS")
     # eval(model, tokenizer, './data/cadec', top_k=top_k, summary_method="MEAN")
-    # eval(model, tokenizer, './data/psytar_disjoint_folds', top_k=top_k, summary_method="CLS")
+    
     # eval(model, tokenizer, './data/psytar_disjoint_folds', top_k=top_k, summary_method="MEAN")
 
 

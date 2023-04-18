@@ -70,7 +70,8 @@ def run(file):
               ]:
         print(data[i][0])
         print(data[i][1])
-
+        print(data[i][2])
+        print(data[i][3])
     print("\n")
 
     for i in [
@@ -93,6 +94,8 @@ if __name__ == '__main__':
 #                        "/home/tc24/BryanWork/saved_models/output_unified_ft_7/output2_10000.json",
                         "/home/tc24/BryanWork/saved_models/output_unified_ft_8/output2_10000.json",
 #                        "/home/tc24/BryanWork/saved_models/output_unified_ft_9/output2_10000.json",
+                        "/home/tc24/BryanWork/saved_models/output_unified_pubmed_base/output2_200000.pth",
+                        "/home/tc24/BryanWork/saved_models/output_unified_ft_11/output2_10000.pth",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
