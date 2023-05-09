@@ -93,11 +93,28 @@ if __name__ == "__main__":
     phecode_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/icd_phecode/phecode2icd_string.csv"
     cpt_tree_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_ccs_hierarchy.csv"
     cpt_map_path = "D:/Projects/CODER/Hierarchical-CODER/data/codes/cpt_ccs/cpt_code2string.csv"
+    eval_data_path = "D:/Projects/CODER/Hierarchical-CODER/eval/all_relations_with_neg.csv"
 
-    loinc = TREE(loinc_tree_path, loinc_map_path)
-    rxnorm = TREE(rxnorm_tree_path, rxnorm_map_path)
-    phecode = TREE(phecode_tree_path, phecode_map_path)
-    cpt = TREE(cpt_tree_path, cpt_map_path)
+    loinc = TREE(loinc_tree_path, loinc_map_path, eval_data_path)
+    rxnorm = TREE(rxnorm_tree_path, rxnorm_map_path, eval_data_path)
+    phecode = TREE(phecode_tree_path, phecode_map_path, eval_data_path)
+    cpt = TREE(cpt_tree_path, cpt_map_path, eval_data_path)
     for d in [loinc, rxnorm, phecode, cpt]:
         print(d.tree_path)
         print(len(set(d.parent.keys()).union(set(d.children.keys()))))
+
+
+    def get_depth(node, tree_dataset, depth_dict):
+        if node in depth_dict:
+            return depth_dict[node], depth_dict
+        else:
+            depth = 0
+            for j in tree_dataset.children[node]:
+                c_depth, depth_dict = get_depth(j, tree_dataset, depth_dict)
+                depth = max(depth, c_depth + 1)
+            depth_dict[node] = depth
+            return depth, depth_dict
+
+    depth_dict = {}
+    for i in loinc.children:
+        _, depth_dict = get_depth(i, loinc, depth_dict)
