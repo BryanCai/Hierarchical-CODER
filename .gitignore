@@ -5,6 +5,8 @@ models/
 normalization/
 umls/
 runs/
+sapbert_base/training_data/training_files/
+sapbert_hierarchical/training_data/training_files/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
