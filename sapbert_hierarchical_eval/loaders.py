@@ -1,5 +1,6 @@
 import torch
 from transformers import AutoModel, AutoTokenizer, BioGptTokenizer, BioGptForCausalLM
+import sys
 sys.path.append('/home/tc24/BryanWork/CODER/sapbert_hierarchical')
 from src.model_wrapper import Model_Wrapper
 

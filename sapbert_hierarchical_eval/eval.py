@@ -22,6 +22,7 @@ from embed_functions import (
     get_biogpt_embed,
     get_sapbert_embed,
     get_distilbert_embed,
+    get_wrapper_embed,
 )
 
 from loaders import (
@@ -29,6 +30,7 @@ from loaders import (
     load_model_and_tokenizer_bert,
     load_model_and_tokenizer_biogpt,
     load_model_and_tokenizer_SapBERT,
+    load_model_and_tokenizer_wrapper,
 )
 
 
