@@ -152,7 +152,7 @@ class Sap_Metric_Learning(nn.Module):
 
         if self.use_miner:
             hard_pairs = self.miner(query_embed, labels)
-            return self.clogit_loss_fn.forward_miner(sim_embeddings, pairs)
+            return self.clogit_loss_fn.forward_miner(query_embed, pairs)
         else:
             return None
 
@@ -184,21 +184,6 @@ class Sap_Metric_Learning(nn.Module):
 
 
         return self.clogit_loss_fn.forward_dist(query_embed1, query_embed2, dists, multi_category=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def reshape_candidates_for_encoder(self, candidates):
