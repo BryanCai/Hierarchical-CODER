@@ -9,7 +9,7 @@ class TreeMultiSimilarityLoss(nn.Module):
         self.base = base
         self.cos = nn.CosineSimilarity()
 
-    def forward_tree(self, query_embed1, query_embed2, dists):
+    def forward(self, query_embed1, query_embed2, dists):
         cdist = self.cos(query_embed1, query_embed2)
         cdist = (cdist+1)/2
 
