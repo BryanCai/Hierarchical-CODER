@@ -290,6 +290,7 @@ if __name__ == '__main__':
 
     model_name_or_path_list = [
                                "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree",
                                "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
                                "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                "GanjinZero/UMLSBert_ENG",
@@ -299,6 +300,7 @@ if __name__ == '__main__':
                                ]
 
     util_function_list = [
+                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           (load_model_and_tokenizer_bert, get_bert_embed),
                           (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
@@ -310,6 +312,7 @@ if __name__ == '__main__':
 
     output_path_list = [
                         "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree/output_0.json",
                         "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
