@@ -393,7 +393,7 @@ def main(args):
         LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
         
         if args.use_tree:
-            train_loss, step_global = train_tree(args, tree_loaders=tree_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
+            train_loss, step_global = train_trees(args, tree_loaders=tree_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
             LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
 
         # save model every epoch
