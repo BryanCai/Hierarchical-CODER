@@ -86,10 +86,14 @@ def parse_args():
     parser.add_argument('--use_miner', action="store_true") 
     parser.add_argument('--miner_margin', default=0.2, type=float) 
     parser.add_argument('--type_of_triplets', default="all", type=str) 
-    parser.add_argument('--use_tree', action="store_true") 
     parser.add_argument('--agg_mode', default="cls", type=str, help="{cls|mean|mean_all_tok}") 
     parser.add_argument('--trust_remote_code', action="store_true",
                         help="allow for custom models defined in their own modeling files")
+
+
+    parser.add_argument('--use_tree', action="store_true")
+    parser.add_argument('--skip_umls', action="store_true")
+    parser.add_argument('--sim_dim', default=-1, type=int) 
 
     args = parser.parse_args()
     return args
@@ -190,9 +194,9 @@ def train(args, data_loader, model, scaler=None, model_wrapper=None, step_global
     
         if args.amp:
             with autocast():
-                loss = model(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                loss = model.get_sim_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
         else:
-            loss = model(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+            loss = model.get_sim_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
         if args.amp:
             scaler.scale(loss).backward()
             scaler.step(model.optimizer)
@@ -304,6 +308,7 @@ def main(args):
             miner_margin=args.miner_margin,
             type_of_triplets=args.type_of_triplets,
             agg_mode=args.agg_mode,
+            sim_dim=args.sim_dim,
     )
 
     if args.parallel:
@@ -389,8 +394,9 @@ def main(args):
         LOGGER.info("Epoch {}/{}".format(epoch,args.epoch))
 
         # train
-        train_loss, step_global = train(args, data_loader=train_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
-        LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
+        if not args.skip_umls:
+            train_loss, step_global = train(args, data_loader=train_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
+            LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
         
         if args.use_tree:
             train_loss, step_global = train_trees(args, tree_loaders=tree_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
