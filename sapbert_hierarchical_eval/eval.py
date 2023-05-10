@@ -9,10 +9,6 @@ from pathlib import Path
 from tqdm import tqdm
 from scipy.stats import spearmanr
 from sklearn.metrics import roc_curve, auc
-# sys.path.append('/home/tc24/BryanWork/CODER/coder_base/')
-sys.path.append('/home/tc24/BryanWork/CODER/unified/')
-sys.path.append('D:/Projects/CODER/Hierarchical-CODER/unified')
-from model import UMLSPretrainedModel
 from cadec_eval import cadec_eval
 from load_trees import TREE
 from itertools import combinations
@@ -26,6 +22,7 @@ from embed_functions import (
     get_biogpt_embed,
     get_sapbert_embed,
     get_distilbert_embed,
+    get_wrapper_embed,
 )
 
 from loaders import (
@@ -33,6 +30,7 @@ from loaders import (
     load_model_and_tokenizer_bert,
     load_model_and_tokenizer_biogpt,
     load_model_and_tokenizer_SapBERT,
+    load_model_and_tokenizer_wrapper,
 )
 
 
@@ -174,8 +172,26 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
 def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir, device, random_samples):
     data_dir = Path(data_dir)
     tree_dir = Path(tree_dir)
+<<<<<<< HEAD
+<<<<<<< HEAD
     model, tokenizer = util_function[0](model_name_or_path, device)
     embed_fun = util_function[1]
+=======
+    model, tokenizer = util_function(model_name_or_path, device)
+
+    if 'SapBERT' in model_name_or_path:
+        embed_fun = get_sapbert_embed
+    elif 'biogpt' in model_name_or_path:
+        embed_fun = get_biogpt_embed
+    elif 'distilbert' in model_name_or_path:
+        embed_fun = get_distilbert_embed
+    else:
+        embed_fun = get_bert_embed
+>>>>>>> 00c09a8... add eval code
+=======
+    model, tokenizer = util_function[0](model_name_or_path, device)
+    embed_fun = util_function[1]
+>>>>>>> f93048f... minor
 
 
     output = {}
@@ -291,6 +307,8 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree",
                                "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
                                "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                "GanjinZero/UMLSBert_ENG",
@@ -300,6 +318,8 @@ if __name__ == '__main__':
                                ]
 
     util_function_list = [
+                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           (load_model_and_tokenizer_bert, get_bert_embed),
                           (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
                           (load_model_and_tokenizer, get_bert_embed),
@@ -309,6 +329,8 @@ if __name__ == '__main__':
                           ]
 
     output_path_list = [
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree/output_0.json",
                         "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",

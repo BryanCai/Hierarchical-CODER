@@ -175,3 +175,9 @@ def get_distilbert_embed(phrase_list, model, tokenizer, device, show_progress=Fa
     output_list.append(output.cpu().numpy())
     del output
     return np.concatenate(output_list, axis=0)
+
+def get_wrapper_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size=64, summary_method="CLS", normalize=True):
+    out =  model.embed_dense(phrase_list, batch_size=batch_size, agg_mode=summary_method.lower())
+    if normalize:
+        out /= (np.sqrt((out**2).sum(-1))[...,np.newaxis] + 1e-16)
+    return out
