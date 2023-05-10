@@ -22,5 +22,5 @@ class TreeMultiSimilarityLoss(nn.Module):
                 case_similarities = cdist[dists == j]
                 pos_loss = (1.0 / self.alpha)*torch.log(torch.add(torch.exp(self.alpha*(self.base - control_similarities)), 1))
                 neg_loss = (1.0 / self.beta) *torch.log(torch.add(torch.exp(self.beta*(case_similarities - self.base)), 1))
-                loss += torch.mean(pos_loss + neg_loss)
+                loss += torch.mean(pos_loss) + torch.mean(neg_loss)
         return loss
