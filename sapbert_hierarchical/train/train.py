@@ -93,7 +93,8 @@ def parse_args():
 
     parser.add_argument('--use_tree', action="store_true")
     parser.add_argument('--skip_umls', action="store_true")
-    parser.add_argument('--sim_dim', default=-1, type=int) 
+    parser.add_argument('--use_clogit', action="store_true")
+    parser.add_argument('--sim_dim', default=-1, type=int)
     parser.add_argument('--num_workers', default=16, type=int) 
 
     args = parser.parse_args()
@@ -192,12 +193,23 @@ def train(args, data_loader, model, scaler=None, model_wrapper=None, step_global
             batch_x_cuda2[k] = v.cuda()
 
         batch_y_cuda = batch_y.cuda()
-    
-        if args.amp:
-            with autocast():
-                loss = model.get_sim_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+
+        if args.use_clogit:
+            if args.amp:
+                with autocast():
+                    loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+            else:
+                loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)
         else:
-            loss = model.get_sim_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+            if args.amp:
+                with autocast():
+                    loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+            else:
+                loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+
+
+
+
         if args.amp:
             scaler.scale(loss).backward()
             scaler.step(model.optimizer)
@@ -244,11 +256,21 @@ def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step
 
             batch_y_cuda = batch_y.cuda()
         
-            if args.amp:
-                with autocast():
-                    loss = model.get_tree_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+
+            if args.use_clogit:
+                if args.amp:
+                    with autocast():
+                        loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                else:
+                    loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)
             else:
-                loss = model.get_tree_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                if args.amp:
+                    with autocast():
+                        loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                else:
+                    loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)
+
+
             if args.amp:
                 scaler.scale(loss).backward()
                 scaler.step(model.optimizer)
