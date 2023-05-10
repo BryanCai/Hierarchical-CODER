@@ -30,22 +30,14 @@ def eval_one(m, tok, embed_fun, folder, top_k, summary_method=None):
     label2id = {line.strip().split(
         "\t")[0]: index for index, line in enumerate(lines)}
     standard_lines = [line.strip().split("\t") for line in lines]
-    if tok is not None:
-        standard_feat = embed_fun(
-            [text for (label, text) in standard_lines], m, tok, device, normalize=True, summary_method=summary_method)
-    else:
-        standard_feat = embed(
-            [text for (label, text) in standard_lines], m.vector_size, m)
+    standard_feat = embed_fun(
+        [text for (label, text) in standard_lines], m, tok, device, normalize=True, summary_method=summary_method)
 
     with open(os.path.join(folder, "test.txt"), "r", encoding="utf-8") as f:
         lines = f.readlines()
     test_lines = [line.strip().split("\t") for line in lines]
-    if tok is not None:
-        test_feat = embed_fun(
-            [text for (label, text) in test_lines], m, tok, device, normalize=True, summary_method=summary_method)
-    else:
-        test_feat = embed(
-            [text for (label, text) in test_lines], m.vector_size, m)
+    test_feat = embed_fun(
+        [text for (label, text) in test_lines], m, tok, device, normalize=True, summary_method=summary_method)
 
     sim_mat = np.dot(test_feat, standard_feat.T)
 
