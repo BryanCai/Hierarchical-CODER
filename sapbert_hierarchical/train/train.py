@@ -94,7 +94,7 @@ def parse_args():
     parser.add_argument('--use_tree', action="store_true")
     parser.add_argument('--skip_umls', action="store_true")
     parser.add_argument('--use_clogit', action="store_true")
-    parser.add_argument('--clogit_alpha', default=1, type=float) 
+    parser.add_argument('--clogit_alpha', default=2, type=float) 
     parser.add_argument('--sim_dim', default=-1, type=int)
     parser.add_argument('--num_workers', default=16, type=int) 
 
