@@ -13,10 +13,10 @@ LOGGER = logging.getLogger(__name__)
 
 class Sap_Metric_Learning(nn.Module):
     def __init__(self, encoder, learning_rate, weight_decay, use_cuda, pairwise, 
-            loss, use_miner=True, miner_margin=0.2, type_of_triplets="all", agg_mode="cls", sim_dim=-1, clogit_alpha=2):
+            loss, use_miner=True, miner_type="triplet", miner_margin=0.2, type_of_triplets="all", agg_mode="cls", sim_dim=-1, clogit_alpha=2):
 
-        LOGGER.info("Sap_Metric_Learning! learning_rate={} weight_decay={} use_cuda={} loss={} use_miner={} miner_margin={} type_of_triplets={} agg_mode={} sim_dim={}, clogit_alpha={}".format(
-            learning_rate,weight_decay,use_cuda,loss,use_miner,miner_margin,type_of_triplets,agg_mode,sim_dim,clogit_alpha
+        LOGGER.info("Sap_Metric_Learning! learning_rate={} weight_decay={} use_cuda={} loss={} use_miner={} miner_type={} miner_margin={} type_of_triplets={} agg_mode={} sim_dim={}, clogit_alpha={}".format(
+            learning_rate,weight_decay,use_cuda,loss,use_miner,miner_type,miner_margin,type_of_triplets,agg_mode,sim_dim,clogit_alpha
         ))
         super(Sap_Metric_Learning, self).__init__()
         self.encoder = encoder
@@ -34,7 +34,10 @@ class Sap_Metric_Learning(nn.Module):
         )
         
         if self.use_miner:
-            self.miner = miners.TripletMarginMiner(margin=miner_margin, type_of_triplets=type_of_triplets)
+            if miner_type == "ms":
+                self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
+            elif miner_type == "triplet":
+                self.miner = miners.TripletMarginMiner(margin=miner_margin, type_of_triplets=type_of_triplets)
         else:self.miner = None
 
         if self.loss == "ms_loss":

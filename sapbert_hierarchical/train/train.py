@@ -97,6 +97,7 @@ def parse_args():
     parser.add_argument('--clogit_alpha', default=2, type=float) 
     parser.add_argument('--sim_dim', default=-1, type=int)
     parser.add_argument('--num_workers', default=16, type=int) 
+    parser.add_argument('--miner_type', default="triplet", type=str) 
 
     args = parser.parse_args()
     return args
@@ -329,6 +330,7 @@ def main(args):
             pairwise=args.pairwise,
             loss=args.loss,
             use_miner=args.use_miner,
+            miner_type=args.miner_type,
             miner_margin=args.miner_margin,
             type_of_triplets=args.type_of_triplets,
             agg_mode=args.agg_mode,

@@ -68,7 +68,11 @@ class ConditionalLogitLoss(nn.Module):
 
 
     def forward_miner(self, embeddings, indices_tuple):
-        a1, p, a2, n = indices_tuple
+        if len(indices_tuple) == 3:
+            a1, p, n = indices_tuple
+            a2 = a1
+        else:
+            a1, p, a2, n = indices_tuple
 
         control_similarities = self.cos(embeddings[a1], embeddings[p])
         case_similarities = self.cos(embeddings[a2], embeddings[n])
