@@ -1,0 +1,201 @@
+"","Index","Chinese_term1","English_term1","Chinese_term2","English_term2","CUI1","CUI2","Similarity","Relativeness"
+"1",1,"<U+9AD8><U+8840><U+538B>","hypertension","<U+5FC3><U+810F><U+75C5>","heart disease","C0020538","C0018799",35,62.5
+"2",2,"<U+52A8><U+8109><U+786C><U+5316>","arteriosclerosis","<U+51A0><U+72B6><U+52A8><U+8109><U+75BE><U+75C5>","Coronary artery disease","C0003850","C0010054",62.5,88.75
+"3",3,"<U+708E><U+75C7>","Inflammation","<U+6297><U+708E>","Anti-inflammatory","C0021368","C0003209",16.25,86.25
+"4",4,"<U+6076><U+5316>","deterioration","<U+4E0D><U+7A33><U+5B9A>","Unstable","C0868945","C0443343",76.25,81.25
+"5",5,"<U+54EE><U+5598>","Asthma","<U+8FC7><U+654F><U+6027><U+54EE><U+5598>","Allergic asthma","C0004096","C0155877",83.75,90
+"6",6,"<U+75DB><U+98CE>","gout","<U+5C3F><U+9178>","Uric acid","C0018099","C0041980",21.25,96
+"7",7,"<U+5E03><U+6D1B><U+82AC>","Ibuprofen","<U+6B62><U+75DB><U+836F><U+7269>","Pain medication","C0020740","C0002771",45,94.75
+"8",8,"<U+75C5><U+6BD2><U+611F><U+67D3>","Viral infection","<U+53D1><U+708E>","inflammation","C0042769","C0021368",35,66.25
+"9",9,"<U+9AD8><U+8840><U+8102>","Hyperlipidemia","<U+9AD8><U+80C6><U+56FA><U+9187>","High cholesterol","C0020473","C1522133",81.25,92
+"10",10,"<U+4F11><U+514B>","shock","<U+6655><U+53A5>","Syncope","C0036974","C0039070",47.25,62.25
+"11",11,"<U+5FC3><U+5F8B><U+5931><U+5E38>","Arrhythmia","<U+5FC3><U+5F8B><U+4E0D><U+9F50>","Arrhythmia","C0003811","C0003811",98.5,97.25
+"12",12,"<U+6025><U+6027><U+611F><U+67D3>","Acute infection","<U+6025><U+6027><U+75C5>","Acute disease","C0275518","C0001314",35,57.5
+"13",13,"<U+8170><U+817F><U+75DB>","Low back pain","<U+8170><U+75DB>","lumbago","C0024031","C0024031",71.25,85
+"14",14,"<U+6CCC><U+5C3F><U+5916><U+79D1>","Urology","<U+53F3><U+80BE>","Right kidney","C0042077","C0227613",30,81.25
+"15",15,"<U+52A0><U+91CD>","Aggravation","<U+52A0><U+5267>","exacerbate","C0541889","C0436331",77,82
+"16",16,"<U+8001><U+5E74><U+6027>","Senile","<U+767D><U+5185><U+969C>","cataract","C0392079","C0086543",8.75,68.75
+"17",17,"<U+808B><U+9AA8>","rib","<U+80F8><U+8154>","Thoracic cavity","C0035561","C0230139",10,68.75
+"18",18,"<U+8170><U+690E>","Lumbar spine","<U+80BE><U+4E0A><U+817A>","Adrenal gland","C0024091","C0001625",6.25,17.5
+"19",19,"<U+6CCC><U+5C3F><U+9053>","Urinary tract","<U+6CCC><U+5C3F><U+5916><U+79D1>","Urology","C0042027","C0042077",17.5,82.5
+"20",20,"<U+7EA2><U+7EC6><U+80DE>","Red blood cell","<U+8840><U+5C0F><U+677F>","Platelet","C0014792","C0005821",12.5,70
+"21",21,"<U+8FC7><U+654F><U+6027><U+9F3B><U+708E>","Allergic rhinitis","<U+8FC7><U+654F>","allergy","C2607914","C0020517",51.25,84.75
+"22",22,"<U+9752><U+9709><U+7D20>","penicillin","<U+6025><U+6027><U+6241><U+6843><U+4F53><U+708E>","Acute tonsillitis","C0030842","C0001361",7.5,80
+"23",23,"<U+672F><U+524D>","Preoperative","<U+9EBB><U+9189>","anesthesia","C0445204","C0278134",7.5,65
+"24",24,"<U+5DE6><U+6C27><U+6C1F><U+6C99><U+661F>","Levofloxacin","<U+53E3><U+670D><U+6297><U+751F><U+7D20>","Oral antibiotic","C0282386","C0559681",38.75,79.75
+"25",25,"<U+8DB3><U+90E8>","Foot","<U+811A>","foot","C0016504","C0016504",97.5,97.5
+"26",26,"<U+809D><U+786C><U+5316>","Cirrhosis","<U+6162><U+6027><U+809D><U+75C5>","Chronic liver disease","C0023890","C0341439",61.25,88.75
+"27",27,"<U+9AD8><U+8840><U+538B><U+6027><U+5FC3><U+810F><U+75C5>","Hypertensive heart disease","<U+52A8><U+8109><U+786C><U+5316>","arteriosclerosis","C0152105","C0003850",53.75,87.5
+"28",28,"<U+603B><U+80C6><U+56FA><U+9187>","Total cholesterol","<U+8840><U+8102>","Blood lipid","C0543421","C0596192",75,92.25
+"29",29,"<U+80BA><U+708E>","pneumonia","<U+54B3><U+55FD>","cough","C0032285","C0010200",47.5,86.5
+"30",30,"<U+5347><U+9AD8>","increase","<U+592A><U+9AD8>","Too high","C0442805","C4036058",56.25,86.25
+"31",31,"<U+5FC3><U+7EDE><U+75DB>","angina pectoris","<U+5FC3><U+810F><U+75C5>","heart disease","C0002962","C0018799",62.5,86.75
+"32",32,"<U+7C7B><U+98CE><U+6E7F><U+5173><U+8282><U+708E>","Rheumatoid Arthritis","<U+5173><U+8282><U+75DB>","Joint pain","C0003873","C0003862",52.5,93.75
+"33",33,"<U+7C7B><U+98CE><U+6E7F><U+5173><U+8282><U+708E>","Rheumatoid Arthritis","<U+6C28><U+7532><U+558B><U+5464>","Methotrexate","C0003873","C0025677",23.75,88.75
+"34",34,"<U+75BC><U+75DB>","pain","<U+8179><U+75DB>","stomach ache","C0030193","C0221512",40,64.75
+"35",35,"<U+6025><U+6027><U+4E0A><U+547C><U+5438><U+9053><U+611F><U+67D3>","Acute upper respiratory tract infection","<U+80BA><U+708E>","pneumonia","C0264222","C0032285",47.5,69
+"36",36,"<U+6D41><U+6D95>","running nose","<U+611F><U+5192>","cold","C1260880","C0009443",56.25,89
+"37",37,"<U+5E72><U+54B3>","dry cough","<U+54B3><U+55FD>","cough","C0850149","C0010200",80,95.5
+"38",38,"<U+54B3><U+75F0>","sputum production","<U+54B3><U+55FD>","cough","C0242104","C0010200",51.25,90
+"39",39,"<U+6CBB><U+7597>","treatment","<U+8F85><U+52A9><U+68C0><U+67E5>","Auxiliary inspection","C0039798","NULL",13.75,55
+"40",40,"<U+4F53><U+6E29>","body temperature","<U+53D1><U+70E7>","fever","C0005903","C0015967",37.5,83.75
+"41",41,"<U+6076><U+5FC3><U+5455><U+5410>","nausea and vomitting","<U+6B62><U+5410>","Antiemetic","C0027498","C0003297",17.5,86.25
+"42",42,"<U+54BD><U+75DB>","Sore throat","<U+5589><U+5499>","throat","C0031350","C0031354",35,82.5
+"43",43,"<U+5468><U+56F4><U+578B><U+80BA><U+764C>","Peripheral lung cancer","<U+65AD><U+5C42><U+626B><U+63CF>","Computed tomography","NULL","C0040405",6.25,58.75
+"44",44,"X<U+7EBF><U+900F><U+89C6>","X-ray","<U+65AD><U+5C42><U+626B><U+63CF>","Computed tomography","C0034571","C0040405",37.5,81.25
+"45",45,"<U+5FC3><U+808C><U+663E><U+50CF>","myocardial perfusion imaging","<U+51A0><U+5FC3><U+75C5>","Coronary heart disease","C2350390","C0010054",15,82.5
+"46",46,"<U+78C1><U+5171><U+632F>","Magnetic resonance","<U+8111><U+7535><U+56FE>","EEG","C0028580","C0013819",8.75,32.5
+"47",47,"<U+514D><U+75AB><U+6291><U+5236>","Immunosuppressive","<U+6C28><U+7532><U+558B><U+5464>","Methotrexate","C0021081","C0025677",45,85
+"48",48,"<U+652F><U+6C14><U+7BA1><U+708E>","bronchitis","<U+54EE><U+5598>","Asthma","C0006277","C0004096",46.25,70
+"49",49,"<U+6162><U+6027><U+8179><U+6CFB>","Chronic diarrhea","<U+8179><U+6CFB>","diarrhea","C0401151","C0011991",72.5,90
+"50",50,"<U+6B62><U+75DB><U+5242>","Analgesics","<U+5E03><U+6D1B><U+82AC>","Ibuprofen","C0002771","C0020740",52.5,91.25
+"51",51,"<U+6241><U+6843><U+4F53><U+80BF><U+5927>","tonsillar hypertrophy","<U+54BD><U+75DB>","Sore throat","C0272386","C0031350",51.25,72.5
+"52",52,"<U+6025><U+6027><U+6241><U+6843><U+4F53><U+708E>","Acute tonsillitis","<U+54BD><U+708E>","pharyngitis","C0001361","C0031350",62.5,77.5
+"53",53,"<U+9AD8><U+8840><U+7CD6>","High blood sugar","<U+7CD6><U+5C3F><U+75C5>","diabetes","C0020456","C0011849",70,93.5
+"54",54,"<U+9632><U+764C>","Cancer prevention","<U+6297><U+764C>","Anticancer","C0281206","C1548818",42.25,77.5
+"55",55,"<U+4E0B><U+80A2>","Lower limb","<U+817F><U+90E8>","Leg","C0023216","C0023216",89.75,97.5
+"56",56,"<U+611F><U+67D3>","infection","<U+7EC6><U+83CC>","bacteria","C0009450","C0004611",23.75,90
+"57",57,"<U+6F2B><U+80BF>","edema","<U+80BF><U+80C0>","swelling","C0013604","C0013604",51.25,87.25
+"58",58,"<U+6297><U+751F><U+7D20>","antibiotic","<U+611F><U+67D3>","infection","C0003232","C0009450",16.25,92.5
+"59",59,"<U+80CE><U+52A8>","Fetal movement","<U+6000><U+5B55>","pregnancy","C0015946","C0032961",44.75,92.25
+"60",60,"<U+598A><U+5A20><U+671F>","Pregnancy","<U+5B55><U+65E9><U+671F>","Early pregnancy","C0032961","C0747845",77.5,95
+"61",61,"<U+542C><U+529B><U+635F><U+5931>","Hearing loss","<U+8033><U+8717><U+7535><U+56FE>","electrocochleography","C0011053","C0013805",31.25,86.25
+"62",62,"<U+964D><U+538B><U+836F>","Antihypertensive drugs","<U+6297><U+9AD8><U+8840><U+538B><U+836F>","Antihypertensive drug","C0003364","C0003364",96.25,97.5
+"63",63,"<U+80BA><U+708E><U+6746><U+83CC>","Klebsiella pneumoniae","<U+5934><U+5B62><U+83CC><U+7D20><U+7C7B>","Cephalosporins","C0001699","C2266959",10,85
+"64",64,"<U+6B62><U+75DB>","Pain relief","<U+75BC><U+75DB>","pain","C0451615","C0030193",15,86.25
+"65",65,"<U+7EA4><U+7EF4><U+7D20>","Fiber","<U+4FBF><U+79D8>","constipation","C0225326","C0009806",10,82.5
+"66",66,"<U+9AD8><U+8840><U+8102>","Hyperlipidemia","<U+9AD8><U+8840><U+538B>","hypertension","C0020473","C0020538",23.75,66.25
+"67",67,"<U+7729><U+6655>","vertigo","<U+5934><U+6655>","dizziness","C0042571","C0012833",73.75,87.5
+"68",68,"<U+809D><U+80BE>","Liver and kidney","<U+809D><U+529F><U+80FD>","liver function","C1268355","C0232741",42.5,76.25
+"69",69,"<U+7CBE><U+795E><U+969C><U+788D>","Mental disorder","<U+8BED><U+65E0><U+4F26><U+6B21>","Incoherent","C0004936","C0542044",47.5,70
+"70",70,"<U+795E><U+5FD7><U+4E0D><U+6E05>","delirium","<U+601D><U+7EF4><U+969C><U+788D>","thought disorder","C0011206","C2115875",31.25,47.5
+"71",71,"<U+8FDF><U+949D>","slow","<U+75F4><U+5446>","dementia","C0439834","C0011265",38.75,65
+"72",72,"<U+7CBE><U+795E><U+969C><U+788D>","Mental disorder","<U+5984><U+60F3>","delusion","C0004936","C0011253",50,77.5
+"73",73,"<U+51A0><U+5468><U+708E>","Pericoronitis","<U+7259><U+5468><U+611F><U+67D3>","Periodontal infection","C0031055","C0747479",78.5,88.5
+"74",74,"<U+836F><U+7269><U+4F9D><U+8D56><U+6027>","Drug dependence","<U+836F><U+7269><U+6210><U+763E>","Drug addiction","C0038580","C0038580",88.75,92.5
+"75",75,"<U+6297><U+7CD6><U+5C3F><U+75C5><U+836F>","Antidiabetic","<U+964D><U+8840><U+7CD6><U+4F5C><U+7528>","Hypoglycemic effect","C0935929","C2936720",56.25,83.75
+"76",76,"<U+51FA><U+751F><U+7F3A><U+9677>","Birth defect","<U+5148><U+5929><U+611A><U+578B>","Down syndrome","C0000768","C0013080",33.75,83.75
+"77",77,"<U+8840><U+5C0F><U+677F><U+589E><U+591A><U+75C7>","Thrombocytosis","<U+51DD><U+8840><U+6D3B><U+9176>","Thromboplastin","C0836924","C0040048",23.75,62.5
+"78",78,"<U+76AE><U+80A4><U+764C>","skin cancer","<U+7D2B><U+5916><U+7EBF>","Ultraviolet light","C0007114","C0041625",8.75,76.25
+"79",79,"<U+652F><U+6C14><U+7BA1><U+8212><U+5F20>","Bronchial dilation","<U+5E72><U+54B3>","dry cough","C0189463","C0850149",22.5,53.75
+"80",80,"<U+652F><U+6C14><U+7BA1><U+708E>","bronchitis","<U+652F><U+6C14><U+7BA1><U+54EE><U+5598>","Bronchial Asthma","C0006277","C0004096",40,66.25
+"81",81,"<U+4F11><U+514B>","shock","<U+5934><U+6655>","lightheadedness","C0036974","C0220870",21,45
+"82",82,"<U+7A81><U+53D1>","sudden onset","<U+6025><U+6027>","acute","C1272517","C0205178",76.25,85.25
+"83",83,"<U+5FC3><U+8840><U+7BA1><U+7CFB><U+7EDF>","Cardiovascular System","<U+51A0><U+72B6><U+52A8><U+8109><U+75BE><U+75C5>","Coronary artery disease","C0007226","C0010054",43.75,84
+"84",84,"<U+809D><U+764C>","Liver cancer","<U+5316><U+7597>","Chemotherapy","C0345904","C0013216",12.5,85
+"85",85,"<U+764C><U+75C7>","cancer","<U+809D><U+764C>","Liver cancer","C0006826","C0345904",45,82.5
+"86",86,"<U+6DCB><U+5DF4><U+7ED3><U+708E>","Lymphadenitis","<U+6DCB><U+5DF4><U+7ED3><U+80BF><U+5927>","swollen lymph nodes","C0024205","C0497156",57.5,75
+"87",87,"<U+7259><U+9F88><U+51FA><U+8840>","bleeding gums","<U+7259><U+5468><U+611F><U+67D3>","Periodontal infection","C0017565","C0747479",41.25,81
+"88",88,"<U+524D><U+5217><U+817A><U+7D20><U+7C7B>","Prostaglandins","<U+80C3><U+6E83><U+75A1>","Stomach ulcer","C0033554","C0038358",7.5,57.5
+"89",89,"<U+6DF7><U+5408><U+578B><U+9AD8><U+8102><U+8840><U+75C7>","Mixed hyperlipidemia","<U+4ED6><U+6C40><U+7C7B>","Statin","C0020474","C0360714",15,78.75
+"90",90,"<U+7532><U+78FA><U+9178><U+500D><U+4ED6><U+53F8><U+6C40>","Betahistine mesylate","<U+7729><U+6655>","dizziness","C0242200","C0012833",8,78.75
+"91",91,"<U+53E3><U+670D><U+964D><U+8840><U+7CD6><U+836F>","Oral hypoglycemic agent","<U+7CD6><U+5C3F><U+75C5>","diabetes","C0359086","C0011849",35,86.5
+"92",92,"<U+53E3><U+670D><U+964D><U+8840><U+7CD6><U+836F>","Oral hypoglycemic agent","<U+4E8C><U+7532><U+53CC><U+80CD><U+7C7B>","Metformin","C0359086","C0025598",67.5,91.5
+"93",93,"<U+4E59><U+9170><U+6C28><U+57FA><U+915A>","Acetaminophen","<U+53D1><U+70E7>","fever","C0000970","C0015967",13.75,90
+"94",94,"<U+54B3><U+75F0>","Expectoration","<U+80BA><U+708E>","pneumonia","C0038056","C0032285",46.5,86.5
+"95",95,"<U+6297><U+75C5><U+6BD2>","Antiviral","<U+75C5><U+6BD2><U+611F><U+67D3>","Viral infection","C0003451","C0042769",28.75,90.25
+"96",96,"<U+54BD>","Pharynx","<U+5589><U+5499>","throat","C0031354","C0031354",60.25,79
+"97",97,"<U+6050><U+6016>","Terrifying","<U+60CA><U+60D5>","Horror","C0558261","C4061714",64,82.75
+"98",98,"<U+53D8><U+786C>","Harden","<U+786C><U+5316>","hardening","C0702118","C0702118",84.75,93.5
+"99",99,"<U+6297><U+708E><U+4F5C><U+7528>","Anti-inflammatory effect","<U+6D88><U+708E>","Anti-inflammatory","C1515999","C0003209",84.75,93.75
+"100",100,"<U+6740><U+83CC>","Sterilization","<U+6D88><U+6BD2>","disinfection","C0038280","C0012683",85,95
+"101",101,"<U+7597><U+6548>","Efficacy","<U+751F><U+6210>","generate","C1280519","NULL",12.25,17.25
+"102",102,"<U+6D88><U+9664>","eliminate","<U+51CF><U+5C11>","cut back","NULL","C0561296",43.75,65.25
+"103",103,"<U+79FB><U+690D>","transplant","<U+518D><U+690D>","Replant","C0040732","C0544725",48.75,67.5
+"104",104,"<U+9AA8><U+79D1>","orthopedics","<U+65AD><U+6307><U+518D><U+690D>","Replantation of amputated finger","C0029355","C3512188",18.75,76.25
+"105",105,"<U+9AA8><U+79D1>","orthopedics","<U+5FC3><U+8840><U+7BA1><U+75C5>","Cardiovascular disease","C0029355","C0007222",5.5,6.75
+"106",106,"<U+8840><U+6DB2><U+51DD><U+56FA>","Blood coagulation","<U+51DD><U+8840><U+9176>","Thrombin","C0005778","C0040018",40,90.25
+"107",107,"<U+80BE><U+810F><U+6392><U+6CC4>","Renal excretion","<U+4EE3><U+8C22>","metabolism","C1373187","C0025519",31.25,80
+"108",108,"<U+80BE><U+810F><U+6392><U+6CC4>","Renal excretion","<U+514D><U+75AB>","Immunology","C1373187","C0152036",7,8.25
+"109",109,"<U+751F><U+7406><U+76D0><U+6C34>","normal saline","<U+79FB><U+690D>","transplant","C0445115","C0040732",5.5,6.75
+"110",110,"<U+6291><U+5236><U+5242>","Inhibitor","<U+5FC3><U+8840><U+7BA1><U+75C5>","Cardiovascular disease","C1999216","C0007222",3,9.25
+"111",111,"<U+51CF><U+8F7B>","relieve","<U+7F13><U+89E3>","ease","C1301676","C1331418",85,90
+"112",112,"<U+7F13><U+89E3>","ease","<U+589E><U+751F>","Hyperplasia","C1331418","C0020507",8.25,27.5
+"113",113,"<U+80C6><U+56FA><U+9187>","cholesterol","<U+6297><U+83CC><U+7D20>","Antibiotic","C0008377","C0003232",5.75,4.5
+"114",114,"<U+773C><U+836F><U+6C34>","Eye drops","<U+773C><U+538B><U+589E><U+9AD8>","ocular hypertension","C0015399","C0028840",8.75,62.5
+"115",115,"<U+603B><U+80C6><U+56FA><U+9187>","Total cholesterol","<U+80A5><U+80D6>","obesity","C0543421","C0028754",22.5,78.75
+"116",116,"<U+98CE><U+70ED><U+611F><U+5192>","Acute upper respiratory infection","<U+54BD><U+5589><U+7EA2><U+80BF>","sore throat","C0264222","C0031350",30,65
+"117",117,"<U+75DB><U+75D2>","Itching","<U+6E29><U+70ED>","Warm","C0033774","C0687712",9.25,33
+"118",118,"<U+54BD><U+75DB>","Sore throat","<U+6241><U+6843><U+4F53>","tonsil","C0031350","C0040421",25,72.5
+"119",119,"<U+89E3><U+9664>","Release","<U+6309><U+538B>","Press","C0030685","NULL",17.5,55
+"120",120,"<U+9888><U+690E>","Cervical vertebrae","<U+810A><U+690E>","vertebrae","C0728985","C0549207",57.5,83.75
+"121",121,"<U+80CC><U+90E8>","Back","<U+810A><U+690E>","vertebrae","C0004600","C0549207",36.25,68.75
+"122",122,"<U+808B><U+9AA8>","rib","<U+814B><U+7A9D>","armpit","C0035561","C0004454",13,40
+"123",123,"<U+5254><U+9664>","Exclude","<U+53BB><U+9664>","Remove","C0332196","C0849355",60,78.75
+"124",124,"<U+53BB><U+9664>","Remove","<U+6B62><U+54B3>","Antitussive","C0849355","C0003449",11.25,12.5
+"125",125,"<U+51CF><U+8F7B>","Lighten","<U+89E3><U+9664>","Release","C1306868","C0030685",63.75,72.5
+"126",126,"<U+75C5><U+6BD2><U+611F><U+67D3>","Viral infection","<U+6025><U+6027><U+6241><U+6843><U+4F53><U+708E>","Acute tonsillitis","C0042769","C0001361",20,65
+"127",127,"<U+7EC6><U+83CC>","bacterial","<U+5FC3><U+8840><U+7BA1><U+75C5>","Cardiovascular disease","C0521009","C0007222",7.5,21.25
+"128",128,"<U+54BD><U+5589>","throat","<U+820C><U+6839>","root of tongue","C0031354","C0226958",37.5,57.5
+"129",129,"<U+8170><U+80CC><U+75BC><U+75DB>","Back pain","<U+80CC><U+90E8>","Back","C0004604","C0004600",21.25,75
+"130",130,"<U+6D88><U+75DB>","Pain relief","<U+54B3><U+55FD>","cough","C0451615","C0010200",6.25,26.25
+"131",131,"<U+75BC><U+75DB><U+7F13><U+89E3>","Pain relief","<U+603B><U+80C6><U+56FA><U+9187>","Total cholesterol","C0451615","C0543421",25,26.25
+"132",132,"<U+89C6><U+7F51><U+819C><U+75C5><U+53D8>","Retinopathy","<U+773C><U+775B>","eye","C0035309","C0015392",13.75,81.25
+"133",133,"<U+8840><U+6DB2><U+900F><U+6790>","Hemodialysis","<U+80BE>","kidney","C0019004","C0022646",17.5,82.5
+"134",134,"<U+8840><U+6DB2><U+900F><U+6790>","Hemodialysis","<U+80BE><U+529F><U+80FD><U+8870><U+7AED>","Renal Failure","C0019004","C0035078",28.75,91.25
+"135",135,"<U+9752><U+5149><U+773C>","glaucoma","<U+773C><U+538B><U+589E><U+9AD8>","ocular hypertension","C0017601","C0028840",88.5,93.5
+"136",136,"<U+9F3B><U+5916><U+4F24>","Nasal trauma","<U+5916><U+529B><U+4F5C><U+7528>","External force","NULL","NULL",28.75,57.5
+"137",137,"<U+6495><U+88C2><U+4F24>","Tearing","<U+5916><U+4F24>","trauma","C0043246","C0043250",36.25,72.5
+"138",138,"<U+89C6><U+91CE><U+68C0><U+67E5>","visual field test","<U+9752><U+5149><U+773C>","glaucoma","C0042825","C0017601",20,75
+"139",139,"<U+5FC3><U+8DF3><U+505C><U+6B62>","cardiac arrest","<U+9759><U+8109><U+538B>","Venous pressure","C0018790","C0042486",6.75,52.5
+"140",140,"<U+660E><U+663E><U+589E><U+5F3A>","Significantly enhanced","<U+6297><U+6C27><U+5316>","antioxidants","NULL","C0003402",4,4
+"141",141,"<U+6025><U+6027><U+80BE><U+5C0F><U+7403><U+80BE><U+708E>","Acute glomerulonephritis","<U+9EBB><U+9189><U+5242>","Anesthetic","C0156221","C0002932",3.75,17.5
+"142",142,"<U+80C6><U+56FA><U+9187>","cholesterol","<U+6D88><U+5316><U+9053><U+611F><U+67D3>","Gastrointestinal infection","C0008377","C1264613",3.75,7.5
+"143",143,"<U+5C3F><U+9053><U+611F><U+67D3>","urinary tract infection","<U+80BE>","kidney","C0042029","C0022646",16.25,53.75
+"144",144,"<U+6DCB><U+5DF4><U+7ED3><U+708E>","Lymphadenitis","<U+7EC6><U+83CC>","bacteria","C0024205","C0004611",11.25,70
+"145",145,"<U+81EA><U+8EAB><U+514D><U+75AB><U+75C5>","Autoimmune disease","<U+7C7B><U+98CE><U+6E7F><U+5173><U+8282><U+708E>","Rheumatoid Arthritis","C0004364","C0003873",22.5,83.75
+"146",146,"<U+7C7B><U+98CE><U+6E7F><U+5173><U+8282><U+708E>","Rheumatoid Arthritis","<U+8170><U+808C><U+52B3><U+635F>","lumbar strain","C0003873","C0262541",7.5,16.25
+"147",147,"<U+7CBE><U+795E><U+538B><U+529B>","mental stress","<U+5934><U+75DB>","headache","C0038443","C0018681",8.75,52.5
+"148",148,"<U+8840><U+7CD6>","blood sugar","<U+5FC3><U+810F><U+75C5>","heart disease","C0005802","C0018799",7.5,56.25
+"149",149,"<U+5173><U+8282><U+708E>","arthritis","<U+80BE><U+4E0A><U+817A>","Adrenal gland","C0003864","C0001625",7.5,8.75
+"150",150,"<U+6025><U+6027><U+80C3><U+708E>","Acute gastritis","<U+6D88><U+5316>","digestion","C0149518","C0012238",10,53.75
+"151",151,"<U+51CF><U+5F31>","Weaken","<U+8870><U+9000>","decline","NULL","NULL",73.75,87.5
+"152",152,"<U+7CBE><U+795E><U+538B><U+529B>","mental stress","<U+60C5><U+7EEA><U+4F4E><U+843D>","Depression","C0038443","C0011570",28.75,66.25
+"153",153,"<U+70E6><U+4E71>","agitation","<U+5934><U+75DB>","headache","C0085631","C0018681",12.5,43.75
+"154",154,"<U+8F6F><U+5F31><U+65E0><U+529B>","weakness","<U+9EBB><U+9189><U+5242>","Anesthetic","C0004093","C0002932",12.5,45
+"155",155,"<U+963B><U+585E><U+6027><U+80BA><U+75C5>","obstructive pulmonary disease","<U+54EE><U+5598>","asthma","C0600260","C0004096",66.25,81.25
+"156",156,"<U+8DB3><U+80BF>","Foot swelling","<U+76AE><U+80A4><U+76B2><U+88C2>","Chapped skin","C0574002","C0549202",13.75,33.75
+"157",157,"<U+547C><U+5438>","Able to breathe","<U+80BA><U+708E>","pneumonia","C0566270","C0032285",8.75,60
+"158",158,"<U+9884><U+9632><U+611F><U+67D3>","Behavior to prevent infection","<U+6B62><U+54B3>","Antitussive","C2585946","C0003449",10,36.25
+"159",159,"<U+524D><U+80F8>","anterior chest","<U+80A9><U+8180>","shoulder","C0230132","C0037004",13.75,31.25
+"160",160,"<U+6162><U+6027><U+54BD><U+708E>","Chronic pharyngitis","<U+541E><U+54BD>","Swallowing","C0155825","C0740170",10,50
+"161",161,"<U+6297><U+80BF><U+7624>","Antitumor","<U+764C><U+75C7>","cancer","C2986475","C0006826",13.75,81.25
+"162",162,"<U+8111><U+7EC6><U+80DE>","Brain Cells","<U+7624><U+7EC6><U+80DE>","Tumor cell","C0596208","C0431085",5,13.75
+"163",163,"<U+514D><U+75AB><U+529F><U+80FD>","Immune Function","<U+6682><U+65F6><U+6027>","Temporary","C1817756","C0205374",3.75,5
+"164",164,"<U+773C><U+75D2>","Itchy eyes","<U+6162><U+6027><U+54B3><U+55FD>","Chronic cough","C0022281","C0010201",3.75,7.5
+"165",165,"<U+6E83><U+70C2>","fester","<U+8113><U+75B1>","Pustule","NULL","C0241157",37.5,81.25
+"166",166,"<U+771F><U+83CC><U+611F><U+67D3>","Fungal infection","<U+91D1><U+9EC4><U+8272><U+8461><U+8404><U+7403><U+83CC>","Staphylococcus aureus","C0026946","C0038172",11.25,33.75
+"167",167,"<U+4E0D><U+5229><U+4E8E>","Adverse effects","<U+4E0D><U+8DB3>","Insufficient (qualifier)","C0879626","C0231180",5.25,6.5
+"168",168,"<U+9AA8><U+8D28><U+589E><U+751F><U+75C7>","bone spur","<U+75BC><U+75DB>","pain","C1442903","C0030193",13.75,53.75
+"169",169,"<U+4E0A><U+547C><U+5438><U+9053>","Upper respiratory tract","<U+6241><U+6843><U+4F53>","tonsil","C0458578","C0040421",18.75,57.5
+"170",170,"<U+80F8><U+9AA8><U+4E0A><U+7A9D>","suprasternal notch","<U+820C><U+9AA8>","Hyoid bone","C0222769","C0020417",17.5,35
+"171",171,"<U+4E0B><U+8179><U+75DB>","Lower abdominal pain","<U+5760><U+75DB>","throbbing pain","C0232495","C0278148",58.75,88.75
+"172",172,"<U+6025><U+6027><U+8111><U+8840><U+7BA1><U+75C5>","Acute cerebrovascular disease","<U+4E2D><U+98CE>","Stroke","C0810006","C0038454",86.25,91.25
+"173",173,"<U+75DB><U+98CE>","gout","<U+5173><U+8282><U+708E>","arthritis","C0018099","C0003864",56.25,86.25
+"174",174,"<U+80F0><U+817A><U+708E>","pancreatitis","<U+6DCB><U+5DF4><U+7EC6><U+80DE>","Lymphocyte","C0030305","C0024264",11.25,48.75
+"175",175,"<U+6307><U+95F4><U+5173><U+8282>","Interphalangeal joint","<U+624B>","hand","C1563055","C0018563",38.5,81.25
+"176",176,"<U+9F3B><U+708E>","rhinitis","<U+5185><U+90E8>","internal","C0035455","C0205102",5.75,13.25
+"177",177,"<U+4E0A><U+547C><U+5438><U+9053>","Upper respiratory tract","<U+4E0B><U+8179><U+75DB>","Lower abdominal pain","C0458578","C0232495",4.75,7.25
+"178",178,"<U+764C><U+80BF>","Cancer","<U+9AA8><U+80BF><U+7624>","Bone tumor","C0006826","C0005967",56.25,90
+"179",179,"<U+9AA8><U+7EC4><U+7EC7>","Bone tissue","<U+80BA><U+5FC3><U+75C5>","Pulmonary heart disease","C0391978","C0034072",4.25,5.5
+"180",180,"<U+53E3><U+8154><U+708E>","Stomatitis","<U+7259><U+5468><U+708E>","Periodontitis","C0038362","C0031099",31.25,52.5
+"181",181,"<U+8179><U+7EDE><U+75DB>","Abdominal cramps","<U+9F3B><U+708E>","rhinitis","C0000729","C0035455",3.25,4.5
+"182",182,"<U+8DBE><U+95F4>","Syndactyly between adjacent toes (in some patients)","<U+6DCB><U+5DF4><U+7ED3>","Lymph node","C3809125","C0024204",3,4.25
+"183",183,"<U+9AA8><U+9AD3><U+7A7F><U+523A>","Bone marrow biopsy","<U+9AA8><U+8D28><U+589E><U+751F><U+75C7>","hyperostosis","C0005954","C0020492",11.25,45
+"184",184,"<U+6297><U+83CC><U+836F><U+7269>","antibiotics","<U+8179><U+7EDE><U+75DB>","Abdominal cramps","C0003232","C0000729",11,17.5
+"185",185,"<U+6E83><U+75A1>","ulcer","<U+53E3><U+8154><U+708E>","Stomatitis","C0041582","C0038362",28.75,50
+"186",186,"<U+76AE><U+708E>","dermatitis","<U+5916><U+90E8>","external","C0011603","C0205101",10,31.25
+"187",187,"<U+89C6><U+795E><U+7ECF><U+708E>","Optic neuritis","<U+4E0A><U+547C><U+5438><U+9053>","Upper respiratory tract","C0029134","C0458578",6.25,8.75
+"188",188,"<U+78C1><U+5171><U+632F><U+6210><U+50CF>","Magnetic resonance imaging","<U+68C0><U+6D4B><U+624B><U+6BB5>","testing method","C0024485","C0039593",31.25,63.75
+"189",189,"<U+7532><U+72B6><U+817A><U+80BF>","Goiter","<U+9888><U+690E><U+75C5>","Cervical spondylosis","C0018021","C1384641",8.5,16
+"190",190,"<U+6162><U+6027><U+6C14><U+7BA1><U+708E>","Chronic bronchitis","<U+5FC3><U+5BA4>","ventricle","C0008677","C0018827",7.5,8.75
+"191",191,"<U+652F><U+6C14><U+7BA1><U+6269><U+5F20>","Bronchiectasis","<U+6162><U+6027><U+54BD><U+5589><U+708E>","Chronic pharyngitis","C0006267","C0155825",16.25,28.75
+"192",192,"<U+5934><U+75DB>","headache","<U+591A><U+53D1><U+6027><U+795E><U+7ECF><U+708E>","Polyneuritis","C0018681","C0032541",17.5,40
+"193",193,"<U+54EE><U+5598>","asthma","<U+652F><U+6C14><U+7BA1>","bronchus","C0004096","C0006255",31.25,77.5
+"194",194,"<U+76AE><U+708E>","dermatitis","<U+6E7F><U+75B9>","eczema","C0011603","C0013595",68.75,83.75
+"195",195,"<U+65E0><U+5F02><U+5E38>","No abnormality","<U+5B8C><U+597D>","intact","C3809765","C0205266",72.5,85
+"196",196,"<U+6B62><U+75DB><U+836F><U+7269>","Analgesics","<U+8584><U+819C><U+8863><U+7247>","film coated tablets","C0002771","C0308070",23.75,42.5
+"197",197,"<U+622A><U+7136>","completely","<U+72C2><U+8E81>","mania","C4036138","C0338831",5,6.25
+"198",198,"<U+60C5><U+611F><U+969C><U+788D>","Affective disorder","<U+795E><U+5FD7><U+4E0D><U+6E05>","delirium","C0525045","C0011206",12.5,25
+"199",199,"<U+80BE><U+7EC4><U+7EC7>","Kidney tissue","<U+6162><U+6027><U+840E><U+7F29><U+6027><U+80C3><U+708E>","Chronic atrophic gastritis","C0586762","C0017154",6.25,7.5
+"200",200,"<U+8111><U+6EA2><U+8840>","intracerebral hemorrhage","<U+4E2D><U+98CE>","Stroke","C2937358","C0038454",71.25,88.75
