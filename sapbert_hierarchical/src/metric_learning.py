@@ -13,10 +13,10 @@ LOGGER = logging.getLogger(__name__)
 
 class Sap_Metric_Learning(nn.Module):
     def __init__(self, encoder, learning_rate, weight_decay, use_cuda, pairwise, 
-            loss, use_miner=True, miner_margin=0.2, type_of_triplets="all", agg_mode="cls"):
+            loss, use_miner=True, miner_margin=0.2, type_of_triplets="all", agg_mode="cls", sim_dim=-1):
 
-        LOGGER.info("Sap_Metric_Learning! learning_rate={} weight_decay={} use_cuda={} loss={} use_miner={} miner_margin={} type_of_triplets={} agg_mode={}".format(
-            learning_rate,weight_decay,use_cuda,loss,use_miner,miner_margin,type_of_triplets,agg_mode
+        LOGGER.info("Sap_Metric_Learning! learning_rate={} weight_decay={} use_cuda={} loss={} use_miner={} miner_margin={} type_of_triplets={} agg_mode={} sim_dim={}".format(
+            learning_rate,weight_decay,use_cuda,loss,use_miner,miner_margin,type_of_triplets,agg_mode, sim_dim
         ))
         super(Sap_Metric_Learning, self).__init__()
         self.encoder = encoder
@@ -28,6 +28,7 @@ class Sap_Metric_Learning(nn.Module):
         self.use_miner = use_miner
         self.miner_margin = miner_margin
         self.agg_mode = agg_mode
+        self.sim_dim = sim_dim
         self.optimizer = optim.AdamW([{'params': self.encoder.parameters()},], 
             lr=self.learning_rate, weight_decay=self.weight_decay
         )
@@ -55,7 +56,7 @@ class Sap_Metric_Learning(nn.Module):
         print ("loss:", self.loss)
     
     @autocast() 
-    def forward(self, query_toks1, query_toks2, labels):
+    def get_sim_loss(self, query_toks1, query_toks2, labels):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -76,6 +77,9 @@ class Sap_Metric_Learning(nn.Module):
         else:
             raise NotImplementedError()
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
+
+        if self.sim_dim != -1:
+            query_embed = query_embed[:,:self.sim_dim]
         
         labels = torch.cat([labels, labels], dim=0)
         
@@ -107,6 +111,10 @@ class Sap_Metric_Learning(nn.Module):
             query_embed2 = (last_hidden_state2 * query_toks2['attention_mask'].unsqueeze(-1)).sum(1) / query_toks2['attention_mask'].sum(-1).unsqueeze(-1)
         else:
             raise NotImplementedError()
+
+        if self.sim_dim != -1:
+            query_embed1 = query_embed1[:,self.sim_dim:]
+            query_embed2 = query_embed2[:,self.sim_dim:]
 
         return self.tree_loss(query_embed1, query_embed2, dists)
 
