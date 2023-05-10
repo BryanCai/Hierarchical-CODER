@@ -7,16 +7,16 @@ from tqdm import tqdm
 import random
 from torch.cuda.amp import autocast
 from pytorch_metric_learning import miners, losses, distances
-from .loss import TreeMultiSimilarityLoss
+from .loss import TreeMultiSimilarityLoss, ConditionalLogitLoss
 LOGGER = logging.getLogger(__name__)
 
 
 class Sap_Metric_Learning(nn.Module):
     def __init__(self, encoder, learning_rate, weight_decay, use_cuda, pairwise, 
-            loss, use_miner=True, miner_margin=0.2, type_of_triplets="all", agg_mode="cls", sim_dim=-1):
+            loss, use_miner=True, miner_type="triplet", miner_margin=0.2, type_of_triplets="all", agg_mode="cls", sim_dim=-1, clogit_alpha=2):
 
-        LOGGER.info("Sap_Metric_Learning! learning_rate={} weight_decay={} use_cuda={} loss={} use_miner={} miner_margin={} type_of_triplets={} agg_mode={} sim_dim={}".format(
-            learning_rate,weight_decay,use_cuda,loss,use_miner,miner_margin,type_of_triplets,agg_mode, sim_dim
+        LOGGER.info("Sap_Metric_Learning! learning_rate={} weight_decay={} use_cuda={} loss={} use_miner={} miner_type={} miner_margin={} type_of_triplets={} agg_mode={} sim_dim={}, clogit_alpha={}".format(
+            learning_rate,weight_decay,use_cuda,loss,use_miner,miner_type,miner_margin,type_of_triplets,agg_mode,sim_dim,clogit_alpha
         ))
         super(Sap_Metric_Learning, self).__init__()
         self.encoder = encoder
@@ -34,7 +34,10 @@ class Sap_Metric_Learning(nn.Module):
         )
         
         if self.use_miner:
-            self.miner = miners.TripletMarginMiner(margin=miner_margin, type_of_triplets=type_of_triplets)
+            if miner_type == "ms":
+                self.miner = miners.MultiSimilarityMiner(epsilon=0.1)
+            elif miner_type == "triplet":
+                self.miner = miners.TripletMarginMiner(margin=miner_margin, type_of_triplets=type_of_triplets)
         else:self.miner = None
 
         if self.loss == "ms_loss":
@@ -50,13 +53,16 @@ class Sap_Metric_Learning(nn.Module):
         elif self.loss == "nca_loss":
             self.loss = losses.NCALoss()
 
-        self.tree_loss = TreeMultiSimilarityLoss()
+        self.tree_ms_loss = TreeMultiSimilarityLoss()
+
+        self.clogit_loss_fn = ConditionalLogitLoss(alpha=clogit_alpha)
+
 
         print ("miner:", self.miner)
         print ("loss:", self.loss)
     
     @autocast() 
-    def get_sim_loss(self, query_toks1, query_toks2, labels):
+    def get_umls_ms_loss(self, query_toks1, query_toks2, labels):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -91,7 +97,7 @@ class Sap_Metric_Learning(nn.Module):
 
 
     @autocast() 
-    def get_tree_loss(self, query_toks1, query_toks2, dists):
+    def get_tree_ms_loss(self, query_toks1, query_toks2, dists):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -116,8 +122,71 @@ class Sap_Metric_Learning(nn.Module):
             query_embed1 = query_embed1[:,self.sim_dim:]
             query_embed2 = query_embed2[:,self.sim_dim:]
 
-        return self.tree_loss(query_embed1, query_embed2, dists)
+        return self.tree_ms_loss(query_embed1, query_embed2, dists)
 
+    @autocast() 
+    def get_umls_clogit_loss(self, query_toks1, query_toks2, labels):
+        """
+        query : (N, h), candidates : (N, topk, h)
+
+        output : (N, topk)
+        """
+        
+        last_hidden_state1 = self.encoder(**query_toks1, return_dict=True).last_hidden_state
+        last_hidden_state2 = self.encoder(**query_toks2, return_dict=True).last_hidden_state
+        if self.agg_mode=="cls":
+            query_embed1 = last_hidden_state1[:,0]  # query : [batch_size, hidden]
+            query_embed2 = last_hidden_state2[:,0]  # query : [batch_size, hidden]
+        elif self.agg_mode == "mean_all_tok":
+            query_embed1 = last_hidden_state1.mean(1)  # query : [batch_size, hidden]
+            query_embed2 = last_hidden_state2.mean(1)  # query : [batch_size, hidden]
+        elif self.agg_mode == "mean":
+            query_embed1 = (last_hidden_state1 * query_toks1['attention_mask'].unsqueeze(-1)).sum(1) / query_toks1['attention_mask'].sum(-1).unsqueeze(-1)
+            query_embed2 = (last_hidden_state2 * query_toks2['attention_mask'].unsqueeze(-1)).sum(1) / query_toks2['attention_mask'].sum(-1).unsqueeze(-1)
+        else:
+            raise NotImplementedError()
+        query_embed = torch.cat([query_embed1, query_embed2], dim=0)
+
+        if self.sim_dim != -1:
+            query_embed = query_embed[:,:self.sim_dim]
+        
+        labels = torch.cat([labels, labels], dim=0)
+
+
+        if self.use_miner:
+            hard_pairs = self.miner(query_embed, labels)
+            return self.clogit_loss_fn.forward_miner(query_embed, hard_pairs)
+        else:
+            return None
+
+    @autocast() 
+    def get_tree_clogit_loss(self, query_toks1, query_toks2, dists):
+        """
+        query : (N, h), candidates : (N, topk, h)
+
+        output : (N, topk)
+        """
+        
+        last_hidden_state1 = self.encoder(**query_toks1, return_dict=True).last_hidden_state
+        last_hidden_state2 = self.encoder(**query_toks2, return_dict=True).last_hidden_state
+        if self.agg_mode=="cls":
+            query_embed1 = last_hidden_state1[:,0]  # query : [batch_size, hidden]
+            query_embed2 = last_hidden_state2[:,0]  # query : [batch_size, hidden]
+        elif self.agg_mode == "mean_all_tok":
+            query_embed1 = last_hidden_state1.mean(1)  # query : [batch_size, hidden]
+            query_embed2 = last_hidden_state2.mean(1)  # query : [batch_size, hidden]
+        elif self.agg_mode == "mean":
+            query_embed1 = (last_hidden_state1 * query_toks1['attention_mask'].unsqueeze(-1)).sum(1) / query_toks1['attention_mask'].sum(-1).unsqueeze(-1)
+            query_embed2 = (last_hidden_state2 * query_toks2['attention_mask'].unsqueeze(-1)).sum(1) / query_toks2['attention_mask'].sum(-1).unsqueeze(-1)
+        else:
+            raise NotImplementedError()
+
+        if self.sim_dim != -1:
+            query_embed1 = query_embed1[:,self.sim_dim:]
+            query_embed2 = query_embed2[:,self.sim_dim:]
+
+
+        return self.clogit_loss_fn.forward_dist(query_embed1, query_embed2, dists, multi_category=True)
 
 
     def reshape_candidates_for_encoder(self, candidates):
