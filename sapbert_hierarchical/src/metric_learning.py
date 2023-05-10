@@ -152,7 +152,7 @@ class Sap_Metric_Learning(nn.Module):
 
         if self.use_miner:
             hard_pairs = self.miner(query_embed, labels)
-            return self.clogit_loss_fn.forward_miner(query_embed, pairs)
+            return self.clogit_loss_fn.forward_miner(query_embed, hard_pairs)
         else:
             return None
 
