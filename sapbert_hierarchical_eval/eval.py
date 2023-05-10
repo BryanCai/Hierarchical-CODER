@@ -174,16 +174,8 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
 def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir, device, random_samples):
     data_dir = Path(data_dir)
     tree_dir = Path(tree_dir)
-    model, tokenizer = util_function(model_name_or_path, device)
-
-    if 'SapBERT' in model_name_or_path:
-        embed_fun = get_sapbert_embed
-    elif 'biogpt' in model_name_or_path:
-        embed_fun = get_biogpt_embed
-    elif 'distilbert' in model_name_or_path:
-        embed_fun = get_distilbert_embed
-    else:
-        embed_fun = get_bert_embed
+    model, tokenizer = util_function[0](model_name_or_path, device)
+    embed_fun = util_function[1]
 
 
     output = {}
@@ -308,21 +300,21 @@ if __name__ == '__main__':
                                ]
 
     util_function_list = [
-                          load_model_and_tokenizer_bert,
-                          load_model_and_tokenizer_SapBERT,
-                          load_model_and_tokenizer,
-                          load_model_and_tokenizer,
-                          load_model_and_tokenizer_biogpt,
-                          load_model_and_tokenizer,
+                          (load_model_and_tokenizer_bert, get_bert_embed),
+                          (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
+                          (load_model_and_tokenizer, get_bert_embed),
+                          (load_model_and_tokenizer, get_bert_embed),
+                          (load_model_and_tokenizer_biogpt, get_biogpt_embed),
+                          (load_model_and_tokenizer, get_distilbert_embed),
                           ]
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/output_coder_base/output2_300000.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1_0.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt_0.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert_0.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
