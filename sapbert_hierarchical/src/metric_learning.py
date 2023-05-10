@@ -7,7 +7,7 @@ from tqdm import tqdm
 import random
 from torch.cuda.amp import autocast
 from pytorch_metric_learning import miners, losses, distances
-from loss import TreeMultiSimilarityLoss
+from .loss import TreeMultiSimilarityLoss
 LOGGER = logging.getLogger(__name__)
 
 
