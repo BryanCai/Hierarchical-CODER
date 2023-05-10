@@ -288,7 +288,7 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triple_umls_full/final",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree",
                                # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
