@@ -411,7 +411,10 @@ def main(args):
         
         # save model last epoch
         if epoch == args.epoch:
-            model_wrapper.save_model(args.output_dir)
+            final_dir = os.path.join(args.output_dir, "final".format(epoch))
+            if not os.path.exists(final_dir):
+                os.makedirs(final_dir)
+            model_wrapper.save_model(final_dir)
             
     end = time.time()
     training_time = end-start
