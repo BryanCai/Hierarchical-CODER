@@ -94,6 +94,7 @@ def parse_args():
     parser.add_argument('--use_tree', action="store_true")
     parser.add_argument('--skip_umls', action="store_true")
     parser.add_argument('--sim_dim', default=-1, type=int) 
+    parser.add_argument('--num_workers', default=16, type=int) 
 
     args = parser.parse_args()
     return args
@@ -346,7 +347,7 @@ def main(args):
             train_set,
             batch_size=args.train_batch_size,
             shuffle=True,
-            num_workers=16,
+            num_workers=args.num_workers,
             collate_fn=collate_fn_batch_encoding
         )
     else:
@@ -361,7 +362,7 @@ def main(args):
             #shuffle=True,
             sampler=samplers.MPerClassSampler(train_set.query_ids,\
                 2, length_before_new_iter=100000),
-            num_workers=16, 
+            num_workers=args.num_workers, 
             )
 
     if args.use_tree:
@@ -375,7 +376,7 @@ def main(args):
                 tree_set,
                 batch_size=args.train_batch_size,
                 shuffle=True,
-                num_workers=16,
+                num_workers=args.num_workers,
                 collate_fn=collate_fn_batch_encoding
             )
 
