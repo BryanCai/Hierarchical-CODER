@@ -289,7 +289,7 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls"
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
                                "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
                                "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                "GanjinZero/UMLSBert_ENG",
@@ -309,7 +309,7 @@ if __name__ == '__main__':
                           ]
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json"
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json",
                         "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
