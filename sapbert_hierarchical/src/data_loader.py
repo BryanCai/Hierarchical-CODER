@@ -325,7 +325,7 @@ class MetricLearningDataset_pairwise(Dataset):
         query_tokens, candidate_tokens, label
     """
     def __init__(self, path, tokenizer): #d_ratio, s_score_matrix, s_candidate_idxs):
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding="utf8") as f:
             lines = f.readlines()
         self.query_ids = []
         self.query_names = []
@@ -350,6 +350,35 @@ class MetricLearningDataset_pairwise(Dataset):
     def __len__(self):
         return len(self.query_names)
 
+
+class TreeDataset_pairwise(Dataset):
+    """
+    Candidate Dataset for:
+        query_tokens, candidate_tokens, label
+    """
+    def __init__(self, path, tokenizer): #d_ratio, s_score_matrix, s_candidate_idxs):
+        with open(path, 'r', encoding="utf8") as f:
+            lines = f.readlines()
+        self.query_dists = []
+        self.query_names = []
+        for line in lines:
+            line = line.rstrip("\n")
+            dist, name1, name2 = line.split("||")
+            self.query_dists.append(dist)
+            self.query_names.append((name1, name2))
+        self.tokenizer = tokenizer
+    
+    def __getitem__(self, query_idx):
+
+        query_name1 = self.query_names[query_idx][0]
+        query_name2 = self.query_names[query_idx][1]
+        query_dist = int(self.query_dists[query_idx])
+
+        return query_name1, query_name2, query_dist
+
+
+    def __len__(self):
+        return len(self.query_names)
 
 
 class MetricLearningDataset(Dataset):

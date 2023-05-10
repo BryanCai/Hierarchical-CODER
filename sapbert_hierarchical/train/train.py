@@ -13,6 +13,7 @@ import os
 import json
 import random
 from tqdm import tqdm
+from pathlib import Path
 
 import sys
 sys.path.append("../") 
@@ -26,6 +27,7 @@ from src.data_loader import (
     QueryDataset_pretraining,
     MetricLearningDataset,
     MetricLearningDataset_pairwise,
+    TreeDataset_pairwise,
 )
 from src.model_wrapper import (
     Model_Wrapper
@@ -84,6 +86,7 @@ def parse_args():
     parser.add_argument('--use_miner', action="store_true") 
     parser.add_argument('--miner_margin', default=0.2, type=float) 
     parser.add_argument('--type_of_triplets', default="all", type=str) 
+    parser.add_argument('--use_tree', action="store_true") 
     parser.add_argument('--agg_mode', default="cls", type=str, help="{cls|mean|mean_all_tok}") 
     parser.add_argument('--trust_remote_code', action="store_true",
                         help="allow for custom models defined in their own modeling files")
@@ -214,7 +217,59 @@ def train(args, data_loader, model, scaler=None, model_wrapper=None, step_global
             model_wrapper.save_model(checkpoint_dir)
     train_loss /= (train_steps + 1e-9)
     return train_loss, step_global
+
+
+def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step_global=0):
+    LOGGER.info("train!")
     
+    train_loss = 0
+    train_steps = 0
+    model.cuda()
+    model.train()
+    for tree in tree_loaders:
+        for i, data in tqdm(enumerate(tree_loaders[tree]), total=len(tree_loaders[tree])):
+            model.optimizer.zero_grad()
+
+            batch_x1, batch_x2, batch_y = data
+            batch_x_cuda1, batch_x_cuda2 = {},{}
+            for k,v in batch_x1.items():
+                batch_x_cuda1[k] = v.cuda()
+            for k,v in batch_x2.items():
+                batch_x_cuda2[k] = v.cuda()
+
+            batch_y_cuda = batch_y.cuda()
+        
+            if args.amp:
+                with autocast():
+                    loss = model.get_tree_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+            else:
+                loss = model.get_tree_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+            if args.amp:
+                scaler.scale(loss).backward()
+                scaler.step(model.optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                model.optimizer.step()
+
+            train_loss += loss.item()
+            wandb.log({"Loss": loss.item()})
+            train_steps += 1
+            step_global += 1
+            #if (i+1) % 10 == 0:
+            #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1,train_loss / (train_steps+1e-9)))
+            #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1, loss.item()))
+
+            # save model every K iterations
+            if step_global % args.checkpoint_step == 0:
+                checkpoint_dir = os.path.join(args.output_dir, "checkpoint_iter_{}".format(str(step_global)))
+                if not os.path.exists(checkpoint_dir):
+                    os.makedirs(checkpoint_dir)
+                model_wrapper.save_model(checkpoint_dir)
+    train_loss /= (train_steps + 1e-9)
+    return train_loss, step_global
+
+
 def main(args):
     init_logging()
     #init_seed(args.seed)
@@ -279,7 +334,7 @@ def main(args):
 
     if args.pairwise:
         train_set = MetricLearningDataset_pairwise(
-                path=args.train_dir,
+                path=Path(args.train_dir)/"umls.txt",
                 tokenizer = tokenizer
         )
         train_loader = torch.utils.data.DataLoader(
@@ -303,6 +358,23 @@ def main(args):
                 2, length_before_new_iter=100000),
             num_workers=16, 
             )
+
+    if args.use_tree:
+        tree_loaders = {}
+        for tree in ["cpt", "loinc", "phecode", "rxnorm"]:
+            tree_set = TreeDataset_pairwise(
+                path=Path(args.train_dir)/(tree+".txt"),
+                tokenizer = tokenizer
+            )
+            tree_loaders[tree] = torch.utils.data.DataLoader(
+                tree_set,
+                batch_size=args.train_batch_size,
+                shuffle=True,
+                num_workers=16,
+                collate_fn=collate_fn_batch_encoding
+            )
+
+
     # mixed precision training 
     if args.amp:
         scaler = GradScaler()
@@ -320,6 +392,10 @@ def main(args):
         train_loss, step_global = train(args, data_loader=train_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
         LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
         
+        if args.use_tree:
+            train_loss, step_global = train_tree(args, tree_loaders=tree_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
+            LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
+
         # save model every epoch
         if args.save_checkpoint_all:
             checkpoint_dir = os.path.join(args.output_dir, "checkpoint_{}".format(epoch))

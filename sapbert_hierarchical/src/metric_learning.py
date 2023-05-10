@@ -7,6 +7,7 @@ from tqdm import tqdm
 import random
 from torch.cuda.amp import autocast
 from pytorch_metric_learning import miners, losses, distances
+from loss import TreeMultiSimilarityLoss
 LOGGER = logging.getLogger(__name__)
 
 
@@ -48,6 +49,7 @@ class Sap_Metric_Learning(nn.Module):
         elif self.loss == "nca_loss":
             self.loss = losses.NCALoss()
 
+        self.tree_loss = TreeMultiSimilarityLoss()
 
         print ("miner:", self.miner)
         print ("loss:", self.loss)
@@ -82,6 +84,32 @@ class Sap_Metric_Learning(nn.Module):
             return self.loss(query_embed, labels, hard_pairs) 
         else:
             return self.loss(query_embed, labels) 
+
+
+    @autocast() 
+    def get_tree_loss(self, query_toks1, query_toks2, dists):
+        """
+        query : (N, h), candidates : (N, topk, h)
+
+        output : (N, topk)
+        """
+        
+        last_hidden_state1 = self.encoder(**query_toks1, return_dict=True).last_hidden_state
+        last_hidden_state2 = self.encoder(**query_toks2, return_dict=True).last_hidden_state
+        if self.agg_mode=="cls":
+            query_embed1 = last_hidden_state1[:,0]  # query : [batch_size, hidden]
+            query_embed2 = last_hidden_state2[:,0]  # query : [batch_size, hidden]
+        elif self.agg_mode == "mean_all_tok":
+            query_embed1 = last_hidden_state1.mean(1)  # query : [batch_size, hidden]
+            query_embed2 = last_hidden_state2.mean(1)  # query : [batch_size, hidden]
+        elif self.agg_mode == "mean":
+            query_embed1 = (last_hidden_state1 * query_toks1['attention_mask'].unsqueeze(-1)).sum(1) / query_toks1['attention_mask'].sum(-1).unsqueeze(-1)
+            query_embed2 = (last_hidden_state2 * query_toks2['attention_mask'].unsqueeze(-1)).sum(1) / query_toks2['attention_mask'].sum(-1).unsqueeze(-1)
+        else:
+            raise NotImplementedError()
+
+        return self.tree_loss(query_embed1, query_embed2, dists)
+
 
 
     def reshape_candidates_for_encoder(self, candidates):
