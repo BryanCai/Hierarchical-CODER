@@ -288,36 +288,39 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree",
-                               "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
-                               "GanjinZero/UMLSBert_ENG",
-                               "monologg/biobert_v1.1_pubmed",
-                               "microsoft/biogpt",
-                               "distilbert-base-uncased",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls_full/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree",
+                               # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
+                               # "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                               # "GanjinZero/UMLSBert_ENG",
+                               # "monologg/biobert_v1.1_pubmed",
+                               # "microsoft/biogpt",
+                               # "distilbert-base-uncased",
                                ]
 
     util_function_list = [
                           (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_bert, get_bert_embed),
-                          (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
-                          (load_model_and_tokenizer, get_bert_embed),
-                          (load_model_and_tokenizer, get_bert_embed),
-                          (load_model_and_tokenizer_biogpt, get_biogpt_embed),
-                          (load_model_and_tokenizer, get_distilbert_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_bert, get_bert_embed),
+                          # (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
+                          # (load_model_and_tokenizer, get_bert_embed),
+                          # (load_model_and_tokenizer, get_bert_embed),
+                          # (load_model_and_tokenizer_biogpt, get_biogpt_embed),
+                          # (load_model_and_tokenizer, get_distilbert_embed),
                           ]
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1_0.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt_0.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls_full/final/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1_0.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt_0.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert_0.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
