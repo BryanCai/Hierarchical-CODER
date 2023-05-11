@@ -162,6 +162,18 @@ def read_relation_pairs(data_path, tree_path):
     return pair_data, tree_terms, tree_data
 
 
+def read_phecode_eval(data_path):
+    with open(data_path, 'r') as f:
+        lines = f.readlines()
+
+    eval_data = []
+    for l in lines:
+        lst = l.rstrip("\n").split("||")
+        eval_data.append(lst)
+
+    return pd.DataFrame(eval_data, columns=["dist", "term1", "term2"])
+
+
 def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device):
     embed1 = embed_fun(string_list1, model, tokenizer, device, normalize=True)
     embed2 = embed_fun(string_list2, model, tokenizer, device, normalize=True)
@@ -182,6 +194,23 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
 
         output[str(f)] = spearmanr(cos_sim, data["score"])[0]
         print(f, output[str(f)])
+
+
+
+    x = read_phecode_eval(data_dir/"phecode_eval.txt")
+
+    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
+
+    for case in combinations(range(4), 2):
+        case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
+        case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
+
+        fpr, tpr, thresholds = roc_curve(case_label, case_sim)
+        auc_score = auc(fpr, tpr)
+        output[str(case)] = auc_score
+        print(case, output[str(case)])
+
+
 
     pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
 
@@ -216,8 +245,8 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
 
         fpr, tpr, thresholds = roc_curve(case_label, case_sim)
         auc_score = auc(fpr, tpr)
-        output[str(case)] = auc_score
-        print(case, output[str(case)])
+        output[str(case) + "-old"] = auc_score
+        print(str(case) + "-old", output[str(case)])
 
 
     for i in pair_data:
