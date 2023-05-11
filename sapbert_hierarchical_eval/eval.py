@@ -288,6 +288,7 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/ms_umls_full/final",
                                "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree",
@@ -301,6 +302,7 @@ if __name__ == '__main__':
 
     util_function_list = [
                           (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_bert, get_bert_embed),
@@ -312,6 +314,7 @@ if __name__ == '__main__':
                           ]
 
     output_path_list = [
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/ms_umls_full/final/output_0.json",
                         "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/final/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_umls/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_tree/output_0.json",
