@@ -303,9 +303,15 @@ def main(args):
     init_logging()
     #init_seed(args.seed)
     print(args)
-
+    LOGGER.info()
     torch.manual_seed(args.random_seed)
     
+    LOGGER.info("use_tree={} skip_umls={} use_clogit={} clogit_alpha={} sim_dim={} miner_type={}".format(
+        args.use_tree,args.skip_umls,args.use_clogit,args.clogit_alpha,args.sim_dim,args.miner_type
+    ))
+    LOGGER.info(args.model_dir)
+    LOGGER.info(args.output_dir)
+
     # prepare for output
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
