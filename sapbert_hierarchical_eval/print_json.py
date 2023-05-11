@@ -15,43 +15,6 @@ def run(file):
 
     print("\n")
 
-    for i in ["('PheCode-PheCode', 'similarity')",
-              "('PheCode-PheCode', 'related')",
-              "('PheCode-RXNORM', 'related')",
-              "('RXNORM-RXNORM', 'similarity')",
-              "('RXNORM-RXNORM', 'related')",
-              "('LOINC-LOINC', 'similarity')",
-              "('PheCode-CCS', 'related')",
-              "('PheCode-LOINC', 'related')",
-              ]:
-        print(data[i])
-    print("\n")
-
-
-    for i in [
-              "('CUI-CUI', 'procedure_diagnoses')",
-              "('CUI-CUI', 'lab_diagnoses')",
-              "('CUI-CUI', 'belong(s) to the category of')",
-              "('CUI-CUI', 'is a subtype of')",
-              "('CUI-CUI', 'may cause')",
-              "('CUI-CUI', 'see also')",
-              "('CUI-CUI', 'may be allelic with')",
-              "('CUI-CUI', 'is associated with')",
-              "('CUI-CUI', 'is a risk factor for')",
-              "('CUI-CUI', 'may contraindicate')",
-              "('CUI-CUI', 'interacts with')",
-              "('CUI-CUI', 'belongs to the drug family of')",
-              "('CUI-CUI', 'is a category subset of')",
-              "('CUI-CUI', 'belongs to drug super-family')",
-              "('CUI-CUI', 'is a vector for')",
-              "('CUI-CUI', 'is an ingredient of')",
-              "('CUI-CUI', 'ddx')",
-              "('CUI-CUI', 'may be caused by')"
-              ]:
-        print(data[i])
-
-    print("\n")
-
 
     for i in [
               "(0, 1)",
@@ -65,14 +28,24 @@ def run(file):
 
     print("\n")
 
+
     for i in [
-              "cadec",
+              "classified_as",
+              "translation_of",
+              "isa",
+              "inverse_isa",
+              "mapped_from",
+              "has_member",
+              "member_of",
+              "has_translation",
+              "expanded_form_of",
+              "mapped_to",
+              "has_inactive_ingredient",
+              "inactive_ingredient_of",
+              "classifies",
+              "has_expanded_form"
               ]:
-        print(data[i][0])
-        print(data[i][1])
-        print(data[i][2])
-        print(data[i][3])
-    print("\n")
+        print(data[i])
 
     for i in [
               "example0_cos_sim",
