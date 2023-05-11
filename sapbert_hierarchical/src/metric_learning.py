@@ -62,7 +62,7 @@ class Sap_Metric_Learning(nn.Module):
         print ("loss:", self.loss)
     
     @autocast() 
-    def get_umls_ms_loss(self, query_toks1, query_toks2, labels):
+    def get_umls_ms_loss(self, query_toks1, query_toks2, labels, rela):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -85,7 +85,10 @@ class Sap_Metric_Learning(nn.Module):
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
 
         if self.sim_dim != -1:
-            query_embed = query_embed[:,:self.sim_dim]
+            if rela:
+                query_embed = query_embed[:,self.sim_dim:]
+            else:
+                query_embed = query_embed[:,:self.sim_dim]
         
         labels = torch.cat([labels, labels], dim=0)
         
@@ -97,7 +100,7 @@ class Sap_Metric_Learning(nn.Module):
 
 
     @autocast() 
-    def get_tree_ms_loss(self, query_toks1, query_toks2, dists):
+    def get_tree_ms_loss(self, query_toks1, query_toks2, dists, rela):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -119,13 +122,17 @@ class Sap_Metric_Learning(nn.Module):
             raise NotImplementedError()
 
         if self.sim_dim != -1:
-            query_embed1 = query_embed1[:,self.sim_dim:]
-            query_embed2 = query_embed2[:,self.sim_dim:]
+            if rela:
+                query_embed1 = query_embed1[:,self.sim_dim:]
+                query_embed2 = query_embed2[:,self.sim_dim:]
+            else:
+                query_embed1 = query_embed1[:,:self.sim_dim]
+                query_embed2 = query_embed2[:,:self.sim_dim]
 
         return self.tree_ms_loss(query_embed1, query_embed2, dists)
 
     @autocast() 
-    def get_umls_clogit_loss(self, query_toks1, query_toks2, labels):
+    def get_umls_clogit_loss(self, query_toks1, query_toks2, labels, rela):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -148,7 +155,10 @@ class Sap_Metric_Learning(nn.Module):
         query_embed = torch.cat([query_embed1, query_embed2], dim=0)
 
         if self.sim_dim != -1:
-            query_embed = query_embed[:,:self.sim_dim]
+            if rela:
+                query_embed = query_embed[:,self.sim_dim:]
+            else:
+                query_embed = query_embed[:,:self.sim_dim]
         
         labels = torch.cat([labels, labels], dim=0)
 
@@ -160,7 +170,7 @@ class Sap_Metric_Learning(nn.Module):
             return None
 
     @autocast() 
-    def get_tree_clogit_loss(self, query_toks1, query_toks2, dists):
+    def get_tree_clogit_loss(self, query_toks1, query_toks2, dists, rela):
         """
         query : (N, h), candidates : (N, topk, h)
 
@@ -182,9 +192,12 @@ class Sap_Metric_Learning(nn.Module):
             raise NotImplementedError()
 
         if self.sim_dim != -1:
-            query_embed1 = query_embed1[:,self.sim_dim:]
-            query_embed2 = query_embed2[:,self.sim_dim:]
-
+            if rela:
+                query_embed1 = query_embed1[:,self.sim_dim:]
+                query_embed2 = query_embed2[:,self.sim_dim:]
+            else:
+                query_embed1 = query_embed1[:,:self.sim_dim]
+                query_embed2 = query_embed2[:,:self.sim_dim]
 
         return self.clogit_loss_fn.forward_dist(query_embed1, query_embed2, dists, multi_category=True)
 
