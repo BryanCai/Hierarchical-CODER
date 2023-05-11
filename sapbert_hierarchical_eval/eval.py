@@ -246,7 +246,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         fpr, tpr, thresholds = roc_curve(case_label, case_sim)
         auc_score = auc(fpr, tpr)
         output[str(case) + "-old"] = auc_score
-        print(str(case) + "-old", output[str(case)])
+        print(str(case) + "-old", output[str(case) + "-old"])
 
 
     for i in pair_data:
