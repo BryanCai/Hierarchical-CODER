@@ -303,7 +303,6 @@ def main(args):
     init_logging()
     #init_seed(args.seed)
     print(args)
-    LOGGER.info()
     torch.manual_seed(args.random_seed)
     
     LOGGER.info("use_tree={} skip_umls={} use_clogit={} clogit_alpha={} sim_dim={} miner_type={}".format(
