@@ -92,7 +92,8 @@ def parse_args():
 
 
     parser.add_argument('--use_tree', action="store_true")
-    parser.add_argument('--skip_umls', action="store_true")
+    parser.add_argument('--use_umls', action="store_true")
+    parser.add_argument('--use_rela', action="store_true")
     parser.add_argument('--use_clogit', action="store_true")
     parser.add_argument('--clogit_alpha', default=2, type=float) 
     parser.add_argument('--sim_dim', default=-1, type=int)
@@ -199,15 +200,75 @@ def train(args, data_loader, model, scaler=None, model_wrapper=None, step_global
         if args.use_clogit:
             if args.amp:
                 with autocast():
-                    loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                    loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)  
             else:
-                loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)
+                loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)
         else:
             if args.amp:
                 with autocast():
-                    loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                    loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)  
             else:
-                loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)  
+
+
+
+
+        if args.amp:
+            scaler.scale(loss).backward()
+            scaler.step(model.optimizer)
+            scaler.update()
+        else:
+            loss.backward()
+            model.optimizer.step()
+
+        train_loss += loss.item()
+        wandb.log({"Loss": loss.item()})
+        train_steps += 1
+        step_global += 1
+        #if (i+1) % 10 == 0:
+        #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1,train_loss / (train_steps+1e-9)))
+        #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1, loss.item()))
+
+        # save model every K iterations
+        if step_global % args.checkpoint_step == 0:
+            checkpoint_dir = os.path.join(args.output_dir, "checkpoint_iter_{}".format(str(step_global)))
+            if not os.path.exists(checkpoint_dir):
+                os.makedirs(checkpoint_dir)
+            model_wrapper.save_model(checkpoint_dir)
+    train_loss /= (train_steps + 1e-9)
+    return train_loss, step_global
+
+def train_rela(args, data_loader, model, scaler=None, model_wrapper=None, step_global=0):
+    LOGGER.info("train!")
+    
+    train_loss = 0
+    train_steps = 0
+    model.cuda()
+    model.train()
+    for i, data in tqdm(enumerate(data_loader), total=len(data_loader)):
+        model.optimizer.zero_grad()
+
+        batch_x1, batch_x2, batch_y = data
+        batch_x_cuda1, batch_x_cuda2 = {},{}
+        for k,v in batch_x1.items():
+            batch_x_cuda1[k] = v.cuda()
+        for k,v in batch_x2.items():
+            batch_x_cuda2[k] = v.cuda()
+
+        batch_y_cuda = batch_y.cuda()
+
+        if args.use_clogit:
+            if args.amp:
+                with autocast():
+                    loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
+            else:
+                loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)
+        else:
+            if args.amp:
+                with autocast():
+                    loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
+            else:
+                loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
 
 
 
@@ -238,6 +299,7 @@ def train(args, data_loader, model, scaler=None, model_wrapper=None, step_global
     return train_loss, step_global
 
 
+
 def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step_global=0):
     LOGGER.info("train!")
     
@@ -262,15 +324,15 @@ def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step
             if args.use_clogit:
                 if args.amp:
                     with autocast():
-                        loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                        loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
                 else:
-                    loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)
+                    loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)
             else:
                 if args.amp:
                     with autocast():
-                        loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)  
+                        loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
                 else:
-                    loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda)
+                    loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)
 
 
             if args.amp:
@@ -305,8 +367,8 @@ def main(args):
     print(args)
     torch.manual_seed(args.random_seed)
     
-    LOGGER.info("use_tree={} skip_umls={} use_clogit={} clogit_alpha={} sim_dim={} miner_type={}".format(
-        args.use_tree,args.skip_umls,args.use_clogit,args.clogit_alpha,args.sim_dim,args.miner_type
+    LOGGER.info("use_tree={} use_umls={} use_rela={} use_clogit={} lr={} clogit_alpha={} sim_dim={} miner_type={}".format(
+        args.use_tree,args.use_umls,args.use_rela,args.use_clogit,args.learning_rate,args.clogit_alpha,args.sim_dim,args.miner_type
     ))
     LOGGER.info(args.model_dir)
     LOGGER.info(args.output_dir)
@@ -369,7 +431,7 @@ def main(args):
         query_ids = torch.tensor(list(query_id))
         return  query_encodings1, query_encodings2, query_ids
 
-    if args.pairwise:
+    if args.use_umls:
         train_set = MetricLearningDataset_pairwise(
                 path=Path(args.train_dir)/"umls.txt",
                 tokenizer = tokenizer
@@ -381,20 +443,20 @@ def main(args):
             num_workers=args.num_workers,
             collate_fn=collate_fn_batch_encoding
         )
-    else:
-        train_set = MetricLearningDataset(
-            path=args.train_dir,
-            tokenizer = tokenizer
+
+    if args.use_rela:
+        rela_set = MetricLearningDataset_pairwise(
+                path=Path(args.train_dir)/"umls_rela.txt",
+                tokenizer = tokenizer
         )
-        # using a sampler
-        train_loader = torch.utils.data.DataLoader(
-            train_set,
+        rela_loader = torch.utils.data.DataLoader(
+            rela_set,
             batch_size=args.train_batch_size,
-            #shuffle=True,
-            sampler=samplers.MPerClassSampler(train_set.query_ids,\
-                2, length_before_new_iter=100000),
-            num_workers=args.num_workers, 
-            )
+            shuffle=True,
+            num_workers=args.num_workers,
+            collate_fn=collate_fn_batch_encoding
+        )
+
 
     if args.use_tree:
         tree_loaders = {}
@@ -426,10 +488,15 @@ def main(args):
         LOGGER.info("Epoch {}/{}".format(epoch,args.epoch))
 
         # train
-        if not args.skip_umls:
+        if args.use_umls:
             train_loss, step_global = train(args, data_loader=train_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
             LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
-        
+
+
+        if args.use_rela:
+            train_loss, step_global = train_rela(args, data_loader=rela_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
+            LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
+
         if args.use_tree:
             train_loss, step_global = train_trees(args, tree_loaders=tree_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
             LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
