@@ -222,7 +222,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         output[str(case)] = auc_score
         print(case, output[str(case)])
 
-    x = read_phecode_eval(data_dir/"cui_cui_eval.txt")
+    x = read_cui_cui_eval(data_dir/"cui_cui_eval.txt")
 
     x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
 
