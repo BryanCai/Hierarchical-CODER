@@ -185,7 +185,8 @@ def get_wrapper_embed(phrase_list, model, tokenizer, device, show_progress=False
 
 def get_truncated_embed_fun(embed_fun, k):
     def f(*args, **kwargs):
-        out = embed_fun(*args, **kwargs)
-        return out[:, :k]
+        out = embed_fun(*args, **kwargs)[:, :k]
+        out /= (np.sqrt((out**2).sum(-1))[...,np.newaxis] + 1e-16)
+        return out
     return f
 
