@@ -212,57 +212,57 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
 
 
 
-    pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
+    # pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
 
 
-    x = pd.DataFrame(combinations(tree_data["PheCode"].keys(), 2), columns=["code1", "code2"])
-    x["dist"] = x.apply(lambda row: dist_PheCode(row["code1"], row["code2"]), axis=1)
+    # x = pd.DataFrame(combinations(tree_data["PheCode"].keys(), 2), columns=["code1", "code2"])
+    # x["dist"] = x.apply(lambda row: dist_PheCode(row["code1"], row["code2"]), axis=1)
 
-    x = pd.concat([x[x["dist"] == 1], x[x["dist"] == 2], x[x["dist"] == 3].sample(100000)])
-    x["term1"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code1"]])), axis=1)
-    x["term2"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code2"]])), axis=1)
+    # x = pd.concat([x[x["dist"] == 1], x[x["dist"] == 2], x[x["dist"] == 3].sample(100000)])
+    # x["term1"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code1"]])), axis=1)
+    # x["term2"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code2"]])), axis=1)
 
-    code_list = []
-    term1_list = []
-    term2_list = []
-    for i in tree_data["PheCode"]:
-        terms = list(tree_data["PheCode"][i])
-        for j in range(len(terms)//2):
-            idx = list(range(len(tree_data["PheCode"][i])))
-            random.shuffle(idx)
-            code_list.append(i)
-            term1_list.append(terms[2*j])
-            term2_list.append(terms[2*j + 1])
+    # code_list = []
+    # term1_list = []
+    # term2_list = []
+    # for i in tree_data["PheCode"]:
+    #     terms = list(tree_data["PheCode"][i])
+    #     for j in range(len(terms)//2):
+    #         idx = list(range(len(tree_data["PheCode"][i])))
+    #         random.shuffle(idx)
+    #         code_list.append(i)
+    #         term1_list.append(terms[2*j])
+    #         term2_list.append(terms[2*j + 1])
 
-    y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
-    x = pd.concat([x, y], ignore_index=True)
+    # y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
+    # x = pd.concat([x, y], ignore_index=True)
 
-    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
+    # x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
 
-    for case in combinations(range(4), 2):
-        case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
-        case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
+    # for case in combinations(range(4), 2):
+    #     case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
+    #     case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
 
-        fpr, tpr, thresholds = roc_curve(case_label, case_sim)
-        auc_score = auc(fpr, tpr)
-        output[str(case) + "-old"] = auc_score
-        print(str(case) + "-old", output[str(case) + "-old"])
+    #     fpr, tpr, thresholds = roc_curve(case_label, case_sim)
+    #     auc_score = auc(fpr, tpr)
+    #     output[str(case) + "-old"] = auc_score
+    #     print(str(case) + "-old", output[str(case) + "-old"])
 
 
-    for i in pair_data:
-        cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, device)
-        tree1, tree2 = i[0].split("-")
-        random_terms1 = random.choices(tree_terms[tree1], k=random_samples)
-        random_terms2 = random.choices(tree_terms[tree2], k=random_samples)
+    # for i in pair_data:
+    #     cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, device)
+    #     tree1, tree2 = i[0].split("-")
+    #     random_terms1 = random.choices(tree_terms[tree1], k=random_samples)
+    #     random_terms2 = random.choices(tree_terms[tree2], k=random_samples)
 
-        random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, device)
+    #     random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, device)
 
-        label = [1]*len(cos_sim) + [0]*len(random_cos_sim)
+    #     label = [1]*len(cos_sim) + [0]*len(random_cos_sim)
 
-        fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
-        output[str(i)] = auc(fpr, tpr)
+    #     fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
+    #     output[str(i)] = auc(fpr, tpr)
 
-        print(i, output[str(i)])
+    #     print(i, output[str(i)])
 
     output["cadec"] = cadec_eval(model, tokenizer, embed_fun)
 
