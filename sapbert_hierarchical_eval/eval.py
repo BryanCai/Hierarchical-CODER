@@ -169,7 +169,7 @@ def read_phecode_eval(data_path):
     eval_data = []
     for l in lines:
         lst = l.rstrip("\n").split("||")
-        eval_data.append(lst)
+        eval_data.append([int(lst[0]), lst[1], lst[2]])
 
     return pd.DataFrame(eval_data, columns=["dist", "term1", "term2"])
 
