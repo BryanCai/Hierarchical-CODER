@@ -226,20 +226,21 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
 
     x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
 
-    for relation in ["classified_as",
-                 "translation_of",
-                 "isa",
-                 "inverse_isa",
-                 "mapped_from",
-                 "has_member",
-                 "member_of",
-                 "has_translation",
-                 "expanded_form_of",
-                 "mapped_to",
-                 "has_inactive_ingredient",
-                 "inactive_ingredient_of",
-                 "classifies",
-                 "has_expanded_form"]:
+    for relation in [
+                     "classified_as",
+                     "translation_of",
+                     "isa",
+                     "inverse_isa",
+                     "mapped_from",
+                     "has_member",
+                     "member_of",
+                     "has_translation",
+                     "expanded_form_of",
+                     "mapped_to",
+                     "has_inactive_ingredient",
+                     "inactive_ingredient_of",
+                     "classifies",
+                     "has_expanded_form"]:
 
         case_label = [1]*sum(x["relation"] == relation) + [0]*sum(x["relation"] == "random")
         case_sim = x[x["relation"] == relation]["cos_sim"].tolist() + x[x["relation"] == "random"]["cos_sim"].tolist()
