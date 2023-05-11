@@ -174,6 +174,17 @@ def read_phecode_eval(data_path):
 
     return pd.DataFrame(eval_data, columns=["dist", "term1", "term2"])
 
+def read_cui_cui_eval(data_path):
+    with open(data_path, 'r') as f:
+        lines = f.readlines()
+
+    eval_data = []
+    for l in lines:
+        lst = l.rstrip("\n").split("||")
+        eval_data.append([int(lst[0]), lst[1], lst[2]])
+
+    return pd.DataFrame(eval_data, columns=["term1", "term2", "relation"])
+
 
 def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device):
     embed1 = embed_fun(string_list1, model, tokenizer, device, normalize=True)
@@ -211,7 +222,32 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         output[str(case)] = auc_score
         print(case, output[str(case)])
 
+    x = read_phecode_eval(data_dir/"cui_cui_eval.txt")
 
+    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
+
+    for relation in ["classified_as",
+                 "translation_of",
+                 "isa",
+                 "inverse_isa",
+                 "mapped_from",
+                 "has_member",
+                 "member_of",
+                 "has_translation",
+                 "expanded_form_of",
+                 "mapped_to",
+                 "has_inactive_ingredient",
+                 "inactive_ingredient_of",
+                 "classifies",
+                 "has_expanded_form"]:
+
+        case_label = [1]*sum(x["relation"] == relation) + [0]*sum(x["relation"] == "random")
+        case_sim = x[x["relation"] == relation]["cos_sim"].tolist() + x[x["relation"] == "random"]["cos_sim"].tolist()
+
+        fpr, tpr, thresholds = roc_curve(case_label, case_sim)
+        auc_score = auc(fpr, tpr)
+        output[relation] = auc_score
+        print(relation, output[relation])
 
     # pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
 
