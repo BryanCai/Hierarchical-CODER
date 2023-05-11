@@ -99,6 +99,7 @@ def parse_args():
     parser.add_argument('--sim_dim', default=-1, type=int)
     parser.add_argument('--num_workers', default=16, type=int) 
     parser.add_argument('--miner_type', default="triplet", type=str) 
+    parser.add_argument('--freeze_all_but_last', action="store_true")
 
     args = parser.parse_args()
     return args
@@ -367,8 +368,8 @@ def main(args):
     print(args)
     torch.manual_seed(args.random_seed)
     
-    LOGGER.info("use_tree={} use_umls={} use_rela={} use_clogit={} lr={} clogit_alpha={} sim_dim={} miner_type={}".format(
-        args.use_tree,args.use_umls,args.use_rela,args.use_clogit,args.learning_rate,args.clogit_alpha,args.sim_dim,args.miner_type
+    LOGGER.info("use_tree={} use_umls={} use_rela={} use_clogit={} lr={} clogit_alpha={} sim_dim={} miner_type={}, freeze_all_but_last={}".format(
+        args.use_tree,args.use_umls,args.use_rela,args.use_clogit,args.learning_rate,args.clogit_alpha,args.sim_dim,args.miner_type,args.freeze_all_but_last
     ))
     LOGGER.info(args.model_dir)
     LOGGER.info(args.output_dir)
@@ -479,6 +480,16 @@ def main(args):
         scaler = GradScaler()
     else:
         scaler = None
+
+
+    if args.freeze_all_but_last:
+        for name, param in model.encoder.named_parameters():
+            if name.startswith("encoder.layer"):
+                if name.startswith("encoder.layer.11"):
+                    pass
+                else:
+                    param.requires_grad = False
+
 
     start = time.time()
     step_global = 0
