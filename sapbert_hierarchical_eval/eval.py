@@ -370,10 +370,13 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/final",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/clogit_01_triplet_umls_full_tree_lr_6/final",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/triplet_umls_100_tree_lr_7_lr_6/final",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/triplet_umls_full_tree_lr_6_lr_6/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_full_lr_6/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_100_lr_6/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/final",
@@ -390,7 +393,10 @@ if __name__ == '__main__':
                           (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
                           (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
@@ -404,10 +410,13 @@ if __name__ == '__main__':
                           ]
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/clogit_01_triplet_umls_full_tree_lr_6/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/triplet_umls_100_tree_lr_7_lr_6/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/triplet_umls_full_tree_lr_6_lr_6/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_full_lr_6/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_100_lr_6/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/output_0.json",
