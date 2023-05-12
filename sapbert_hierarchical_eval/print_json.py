@@ -90,10 +90,13 @@ def run(file):
 if __name__ == '__main__':
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/clogit_01_triplet_umls_full_tree_lr_6/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/triplet_umls_100_tree_lr_7_lr_6/output_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft_ft/triplet_umls_full_tree_lr_6_lr_6/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze/output_0.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_full_lr_6/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_100_lr_6/output_0.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/output_0.json",
