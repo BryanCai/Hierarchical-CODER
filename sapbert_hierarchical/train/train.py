@@ -6,6 +6,7 @@ import torch.optim as optim
 from torch.cuda.amp import autocast 
 from torch.cuda.amp import GradScaler
 from pytorch_metric_learning import samplers
+import torch.optim as optim
 import logging
 import time
 import pdb
@@ -195,6 +196,9 @@ def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_globa
         total_length += len(data_loaders[dataset])
         data_iterators[dataset] = iter(data_loaders[dataset])
 
+    scheduler = optim.lr_scheduler.PolynomialLR(model.optimizer, total_iters=total_length)
+
+
     pbar = tqdm(total=total_length)
     for i in range(max_length):
         model.optimizer.zero_grad()
@@ -252,6 +256,7 @@ def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_globa
                 loss.backward()
                 model.optimizer.step()
 
+            scheduler.step()
             train_loss += loss.item()
             wandb.log({"Loss": loss.item()})
             train_steps += 1
