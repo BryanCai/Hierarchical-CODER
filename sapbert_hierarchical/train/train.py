@@ -188,20 +188,22 @@ def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_globa
     model.train()
 
     max_length = 0
+    total_length = 0
     data_iterators = {}
     for dataset in data_loaders:
         max_length = max(max_length, len(data_loaders[dataset]))
+        total_length += len(data_loaders[dataset])
         data_iterators[dataset] = iter(data_loaders[dataset])
 
-    for i in tqdm(range(max_length)):
+    pbar = tqdm(total=total_length)
+    for i in range(max_length):
         model.optimizer.zero_grad()
-
 
         for dataset in data_iterators:
             data = next(data_iterators[dataset], None)
             if data is None:
                 continue
-
+            pbar.update(1)
             batch_x1, batch_x2, batch_y = data
             batch_x_cuda1, batch_x_cuda2 = {},{}
             for k,v in batch_x1.items():
@@ -264,7 +266,7 @@ def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_globa
                 if not os.path.exists(checkpoint_dir):
                     os.makedirs(checkpoint_dir)
                 model_wrapper.save_model(checkpoint_dir)
-
+    pbar.close()
     train_loss /= (train_steps + 1e-9)
     return train_loss, step_global
 
