@@ -179,138 +179,27 @@ def load_queries_pretraining(data_dir, filter_duplicate):
     
     return dataset.data
 
-def train(args, data_loader, model, scaler=None, model_wrapper=None, step_global=0):
+def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_global=0):
     LOGGER.info("train!")
     
     train_loss = 0
     train_steps = 0
     model.cuda()
     model.train()
-    for i, data in tqdm(enumerate(data_loader), total=len(data_loader)):
+
+    max_length = 0
+    for dataset in data_loaders:
+        max_length = max(max_length, len(data_loaders[dataset]))
+
+
+    for i in tqdm(range(max_length)):
         model.optimizer.zero_grad()
 
-        batch_x1, batch_x2, batch_y = data
-        batch_x_cuda1, batch_x_cuda2 = {},{}
-        for k,v in batch_x1.items():
-            batch_x_cuda1[k] = v.cuda()
-        for k,v in batch_x2.items():
-            batch_x_cuda2[k] = v.cuda()
 
-        batch_y_cuda = batch_y.cuda()
-
-        if args.use_clogit:
-            if args.amp:
-                with autocast():
-                    loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)  
-            else:
-                loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)
-        else:
-            if args.amp:
-                with autocast():
-                    loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)  
-            else:
-                loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=False)  
-
-
-
-
-        if args.amp:
-            scaler.scale(loss).backward()
-            scaler.step(model.optimizer)
-            scaler.update()
-        else:
-            loss.backward()
-            model.optimizer.step()
-
-        train_loss += loss.item()
-        wandb.log({"Loss": loss.item()})
-        train_steps += 1
-        step_global += 1
-        #if (i+1) % 10 == 0:
-        #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1,train_loss / (train_steps+1e-9)))
-        #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1, loss.item()))
-
-        # save model every K iterations
-        if step_global % args.checkpoint_step == 0:
-            checkpoint_dir = os.path.join(args.output_dir, "checkpoint_iter_{}".format(str(step_global)))
-            if not os.path.exists(checkpoint_dir):
-                os.makedirs(checkpoint_dir)
-            model_wrapper.save_model(checkpoint_dir)
-    train_loss /= (train_steps + 1e-9)
-    return train_loss, step_global
-
-def train_rela(args, data_loader, model, scaler=None, model_wrapper=None, step_global=0):
-    LOGGER.info("train!")
-    
-    train_loss = 0
-    train_steps = 0
-    model.cuda()
-    model.train()
-    for i, data in tqdm(enumerate(data_loader), total=len(data_loader)):
-        model.optimizer.zero_grad()
-
-        batch_x1, batch_x2, batch_y = data
-        batch_x_cuda1, batch_x_cuda2 = {},{}
-        for k,v in batch_x1.items():
-            batch_x_cuda1[k] = v.cuda()
-        for k,v in batch_x2.items():
-            batch_x_cuda2[k] = v.cuda()
-
-        batch_y_cuda = batch_y.cuda()
-
-        if args.use_clogit:
-            if args.amp:
-                with autocast():
-                    loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
-            else:
-                loss = model.get_umls_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)
-        else:
-            if args.amp:
-                with autocast():
-                    loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
-            else:
-                loss = model.get_umls_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
-
-
-
-
-        if args.amp:
-            scaler.scale(loss).backward()
-            scaler.step(model.optimizer)
-            scaler.update()
-        else:
-            loss.backward()
-            model.optimizer.step()
-
-        train_loss += loss.item()
-        wandb.log({"Loss": loss.item()})
-        train_steps += 1
-        step_global += 1
-        #if (i+1) % 10 == 0:
-        #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1,train_loss / (train_steps+1e-9)))
-        #LOGGER.info ("epoch: {} loss: {:.3f}".format(i+1, loss.item()))
-
-        # save model every K iterations
-        if step_global % args.checkpoint_step == 0:
-            checkpoint_dir = os.path.join(args.output_dir, "checkpoint_iter_{}".format(str(step_global)))
-            if not os.path.exists(checkpoint_dir):
-                os.makedirs(checkpoint_dir)
-            model_wrapper.save_model(checkpoint_dir)
-    train_loss /= (train_steps + 1e-9)
-    return train_loss, step_global
-
-
-
-def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step_global=0):
-    LOGGER.info("train!")
-    
-    train_loss = 0
-    train_steps = 0
-    model.cuda()
-    model.train()
-    for tree in tree_loaders:
-        for i, data in tqdm(enumerate(tree_loaders[tree]), total=len(tree_loaders[tree])):
-            model.optimizer.zero_grad()
+        for dataset in data_loaders:
+            if i > len(data_loaders[dataset]):
+                continue
+            data = data_loaders[dataset][i]
 
             batch_x1, batch_x2, batch_y = data
             batch_x_cuda1, batch_x_cuda2 = {},{}
@@ -320,21 +209,37 @@ def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step
                 batch_x_cuda2[k] = v.cuda()
 
             batch_y_cuda = batch_y.cuda()
-        
 
-            if args.use_clogit:
-                if args.amp:
-                    with autocast():
-                        loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
+            if dataset == "umls":
+                rela = False
+                if args.use_clogit:
+                    loss_fun = model.get_umls_clogit_loss
                 else:
-                    loss = model.get_tree_clogit_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)
+                    loss_fun = model.get_umls_ms_loss
+
+            elif dataset == "rela":
+                rela = True
+                if args.use_clogit:
+                    loss_fun = model.get_umls_clogit_loss
+                else:
+                    loss_fun = model.get_umls_ms_loss
+
+            elif dataset in ["cpt", "loinc", "phecode", "rxnorm"]:
+                rela = True
+                if args.use_clogit:
+                    loss_fun = model.get_tree_clogit_loss
+                else:
+                    loss_fun = model.get_tree_ms_loss
             else:
-                if args.amp:
-                    with autocast():
-                        loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)  
-                else:
-                    loss = model.get_tree_ms_loss(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=True)
+                raise Exception("Unknown dataset")
 
+
+            if args.amp:
+                with autocast():
+                    loss = loss_fun(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=rela)  
+            else:
+                loss = loss_fun(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=rela)
+           
 
             if args.amp:
                 scaler.scale(loss).backward()
@@ -358,6 +263,7 @@ def train_trees(args, tree_loaders, model, scaler=None, model_wrapper=None, step
                 if not os.path.exists(checkpoint_dir):
                     os.makedirs(checkpoint_dir)
                 model_wrapper.save_model(checkpoint_dir)
+
     train_loss /= (train_steps + 1e-9)
     return train_loss, step_global
 
@@ -432,12 +338,14 @@ def main(args):
         query_ids = torch.tensor(list(query_id))
         return  query_encodings1, query_encodings2, query_ids
 
+    data_loaders = {}
+
     if args.use_umls:
         train_set = MetricLearningDataset_pairwise(
                 path=Path(args.train_dir)/"umls.txt",
                 tokenizer = tokenizer
         )
-        train_loader = torch.utils.data.DataLoader(
+        data_loaders["umls"] = torch.utils.data.DataLoader(
             train_set,
             batch_size=args.train_batch_size,
             shuffle=True,
@@ -450,7 +358,7 @@ def main(args):
                 path=Path(args.train_dir)/"umls_rela.txt",
                 tokenizer = tokenizer
         )
-        rela_loader = torch.utils.data.DataLoader(
+        data_loaders["rela"] = torch.utils.data.DataLoader(
             rela_set,
             batch_size=args.train_batch_size,
             shuffle=True,
@@ -466,7 +374,7 @@ def main(args):
                 path=Path(args.train_dir)/(tree+".txt"),
                 tokenizer = tokenizer
             )
-            tree_loaders[tree] = torch.utils.data.DataLoader(
+            data_loaders[tree] = torch.utils.data.DataLoader(
                 tree_set,
                 batch_size=args.train_batch_size,
                 shuffle=True,
@@ -499,18 +407,9 @@ def main(args):
         LOGGER.info("Epoch {}/{}".format(epoch,args.epoch))
 
         # train
-        if args.use_umls:
-            train_loss, step_global = train(args, data_loader=train_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
-            LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
+        train_loss, step_global = train(args, data_loaders=data_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
+        LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
 
-
-        if args.use_rela:
-            train_loss, step_global = train_rela(args, data_loader=rela_loader, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
-            LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
-
-        if args.use_tree:
-            train_loss, step_global = train_trees(args, tree_loaders=tree_loaders, model=model, scaler=scaler, model_wrapper=model_wrapper, step_global=step_global)
-            LOGGER.info('loss/train_per_epoch={}/{}'.format(train_loss,epoch))
 
         # save model every epoch
         if args.save_checkpoint_all:
