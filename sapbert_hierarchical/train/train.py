@@ -218,21 +218,21 @@ def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_globa
             batch_y_cuda = batch_y.cuda()
 
             if dataset == "umls":
-                rela = False
+                sim = True
                 if args.use_clogit:
                     loss_fun = model.get_umls_clogit_loss
                 else:
                     loss_fun = model.get_umls_ms_loss
 
             elif dataset == "rela":
-                rela = True
+                sim = False
                 if args.use_clogit:
                     loss_fun = model.get_umls_clogit_loss
                 else:
                     loss_fun = model.get_umls_ms_loss
 
             elif dataset in ["cpt", "loinc", "phecode", "rxnorm"]:
-                rela = True
+                sim = False
                 if args.use_clogit:
                     loss_fun = model.get_tree_clogit_loss
                 else:
@@ -243,9 +243,9 @@ def train(args, data_loaders, model, scaler=None, model_wrapper=None, step_globa
 
             if args.amp:
                 with autocast():
-                    loss = loss_fun(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=rela)  
+                    loss = loss_fun(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, sim=sim)  
             else:
-                loss = loss_fun(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, rela=rela)
+                loss = loss_fun(batch_x_cuda1, batch_x_cuda2, batch_y_cuda, sim=sim)
            
 
             if args.amp:
