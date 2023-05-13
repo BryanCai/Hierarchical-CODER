@@ -75,7 +75,8 @@ def run(file):
               ]:
         print(data[i])
 
-        
+    print("\n")
+
 
     for i in [
               "example0_cos_sim",
