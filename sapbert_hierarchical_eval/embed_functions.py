@@ -66,7 +66,7 @@ def get_biogpt_embed(phrase_list, model, tokenizer, device, show_progress=False,
             input_gpu_0 = torch.LongTensor(input_ids[now_count:min(
                 now_count + batch_size, count)]).to(device)
             if summary_method == "CLS":
-                embed = model(input_gpu_0, output_hidden_states=True).hidden_states[-1][:,0,:]
+                embed = model(input_gpu_0, output_hidden_states=True).hidden_states[-1][:,-1,:]
             if summary_method == "MEAN":
                 embed = torch.mean(model(input_gpu_0, output_hidden_states=True).hidden_states[-1], dim=1)
             if normalize:
