@@ -232,7 +232,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
                      'DDX'
                      ]
                      
-    x = x[x["relation"] in relation_list]
+    x = x[x["relation"].isin(relation_list + ["random"])]
 
     x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
 
