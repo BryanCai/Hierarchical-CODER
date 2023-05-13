@@ -31,6 +31,19 @@ def run(file):
 
 
     for i in [
+              'ALL_CAUSITIVE',
+              'ALL_MAY_CAUSE_OR_TREAT',
+              'method_of',
+              'classifies',
+              'DDX'
+              ]:
+        print(data[i])
+
+    print("\n")
+
+
+
+    for i in [
               'component_of',
               'classified_as',
               'finding_site_of',
@@ -64,6 +77,7 @@ def run(file):
 
     print("\n")
 
+
     for i in [
               "example0_cos_sim",
               "example1_cos_sim",
@@ -90,21 +104,28 @@ def run(file):
 if __name__ == '__main__':
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_8_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/output_0.json",
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/output.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_01_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_10_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_1_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_full/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output.json",
+                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/pubmedbert.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert.json",
                         ]
 
     for i in output_path_list:

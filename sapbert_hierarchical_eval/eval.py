@@ -224,9 +224,12 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
 
     x = read_cui_cui_eval(data_dir/"cui_cui_eval.txt")
 
-    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
-
-    for relation in [
+    relation_list = [
+                     'ALL_CAUSITIVE',
+                     'ALL_MAY_CAUSE_OR_TREAT',
+                     'method_of',
+                     'classifies',
+                     'DDX',
                      'component_of',
                      'classified_as',
                      'finding_site_of',
@@ -255,7 +258,13 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
                      'has_class',
                      'has_expanded_form',
                      'class_of'
-                     ]:
+                     ]
+                     
+    x = x[x["relation"].isin(relation_list + ["random"])]
+
+    x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
+
+    for relation in relation_list:
 
         case_label = [1]*sum(x["relation"] == relation) + [0]*sum(x["relation"] == "random")
         case_sim = x[x["relation"] == relation]["cos_sim"].tolist() + x[x["relation"] == "random"]["cos_sim"].tolist()
@@ -265,57 +274,6 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         output[relation] = auc_score
         print(relation, output[relation])
 
-    # pair_data, tree_terms, tree_data = read_relation_pairs(data_dir/"AllRelationPairs.csv", tree_dir)
-
-
-    # x = pd.DataFrame(combinations(tree_data["PheCode"].keys(), 2), columns=["code1", "code2"])
-    # x["dist"] = x.apply(lambda row: dist_PheCode(row["code1"], row["code2"]), axis=1)
-
-    # x = pd.concat([x[x["dist"] == 1], x[x["dist"] == 2], x[x["dist"] == 3].sample(100000)])
-    # x["term1"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code1"]])), axis=1)
-    # x["term2"] = x.apply(lambda row: random.choice(list(tree_data["PheCode"][row["code2"]])), axis=1)
-
-    # code_list = []
-    # term1_list = []
-    # term2_list = []
-    # for i in tree_data["PheCode"]:
-    #     terms = list(tree_data["PheCode"][i])
-    #     for j in range(len(terms)//2):
-    #         idx = list(range(len(tree_data["PheCode"][i])))
-    #         random.shuffle(idx)
-    #         code_list.append(i)
-    #         term1_list.append(terms[2*j])
-    #         term2_list.append(terms[2*j + 1])
-
-    # y = pd.DataFrame({"dist": [0]*len(code_list), "code1": code_list, "code2": code_list, "term1": term1_list, "term2": term2_list})
-    # x = pd.concat([x, y], ignore_index=True)
-
-    # x["cos_sim"] = get_cos_sim(embed_fun, x["term1"].tolist(), x["term2"].tolist(), model, tokenizer, device)
-
-    # for case in combinations(range(4), 2):
-    #     case_label = [1]*sum(x["dist"] == case[0]) + [0]*sum(x["dist"] == case[1])
-    #     case_sim = x[x["dist"] == case[0]]["cos_sim"].tolist() + x[x["dist"] == case[1]]["cos_sim"].tolist()
-
-    #     fpr, tpr, thresholds = roc_curve(case_label, case_sim)
-    #     auc_score = auc(fpr, tpr)
-    #     output[str(case) + "-old"] = auc_score
-    #     print(str(case) + "-old", output[str(case) + "-old"])
-
-
-    # for i in pair_data:
-    #     cos_sim = get_cos_sim(embed_fun, pair_data[i]["string1"], pair_data[i]["string2"], model, tokenizer, device)
-    #     tree1, tree2 = i[0].split("-")
-    #     random_terms1 = random.choices(tree_terms[tree1], k=random_samples)
-    #     random_terms2 = random.choices(tree_terms[tree2], k=random_samples)
-
-    #     random_cos_sim = get_cos_sim(embed_fun, random_terms1, random_terms2, model, tokenizer, device)
-
-    #     label = [1]*len(cos_sim) + [0]*len(random_cos_sim)
-
-    #     fpr, tpr, thresholds = roc_curve(label, cos_sim + random_cos_sim)
-    #     output[str(i)] = auc(fpr, tpr)
-
-    #     print(i, output[str(i)])
 
     output["cadec"] = cadec_eval(model, tokenizer, embed_fun)
 
@@ -370,18 +328,25 @@ if __name__ == '__main__':
 
 
     model_name_or_path_list = [
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze_decay/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_decay/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze_decay/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_8_decay/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/final",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/final",
+                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_01_triplet_umls_full_lr_5/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_10_triplet_umls_full_lr_5/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_1_triplet_umls_full_lr_5/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_full/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
+                               # # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/final",
                                # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
                                # "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
                                # "GanjinZero/UMLSBert_ENG",
+                               # "microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract",
                                # "monologg/biobert_v1.1_pubmed",
                                # "microsoft/biogpt",
                                # "distilbert-base-uncased",
@@ -389,16 +354,23 @@ if __name__ == '__main__':
 
     util_function_list = [
                           (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
-                          (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
-                          (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_bert, get_bert_embed),
                           # (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
+                          # (load_model_and_tokenizer, get_bert_embed),
                           # (load_model_and_tokenizer, get_bert_embed),
                           # (load_model_and_tokenizer, get_bert_embed),
                           # (load_model_and_tokenizer_biogpt, get_biogpt_embed),
@@ -406,21 +378,28 @@ if __name__ == '__main__':
                           ]
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_full_lr_6_tree_freeze_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_7_freeze_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_full_tree_lr_8_decay/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/triplet_umls_100_tree_lr_7/output_0.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_ft/clogit_01_triplet_umls_100_lr_6_tree/output_0.json",
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert_0.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/output.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_01_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_10_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_1_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_full/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output.json",
+                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/pubmedbert.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
