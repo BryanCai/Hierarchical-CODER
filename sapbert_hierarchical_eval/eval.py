@@ -336,11 +336,11 @@ if __name__ == '__main__':
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/final",
                                # "/home/tc24/BryanWork/saved_models/output_coder_base/model_300000.pth",
-                               "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
-                               "GanjinZero/UMLSBert_ENG",
-                               "monologg/biobert_v1.1_pubmed",
+                               # "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+                               # "GanjinZero/UMLSBert_ENG",
+                               # "monologg/biobert_v1.1_pubmed",
                                "microsoft/biogpt",
-                               "distilbert-base-uncased",
+                               # "distilbert-base-uncased",
                                ]
 
     util_function_list = [
@@ -352,11 +352,11 @@ if __name__ == '__main__':
                           # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_bert, get_bert_embed),
-                          (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
-                          (load_model_and_tokenizer, get_bert_embed),
-                          (load_model_and_tokenizer, get_bert_embed),
+                          # (load_model_and_tokenizer_SapBERT, get_sapbert_embed),
+                          # (load_model_and_tokenizer, get_bert_embed),
+                          # (load_model_and_tokenizer, get_bert_embed),
                           (load_model_and_tokenizer_biogpt, get_biogpt_embed),
-                          (load_model_and_tokenizer, get_distilbert_embed),
+                          # (load_model_and_tokenizer, get_distilbert_embed),
                           ]
 
     output_path_list = [
@@ -368,11 +368,11 @@ if __name__ == '__main__':
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output_100.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output.json",
                         # "/home/tc24/BryanWork/saved_models/output_coder_base/output.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1.json",
                         "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt.json",
-                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert.json",
+                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert.json",
                         ]
 
     for i in range(len(model_name_or_path_list)):
