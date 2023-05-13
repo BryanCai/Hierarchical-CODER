@@ -225,6 +225,11 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
     x = read_cui_cui_eval(data_dir/"cui_cui_eval.txt")
 
     relation_list = [
+                     'ALL_CAUSITIVE',
+                     'ALL_MAY_CAUSE_OR_TREAT',
+                     'method_of',
+                     'classifies',
+                     'DDX',
                      'component_of',
                      'classified_as',
                      'finding_site_of',
@@ -252,12 +257,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
                      'has_active_moiety',
                      'has_class',
                      'has_expanded_form',
-                     'class_of',
-                     'ALL_CAUSITIVE',
-                     'ALL_MAY_CAUSE_OR_TREAT',
-                     'method_of',
-                     'classifies',
-                     'DDX'
+                     'class_of'
                      ]
                      
     x = x[x["relation"].isin(relation_list + ["random"])]
