@@ -106,14 +106,17 @@ if __name__ == '__main__':
     output_path_list = [
                         "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/output.json",
                         "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/output.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_100.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output.json",
                         "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/output.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output_100.json",
                         "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_100_lr_6/output.json",
-                        # "/home/tc24/BryanWork/saved_models/output_coder_base/output_300000_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/sapbert_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/coder_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biobert1_1_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/biogpt_0.json",
-                        # "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/distilbert_0.json",
+                        "/home/tc24/BryanWork/saved_models/output_coder_base/output.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/output.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/output.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/output.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/output.json",
+                        "/home/tc24/BryanWork/CODER/unified_eval/fixed_model_eval/output.json",
                         ]
 
     for i in output_path_list:
