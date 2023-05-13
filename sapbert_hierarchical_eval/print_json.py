@@ -41,6 +41,42 @@ def run(file):
 
     print("\n")
 
+
+
+    for i in [
+              'component_of',
+              'classified_as',
+              'finding_site_of',
+              'translation_of',
+              'isa',
+              'subset_includes_concept',
+              'inverse_isa',
+              'has_ingredient',
+              'concept_in_subset',
+              'mapped_from',
+              'has_member',
+              'member_of',
+              'has_translation',
+              'expanded_form_of',
+              'mapped_to',
+              'has_inactive_ingredient',
+              'ingredient_of',
+              'inactive_ingredient_of',
+              'has_finding_site',
+              'classifies',
+              'active_moiety_of',
+              'has_component',
+              'has_active_ingredient',
+              'active_ingredient_of',
+              'has_active_moiety',
+              'has_class',
+              'has_expanded_form',
+              'class_of'
+              ]:
+        print(data[i])
+
+        
+
     for i in [
               "example0_cos_sim",
               "example1_cos_sim",
