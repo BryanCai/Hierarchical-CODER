@@ -348,9 +348,9 @@ if __name__ == '__main__':
                                ]
 
     util_function_list = [
-                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
-                          # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
+                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          (load_model_and_tokenizer_wrapper, get_wrapper_embed),
+                          (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_wrapper, get_wrapper_embed),
                           # (load_model_and_tokenizer_wrapper, get_truncated_embed_fun(get_wrapper_embed, 100)),
