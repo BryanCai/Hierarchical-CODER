@@ -104,9 +104,11 @@ def run(file):
 if __name__ == '__main__':
 
     output_path_list = [
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_01_triplet_umls_full_lr_5/output.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_10_triplet_umls_full_lr_5/output.json",
-                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_1_triplet_umls_full_lr_5/output.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/output.json",
+                        "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_100/output_100.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_01_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_10_triplet_umls_full_lr_5/output.json",
+                        # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical_clogit/alpha_1_triplet_umls_full_lr_5/output.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_full/output.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output.json",
                         # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/output_100.json",
