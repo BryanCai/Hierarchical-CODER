@@ -26,8 +26,8 @@ def run(file):
                 "(2, 3)",
                 ]:
           print(data[i][j])
-
-    print("\n")
+          
+      print("\n")
 
 
     for j in (0, 1, 2):
