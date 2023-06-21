@@ -198,7 +198,7 @@ def get_scores(label, score):
     roc_auc_score = auc(fpr, tpr)
 
     precision, recall, thresholds = precision_recall_curve(label, score)
-    precision_recall_auc_score = auc(precision, recall)
+    precision_recall_auc_score = auc(recall, precision)
 
     mcc = matthews_corrcoef(label, score)
 
