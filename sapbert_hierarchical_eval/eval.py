@@ -200,9 +200,9 @@ def get_scores(label, score):
     precision, recall, thresholds = precision_recall_curve(label, score)
     precision_recall_auc_score = auc(recall, precision)
 
-    mcc = matthews_corrcoef(label, score)
+    # mcc = matthews_corrcoef(label, score)
 
-    return (roc_auc_score, precision_recall_auc_score, mcc)
+    return (roc_auc_score, precision_recall_auc_score)
 
 
 def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir, device, random_samples):
