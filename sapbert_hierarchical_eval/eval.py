@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 from tqdm import tqdm
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, pearsonr
 from sklearn.metrics import roc_curve, precision_recall_curve, matthews_corrcoef, auc
 from cadec_eval import cadec_eval
 from load_trees import TREE
@@ -202,7 +202,11 @@ def get_scores(label, score):
 
     # mcc = matthews_corrcoef(label, score)
 
+    pearson_score = spearmanr(label, score).statistic
+
     return (roc_auc_score, precision_recall_auc_score)
+
+
 
 
 def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir, device, random_samples):
@@ -216,7 +220,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         data = read_rank_csv(data_dir/f)
         cos_sim = get_cos_sim(embed_fun, data["string1"], data["string2"], model, tokenizer, device)
 
-        output[str(f)] = spearmanr(cos_sim, data["score"])[0]
+        output[str(f)] = spearmanr(cos_sim, data["score"]).statistic
         print(f, output[str(f)])
 
 
