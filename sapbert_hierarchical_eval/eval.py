@@ -202,9 +202,9 @@ def get_scores(label, score):
 
     # mcc = matthews_corrcoef(label, score)
 
-    pearson_score = spearmanr(label, score).statistic
+    spearman_score = spearmanr(label, score).statistic
 
-    return (roc_auc_score, precision_recall_auc_score)
+    return (roc_auc_score, precision_recall_auc_score, spearman_score)
 
 
 
