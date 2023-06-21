@@ -16,6 +16,7 @@ import time
 from collections import Counter
 import csv
 import re
+import matplotlib.pyplot as plt
 
 from embed_functions import (
     get_bert_embed,
@@ -193,12 +194,18 @@ def get_cos_sim(embed_fun, string_list1, string_list2, model, tokenizer, device)
 
 
 
-def get_scores(label, score):
+def get_scores(label, score, save_file=None):
     fpr, tpr, thresholds = roc_curve(label, score)
     roc_auc_score = auc(fpr, tpr)
 
     precision, recall, thresholds = precision_recall_curve(label, score)
     precision_recall_auc_score = auc(recall, precision)
+
+    if save_file is not None:
+        plt.plot(recall,precision)
+        plt.ylabel('Precision')
+        plt.xlabel('Recall')
+        plt.savefig(save_file)
 
     # mcc = matthews_corrcoef(label, score)
 
@@ -238,7 +245,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         # output[str(case)] = auc_score
         # print(case, output[str(case)])
 
-        scores = get_scores(case_label, case_sim)
+        scores = get_scores(case_label, case_sim, save_file="./plots/" + str(case) + ".pdf")
         output[str(case)] = scores
         print(case, output[str(case)])
 
@@ -294,7 +301,7 @@ def run_many(model_name_or_path, util_function, output_path, data_dir, tree_dir,
         # output[relation] = auc_score
         # print(relation, output[relation])
 
-        scores = get_scores(case_label, case_sim)
+        scores = get_scores(case_label, case_sim, save_file="./plots/" + str(case) + ".pdf")
         output[relation] = scores
         print(relation, output[relation])
 
