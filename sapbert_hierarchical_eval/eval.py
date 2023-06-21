@@ -203,9 +203,12 @@ def get_scores(label, score, save_file=None):
 
     if save_file is not None:
         plt.plot(recall,precision)
+        plt.xlim([0, 1])
+        plt.ylim([0, 1])
         plt.ylabel('Precision')
         plt.xlabel('Recall')
         plt.savefig(save_file)
+        plt.clf()
 
     # mcc = matthews_corrcoef(label, score)
 
