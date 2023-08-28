@@ -371,7 +371,7 @@ if __name__ == '__main__':
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_full/final",
-                               "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/final",
+                               # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_full/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/triplet_umls_rela_tree_100/final",
                                # "/home/tc24/BryanWork/saved_models/sapbert_hierarchical/clogit_01_triplet_umls_rela_tree_full_lr_6/final",
