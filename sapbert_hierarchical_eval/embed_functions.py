@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 
-def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
+def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="MEAN", normalize=True):
     model = model.to(device)
     input_ids = []
     for phrase in phrase_list:
@@ -46,7 +46,7 @@ def get_bert_embed(phrase_list, model, tokenizer, device, show_progress=False, b
     del output
     return np.concatenate(output_list, axis=0)
 
-def get_biogpt_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
+def get_biogpt_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="MEAN", normalize=True):
     model = model.to(device)
     input_ids = []
     for phrase in phrase_list:
@@ -132,7 +132,7 @@ def get_sapbert_embed(phrase_list, model, tokenizer, device, show_progress=False
     
     return dense_embeds
 
-def get_distilbert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="CLS", normalize=True):
+def get_distilbert_embed(phrase_list, model, tokenizer, device, show_progress=False, batch_size = 64, summary_method="MEAN", normalize=True):
     model = model.to(device)
     input_ids = []
     for phrase in phrase_list:
